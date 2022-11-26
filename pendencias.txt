@@ -1,0 +1,8 @@
+Signatario
+    SignatarioNome
+    SignatarioEmail
+    SignatarioModoDeAutenticacao
+
+Documento
+    DocumentoNome
+DocumentoBase64
