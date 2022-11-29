@@ -5,6 +5,9 @@ const AutenticacaoLocal = require("./Consultas/Autenticacao/AutenticacaoLocal");
 const Assinatura = require("./Utils/Assinatura");
 const crypto = require("crypto");
 
+rotas.get("/GerarParDeChaves", Assinatura.GerarParDeChaves);
+rotas.post("/RecuperarHash", Assinatura.RecuperarHash);
+
 rotas.post("/documento", 
     CriarRegistro.Documento, 
     CriarRegistro.Signatario, 
