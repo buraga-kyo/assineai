@@ -72,6 +72,10 @@ exports.GerarParDeChaves = (req,res) => {
     res.send({ChavePrivada, ChavePublica})
 }
 
+exports.GerarHash = () => {
+    
+}
+
 exports.Assinar = ({ body }, res, ProximaFuncao) => {
 
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
