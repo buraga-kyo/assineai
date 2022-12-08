@@ -1,11 +1,11 @@
 const formidable = require('formidable');
 const fs = require('fs');
 
-function zenps (req) {
+module.exports = async function ConverterPDFParaBase64 (req) {
     const form = new formidable.IncomingForm();
-    form.parse(req, (err, fields, {file}) => {
-        return fs.readFileSync(file.filepath).toString("base64");
+    return new Promise((resolve, reject) => {
+        form.parse(req, (err, fields, {file}) => {
+            resolve(fs.readFileSync(file.filepath).toString("base64"));
+        })
     })
 }
-
-export default zenps

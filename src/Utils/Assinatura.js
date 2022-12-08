@@ -72,8 +72,23 @@ exports.GerarParDeChaves = (req,res) => {
     res.send({ChavePrivada, ChavePublica})
 }
 
-exports.GerarHash = () => {
-    
+exports.AssinarPDF = (ArrayUint8, base64ChavePrivada) => {
+    // const Hash = crypto.createHash('SHA256').update(ArrayUint8).digest('hex');
+
+    ChavePrivada = crypto.createPrivateKey({
+        key: Buffer.from(base64ChavePrivada, 'base64'),
+        type: 'pkcs8',
+        format: 'der',
+    })
+
+    const Hash = crypto.createSign('SHA256').update(ArrayUint8).end()
+    const Assinatura = Hash.sign(ChavePrivada)
+
+    return Assinatura.toString('base64')
+}
+
+exports.GerarChavePrivada = (base64ChavePrivada) => {
+
 }
 
 exports.Assinar = ({ body }, res, ProximaFuncao) => {
