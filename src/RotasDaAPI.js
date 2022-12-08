@@ -3,10 +3,19 @@ const CriarRegistro = require("./Consultas/CriarRegistro");
 const CriarPDFDocumento = require("./Utils/CriarPDFDocumento");
 const AutenticacaoLocal = require("./Consultas/Autenticacao/AutenticacaoLocal");
 const Assinatura = require("./Utils/Assinatura");
-const { default: ConverterPDFParaBase64 } = require("./Utils/ConverterPDFParaBase64");
-
+const ConverterPDFParaBase64 = require("./Utils/ConverterPDFParaBase64");
+const FileReader = require('FileReader');
+const ConverterPDFParaArrayBuffer = require("./Utils/ConverterPDFParaArrayBuffer");
+const RecuperarBase64ChavePrivada = require("./Utils/RecuperarBase64ChavePrivada");
+const formidable = require('formidable');
 
 rotas.get("/GerarParDeChaves", Assinatura.GerarParDeChaves);
+
+rotas.post("/AssinarPDF", async (req, res) => {
+    const {ArrayBuffer, Base64ChavePrivada} = await ConverterPDFParaArrayBuffer(req)
+    const ArrayUint8 = new Uint8Array(ArrayBuffer)
+    res.send(Assinatura.AssinarPDF(ArrayUint8, Base64ChavePrivada))
+});
 
 rotas.post("/CriarSignatario", CriarRegistro.Signatario);
 rotas.post("/CriarDocumento", CriarRegistro.Documento);
@@ -19,12 +28,16 @@ rotas.post("/VerificarAssinatura", Assinatura.VerificarAssinatura);
 rotas.post("/criarusuario", AutenticacaoLocal.VerificarUsuarioCadastrado, AutenticacaoLocal.CriarUsuario);
 rotas.post("/logarusuario", AutenticacaoLocal.LogarUsuario);
 
-rotas.post("/ConverterPDFParaBase64", (req, res) => {
-    res.send(ConverterPDFParaBase64(req));
-    // const form = new formidable.IncomingForm();
-    // form.parse(req, (err, fields, {file}) => {
-    //     res.send(fs.readFileSync(file.filepath).toString("base64"));
-    // })
-})
+rotas.post("/ConverterPDFParaBase64", async (req, res) => {
+    res.send(await ConverterPDFParaBase64(req))
+});
+
+rotas.post("/documento", 
+    CriarRegistro.Documento, 
+    CriarRegistro.Signatario, 
+    CriarPDFDocumento, 
+    Assinatura.Assinar, 
+    Assinatura.VerificarAssinatura
+);
 
 module.exports = rotas;
