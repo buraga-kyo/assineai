@@ -4,54 +4,22 @@ const FileReader = require('FileReader');
 const fs = require('fs');
 const { sign } = require('pdf-signer-brazil');
 
-exports.AssinarPDFComCertificadoDigital = (req,res) => {
-   
-    const SenhaDoCertificado = process.env.SENHA_DO_CERTIFICADO
-    const BufferDoCertificado = fs.readFileSync(`./Arquivos/cert.pfx`)
-    const BufferDoPDF = fs.readFileSync(`./Arquivos/Bol.pdf`)
-    const ConfiguracoesDaAssinatura = {
-        reason: 'PLANO',
-        email: 'sprtj@protonmail.com',
-        location: 'Rio de Janeiro, BR',
-        signerName: 'BRAGA US',
-        annotationAppearanceOptions: {
-            signatureCoordinates: { left: 20, bottom: 120, right: 190, top: 20 },
-            signatureDetails: [
-                {
-                    value: 'BRAGA US',
-                    fontSize: 5,
-                    transformOptions: { rotate: 0, space: 2, tilt: 0, xPos: 0, yPos: 32 },
-                },
-                {
-                    value: 'Este arquivo foi assinado digitalmente',
-                    fontSize: 5,
-                    transformOptions: { rotate: 0, space: 2, tilt: 0, xPos: 0, yPos: 25.4 },
-                },
-                {
-                    value: 'Assinado',
-                    fontSize: 5,
-                    transformOptions: { rotate: 0, space: 2, tilt: 0, xPos: 0, yPos: 18 },
-                },
-                {
-                    value: 'Verifique o arquivo em verificador.iti.gov.br',
-                    fontSize: 5,
-                    transformOptions: { rotate: 0, space: 2, tilt: 0, xPos: 0, yPos: 11 },
-                },
-            ]
-        },
-    }
 
-    const PDFAssinado = sign(
-        BufferDoPDF, 
-        BufferDoCertificado, 
-        SenhaDoCertificado, 
-        ConfiguracoesDaAssinatura
-    ).then(BufferDoPDFAssinado => {
-        fs.writeFileSync('./Arquivos/signeds.pdf', BufferDoPDFAssinado)
-        res.send(BufferDoPDFAssinado)
+exports.VerificarAssinaturaIndividual = (Base64ChavePublica, Base64Assinatura, ArrayUint8) => {
+    ChavePublica = crypto.createPublicKey({
+        key: Buffer.from(Base64ChavePublica, 'base64'),
+        type: 'spki',
+        format: 'der',
     })
 
+    const Hash = crypto.createVerify("SHA256")
+    Hash.update(ArrayUint8)
+    Hash.end()
+
+    const Resultado = Hash.verify(ChavePublica, Buffer.from(Base64Assinatura, 'base64'))
+    return Resultado
 }
+
 
 exports.GerarParDeChaves = (req,res) => {
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
@@ -133,14 +101,63 @@ exports.VerificarAssinatura = ({ body: {Documento, ChavePublica, Assinatura} }, 
         format: 'der',
     })
 
-	const Hash = crypto.createVerify("SHA256")
-	Hash.update(Documento)
-	Hash.end()
+    const Hash = crypto.createVerify("SHA256")
+    Hash.update(Documento)
+    Hash.end()
 
-	const Resultado = Hash.verify(ChavePublica, Buffer.from(Assinatura, 'base64'))
-	res.send({ Resultado })
+    const Resultado = Hash.verify(ChavePublica, Buffer.from(Assinatura, 'base64'))
+    res.send({ Resultado })
 }
 
+
+exports.AssinarPDFComCertificadoDigital = (req,res) => {
+   
+    const SenhaDoCertificado = process.env.SENHA_DO_CERTIFICADO
+    const BufferDoCertificado = fs.readFileSync(`./Arquivos/cert.pfx`)
+    const BufferDoPDF = fs.readFileSync(`./Arquivos/Bol.pdf`)
+    const ConfiguracoesDaAssinatura = {
+        reason: 'PLANO',
+        email: 'sprtj@protonmail.com',
+        location: 'Rio de Janeiro, BR',
+        signerName: 'BRAGA US',
+        annotationAppearanceOptions: {
+            signatureCoordinates: { left: 20, bottom: 120, right: 190, top: 20 },
+            signatureDetails: [
+                {
+                    value: 'BRAGA US',
+                    fontSize: 5,
+                    transformOptions: { rotate: 0, space: 2, tilt: 0, xPos: 0, yPos: 32 },
+                },
+                {
+                    value: 'Este arquivo foi assinado digitalmente',
+                    fontSize: 5,
+                    transformOptions: { rotate: 0, space: 2, tilt: 0, xPos: 0, yPos: 25.4 },
+                },
+                {
+                    value: 'Assinado',
+                    fontSize: 5,
+                    transformOptions: { rotate: 0, space: 2, tilt: 0, xPos: 0, yPos: 18 },
+                },
+                {
+                    value: 'Verifique o arquivo em verificador.iti.gov.br',
+                    fontSize: 5,
+                    transformOptions: { rotate: 0, space: 2, tilt: 0, xPos: 0, yPos: 11 },
+                },
+            ]
+        },
+    }
+
+    const PDFAssinado = sign(
+        BufferDoPDF, 
+        BufferDoCertificado, 
+        SenhaDoCertificado, 
+        ConfiguracoesDaAssinatura
+    ).then(BufferDoPDFAssinado => {
+        fs.writeFileSync('./Arquivos/signeds.pdf', BufferDoPDFAssinado)
+        res.send(BufferDoPDFAssinado)
+    })
+
+}
 
     // var form = new formidable.IncomingForm();
     // form.parse(req, (err, fields, files) => {

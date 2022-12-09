@@ -7,7 +7,9 @@ module.exports = function ConverterPDFParaArrayBuffer (req) {
         form.parse(req, (err, fields, {file}) => {
             resolve({
                 ArrayBuffer: fs.readFileSync(file.filepath), 
-                Base64ChavePrivada: fields.Base64ChavePrivada
+                Base64ChavePrivada: fields.Base64ChavePrivada || '',
+                Base64ChavePublica: fields.Base64ChavePublica || '',
+                Base64Assinatura: fields.Base64Assinatura || ''
             })
         })
     })
