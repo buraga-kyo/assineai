@@ -11,6 +11,13 @@ const formidable = require('formidable');
 
 rotas.get("/GerarParDeChaves", Assinatura.GerarParDeChaves);
 
+rotas.post("/VerificarAssinaturaIndividual", async (req, res) => {
+    const {ArrayBuffer, Base64ChavePublica, Base64Assinatura} = await ConverterPDFParaArrayBuffer(req)
+    const ArrayUint8 = new Uint8Array(ArrayBuffer)
+    const Verificador = Assinatura.VerificarAssinaturaIndividual(Base64ChavePublica, Base64Assinatura, ArrayUint8)
+    res.send(Verificador)
+})
+
 rotas.post("/AssinarPDF", async (req, res) => {
     const {ArrayBuffer, Base64ChavePrivada} = await ConverterPDFParaArrayBuffer(req)
     const ArrayUint8 = new Uint8Array(ArrayBuffer)
