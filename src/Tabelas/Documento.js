@@ -12,7 +12,7 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
     DocumentoStatusAssinatura: {
       type: Sequelize.STRING,
     },
-    DocumentoOriginalBase64: {
+    DocumentoBase64: {
       type: Sequelize.TEXT,
     },
     DocumentoAssinadoBase64: {
