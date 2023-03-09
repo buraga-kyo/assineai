@@ -76,17 +76,21 @@ exports.AssinarPDFComCertificadoDigital = (req,res) => {
         },
     }
 
-    const PDFAssinado = sign(
-        BufferDoPDF, 
-        BufferDoCertificado, 
-        SenhaDoCertificado, 
-        ConfiguracoesDaAssinatura
-    ).then(BufferDoPDFAssinado => {
-        fs.writeFileSync('./Arquivos/signeds.pdf', BufferDoPDFAssinado)
-        res.send(BufferDoPDFAssinado)
+exports.VerificarAssinaturaIndividual = (Base64ChavePublica, Base64Assinatura, ArrayUint8) => {
+    ChavePublica = crypto.createPublicKey({
+        key: Buffer.from(Base64ChavePublica, 'base64'),
+        type: 'spki',
+        format: 'der',
     })
 
+    const Hash = crypto.createVerify("SHA256")
+    Hash.update(ArrayUint8)
+    Hash.end()
+
+    const Resultado = Hash.verify(ChavePublica, Buffer.from(Base64Assinatura, 'base64'))
+    return Resultado
 }
+
 
 exports.GerarParDeChaves = (req,res) => {
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
@@ -130,12 +134,12 @@ exports.VerificarAssinatura = ({ body: {Documento, ChavePublica, Assinatura} }, 
         format: 'der',
     })
 
-	const Hash = crypto.createVerify("SHA256")
-	Hash.update(Documento)
-	Hash.end()
+    const Hash = crypto.createVerify("SHA256")
+    Hash.update(Documento)
+    Hash.end()
 
-	const Resultado = Hash.verify(ChavePublica, Buffer.from(Assinatura, 'base64'))
-	res.send({ Resultado })
+    const Resultado = Hash.verify(ChavePublica, Buffer.from(Assinatura, 'base64'))
+    res.send({ Resultado })
 }
 
 
