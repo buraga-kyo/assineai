@@ -10,12 +10,6 @@ const CriarDocumentoViaAPI = require("./Utils/CriarDocumentoViaAPI");
 
 rotas.post("/CriarDocumentoViaAPI", CriarDocumentoViaAPI);
 
-// rotas.post("/CriarDocumentoViaAPI", async (Requisicao, Resposta) => {
-//     const IdDoDocumento = await CriarRegistros.Documento(Requisicao.body.DocumentoNome, Requisicao.body.DocumentoBase64);
-//     console.log(IdDoDocumento);
-//     Resposta.send(200);
-// });
-
 rotas.get("/GerarParDeChaves", Assinatura.GerarParDeChaves);
 
 rotas.post("/CriarSignatario", CriarRegistro.Signatario);
