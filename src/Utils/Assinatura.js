@@ -76,6 +76,18 @@ exports.AssinarPDFComCertificadoDigital = (req,res) => {
         },
     }
 
+    const PDFAssinado = sign(
+        BufferDoPDF, 
+        BufferDoCertificado, 
+        SenhaDoCertificado, 
+        ConfiguracoesDaAssinatura
+    ).then(BufferDoPDFAssinado => {
+        fs.writeFileSync('./Arquivos/signeds.pdf', BufferDoPDFAssinado)
+        res.send(BufferDoPDFAssinado)
+    })
+
+}
+
 exports.VerificarAssinaturaIndividual = (Base64ChavePublica, Base64Assinatura, ArrayUint8) => {
     ChavePublica = crypto.createPublicKey({
         key: Buffer.from(Base64ChavePublica, 'base64'),
