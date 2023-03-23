@@ -1,4 +1,4 @@
-const { Documento, Signatario } = require("../BancoDeDados/Conector").Tabelas;
+const { Documento, Signatario } = require("../Conector").Tabelas;
 
 exports.Documento = async (DocumentoNome, DocumentoBase64) => {
 
