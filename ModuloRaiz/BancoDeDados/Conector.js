@@ -1,8 +1,8 @@
 const Configuracao = require("./Configuracao");
 const Sequelize = require("sequelize");
-const Documento = require("../Tabelas/Documento");
-const Signatario = require("../Tabelas/Signatario");
-const Usuario = require("../Tabelas/Usuario");
+const Documento = require("./Tabelas/Documento");
+const Signatario = require("./Tabelas/Signatario");
+const Usuario = require("./Tabelas/Usuario");
 const BancoDeDados = {};
 
 const InstanciaConfiguradaDoSequelize = new Sequelize(
