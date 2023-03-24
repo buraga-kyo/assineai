@@ -1,7 +1,9 @@
 const CriarRegistros = require("../BancoDeDados/Consultas/CriarRegistros");
 const ConstruirPaginaComDadosDeAssinatura = require("../Ferramentas/ManipulacaoDePDF/ConstruirPaginaComDadosDeAssinatura");
+const ConverterPDFparaPDFA = require("../Ferramentas/ManipulacaoDePDF/ConverterPDFparaPDFA");
 const AssinarPDFcomCertificadoDigital = require("../Ferramentas/LidadorDeAssinatura/CertificadoDigital");
-const fs = require("fs");
+const AssinarPDFcomCriptografiaAssimetrica = require("../Ferramentas/LidadorDeAssinatura/CriptografiaAssimetrica");
+const VerificarAutenticidadeDoPDF = require("../Ferramentas/LidadorDeAssinatura/VerificadorDeCriptografiaAssimetrica");
 
 module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
     
@@ -22,18 +24,22 @@ module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
 
     const DocumentoBase64Atualizado = await ConstruirPaginaComDadosDeAssinatura(DocumentoBase64)
 
-    const NomdeDoArquivo = "./ArquivosTemporarios/"+IdDoDocumento+".pdf"
+    const NomeDoArquivo = IdDoDocumento+".pdf"
+    const CaminhoDoArquivo = "./ArquivosTemporarios/"+NomeDoArquivo
 
-    fs.writeFile(NomdeDoArquivo, DocumentoBase64Atualizado, 'base64', error => {
-        if (error) {
-            throw error;
-        } else {
-            exec('gswin32c -dPDFA=1 -dBATCH -dNOPAUSE -dNOOUTERSAVE -dPDFSETTINGS=/printer -dCompatibilityLevel="1.4" -dPDFACompatibilityPolicy=1 -dUseCIEColor -sProcessColorModel=DeviceRGB -sColorConversionStrategy=RGB -sDEVICE=pdfwrite -sOutputFile="'+NomdeDoArquivo+'" "_'+NomdeDoArquivo+'" "PDFA_def.ps"')
-            console.log('base64 saved!');
-        }
-    });    
+    const NomeDoPDFA = await ConverterPDFparaPDFA(CaminhoDoArquivo, NomeDoArquivo, DocumentoBase64Atualizado)
 
-    //const resultado = await AssinarPDFcomCertificadoDigital(DocumentoBase64Atualizado)
+    const CaminhoDoArquivoPDFA = "./ArquivosTemporarios/"+NomeDoPDFA
+
+    const BufferDoPDFAcomCertificado = await AssinarPDFcomCertificadoDigital(CaminhoDoArquivoPDFA, NomeDoPDFA)
+
+    const Base64PDFComCertificado = BufferDoPDFAcomCertificado.toString('base64')
+
+    const Data = AssinarPDFcomCriptografiaAssimetrica(Base64PDFComCertificado)
+
+    const resultado = VerificarAutenticidadeDoPDF(Data.ChavePublica, Data.Assinatura, Base64PDFComCertificado)
+
+    console.log(resultado)
 
     // console.log(DocumentoBase64Atualizado)
     // console.log(IdDoSignatario)

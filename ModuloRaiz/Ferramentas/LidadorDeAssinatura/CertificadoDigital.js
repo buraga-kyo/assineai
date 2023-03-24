@@ -1,11 +1,11 @@
 const fs = require('fs');
 const { sign } = require('pdf-signer-brazil');
 
-exports.AssinarPDFComCertificadoDigital = () => {
+module.exports = (CaminhoDoArquivoPDFA, NomeDoArquivo) => {
    
     const SenhaDoCertificado = process.env.SENHA_DO_CERTIFICADO
-    const BufferDoCertificado = fs.readFileSync(`./Arquivos/cert.pfx`)
-    const BufferDoPDF = fs.readFileSync(`./Arquivos/Bol.pdf`)
+    const BufferDoCertificado = fs.readFileSync(`./ArquivosTemporarios/cert.pfx`)
+    const BufferDoPDF = fs.readFileSync(CaminhoDoArquivoPDFA)
     const ConfiguracoesDaAssinatura = {
         reason: 'PLANO',
         email: 'sprtj@protonmail.com',
@@ -38,14 +38,12 @@ exports.AssinarPDFComCertificadoDigital = () => {
         },
     }
 
-    const PDFAssinado = sign(
-        BufferDoPDF, 
-        BufferDoCertificado, 
-        SenhaDoCertificado, 
-        ConfiguracoesDaAssinatura
-    ).then(BufferDoPDFAssinado => {
-        fs.writeFileSync('./Arquivos/signeds.pdf', BufferDoPDFAssinado)
-        res.send(BufferDoPDFAssinado)
+    return new Promise(async (resolve, reject) => {
+
+        const BufferDoPDFAssinado = await sign(BufferDoPDF, BufferDoCertificado, SenhaDoCertificado, ConfiguracoesDaAssinatura)
+        fs.writeFileSync('./ArquivosTemporarios/cert'+NomeDoArquivo, BufferDoPDFAssinado)
+        resolve(BufferDoPDFAssinado)
+
     })
 
 }

@@ -1,11 +1,6 @@
 const crypto = require("crypto");
-const formidable = require('formidable');
-const FileReader = require('FileReader');
-const fs = require('fs');
-const { sign } = require('pdf-signer-brazil');
 
-
-exports.Assinar = ({ body }, res, ProximaFuncao) => {
+module.exports = (DocumentoBase64) => {
 
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
         modulusLength: 2048,
@@ -29,12 +24,12 @@ exports.Assinar = ({ body }, res, ProximaFuncao) => {
     })
     
     const Hash = crypto.createSign('SHA256')
-    Hash.update(body.Documento)
+    Hash.update(DocumentoBase64)
     Hash.end()
     const Assinatura = Hash.sign(ChavePrivada)
 
-	body.ChavePublica = ChavePublica
-	body.Assinatura = Assinatura
-	
-	ProximaFuncao()
+    return {
+        ChavePublica,
+        Assinatura: Assinatura.toString('base64')
+    }
 }
