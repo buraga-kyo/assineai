@@ -5,7 +5,7 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require('morgan');
 
-const LidadorDeRotasDaAPI = require("../ModuloRaiz/Procedimentos/LidadorDeRotaDaAPI");
+const LidadorDeRotasDaAPI = require("../ModuloRaiz/RegrasDeNegocio/Procedimentos/LidadorDeRotaDaAPI");
 
 const Servidor = express();
 
