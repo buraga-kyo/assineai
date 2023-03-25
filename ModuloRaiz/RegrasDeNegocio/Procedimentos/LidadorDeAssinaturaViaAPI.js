@@ -1,4 +1,4 @@
-const CriarRegistros = require("../BancoDeDados/Consultas/CriarRegistros");
+const CriarRegistros = require("../../BancoDeDados/Consultas/CriarRegistros");
 const ConstruirPaginaComDadosDeAssinatura = require("../Ferramentas/ManipulacaoDePDF/ConstruirPaginaComDadosDeAssinatura");
 const ConverterPDFparaPDFA = require("../Ferramentas/ManipulacaoDePDF/ConverterPDFparaPDFA");
 const AssinarPDFcomCertificadoDigital = require("../Ferramentas/LidadorDeAssinatura/CertificadoDigital");
