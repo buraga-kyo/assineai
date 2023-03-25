@@ -36,10 +36,15 @@ module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
     const Base64PDFComCertificado = BufferDoPDFAcomCertificado.toString('base64')
 
     const Data = AssinarPDFcomCriptografiaAssimetrica(Base64PDFComCertificado)
+    const Data2 = AssinarPDFcomCriptografiaAssimetrica(Base64PDFComCertificado)
 
-    const resultado = VerificarAutenticidadeDoPDF(Data.ChavePublica, Data.Assinatura, Base64PDFComCertificado)
+    const resultado = VerificarAutenticidadeDoPDF(Data2.ChavePublica, Data2.Assinatura, Base64PDFComCertificado)
+    const resultado2 = VerificarAutenticidadeDoPDF(Data.ChavePublica, Data.Assinatura, Base64PDFComCertificado)
+    const resultado3 = VerificarAutenticidadeDoPDF(Data.ChavePublica, Data.Assinatura, DocumentoBase64)
 
     console.log(resultado)
+    console.log(resultado2)
+    console.log(resultado3)
 
     // console.log(DocumentoBase64Atualizado)
     // console.log(IdDoSignatario)
