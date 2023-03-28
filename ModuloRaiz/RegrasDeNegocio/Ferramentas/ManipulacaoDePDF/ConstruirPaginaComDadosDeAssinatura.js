@@ -1,13 +1,43 @@
-const { PDFDocument } = require("pdf-lib");
+const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
 
 module.exports = async (DocumentoBase64) =>  {
 
     const BufferDoBase64 = Buffer.from(DocumentoBase64, 'base64');
 
     const PDF = await PDFDocument.load(BufferDoBase64)
+    const HelveticaBold = await PDF.embedFont(StandardFonts.HelveticaBold)
+    const Helvetica = await PDF.embedFont(StandardFonts.Helvetica)
 
     const pagina = PDF.addPage();
-    pagina.drawText('Exemplo', {x:0,y:820,size:20})
+
+    pagina.drawText('(Assina AI Logo)', {
+        x: 30,
+        y: 800,
+        size: 15,
+        font: HelveticaBold
+    })
+
+    pagina.drawText('Relatório de Assinaturas', {
+        x: 155,
+        y: 800,
+        size: 10,
+        font: Helvetica
+    })
+
+    pagina.drawText('Datas e Horários em UTC-0300 (America/Sao_Paulo)', {
+        x: 400,
+        y: 810,
+        size: 7,
+        font: Helvetica
+    })
+
+    pagina.drawText('Última atualização em 28 Março 2023, 10:19', {
+        x: 427,
+        y: 800,
+        size: 7,
+        font: Helvetica
+    })
+
     const BytesDoPDF = await PDF.save()
     const DocumentoBase64Atualizado = Buffer.from(BytesDoPDF).toString('base64')
 
