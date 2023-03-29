@@ -1,5 +1,11 @@
 module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
     const Signatario = InstanciaConfiguradaDoSequelize.define("Signatario", {
+        SignatarioId: {
+            type: Sequelize.INTEGER,
+            autoIncrement: true,
+            allowNull: false,
+            primaryKey: true
+        },        
         SignatarioToken: {
             type: Sequelize.TEXT
         },
