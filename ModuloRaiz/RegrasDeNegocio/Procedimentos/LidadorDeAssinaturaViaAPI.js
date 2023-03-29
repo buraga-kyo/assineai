@@ -1,15 +1,27 @@
-const CriarRegistros = require("../../BancoDeDados/Consultas/CriarRegistros");
+const { Documento, Signatario, PDFBase64 } = require("../../BancoDeDados/Conector").Tabelas;
+
 const ConstruirPaginaComDadosDeAssinatura = require("../Ferramentas/ManipulacaoDePDF/ConstruirPaginaComDadosDeAssinatura");
 const CriarArquivoPDFApartirDoBase64 = require("../Ferramentas/ManipulacaoDePDF/CriarArquivoPDFApartirDoBase64");
 const AssinarPDFcomCertificadoDigital = require("../Ferramentas/LidadorDeAssinatura/CertificadoDigital");
 const AssinarPDFcomCriptografiaAssimetrica = require("../Ferramentas/LidadorDeAssinatura/CriptografiaAssimetrica");
 const VerificarAutenticidadeDoPDF = require("../Ferramentas/LidadorDeAssinatura/VerificadorDeCriptografiaAssimetrica");
+
 const fs = require("fs");
+const crypto = require("crypto");
 
 module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
     
-    const DocumentoBase64 = Requisicao.body.DocumentoBase64
-    const IdDoDocumento = await CriarRegistros.Documento(Requisicao.body.DocumentoNome, DocumentoBase64);
+    const RegistroDoDocumento = {
+        DocumentoNome: Requisicao.body.DocumentoNome,
+        DocumentoGUID: crypto.randomUUID()
+    }
+    const { DocumentoId } = await Documento.create(RegistroDoDocumento)
+
+    const RegistroPDFBase64 = {
+        PDFBase64Original: Requisicao.body.DocumentoBase64,
+        DocumentoId
+    }
+    PDFBase64.create(RegistroPDFBase64)
 
     const RegistroDoSignatario = {
         SignatarioNome: Requisicao.body.SignatarioNome,
@@ -18,14 +30,13 @@ module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
         SignatarioIp: Requisicao.connection.remoteAddress || Requisicao.socket.remoteAddress || Requisicao.connection.socket.remoteAddress,
         SignatarioDispositivo: JSON.stringify(Requisicao.headers),
         SignatarioToken: Requisicao.body.SignatarioToken,
-        DocumentoId: IdDoDocumento
+        DocumentoId
     }; 
+    Signatario.create(RegistroDoSignatario)
 
-    const IdDoSignatario = await CriarRegistros.Signatario(RegistroDoSignatario)
+    const DocumentoBase64Atualizado = await ConstruirPaginaComDadosDeAssinatura(RegistroPDFBase64.PDFBase64Original)
 
-    const DocumentoBase64Atualizado = await ConstruirPaginaComDadosDeAssinatura(DocumentoBase64)
-
-    const NomeDoArquivo = IdDoDocumento+".pdf"
+    const NomeDoArquivo = DocumentoId+".pdf"
     const CaminhoDoArquivo = "./ArquivosTemporarios/"+NomeDoArquivo
 
     const ArquivoPDFCriadoComSucesso = await CriarArquivoPDFApartirDoBase64(CaminhoDoArquivo, DocumentoBase64Atualizado)
@@ -34,11 +45,29 @@ module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
         const PDFAssinadoComSucesso = await AssinarPDFcomCertificadoDigital(NomeDoArquivo)
 
         if (PDFAssinadoComSucesso) {
-            const BufferDoPDFcomCertificado =  fs.readFileSync("./ArquivosTemporarios/"+IdDoDocumento+"_signed.pdf")
+            const BufferDoPDFcomCertificado =  fs.readFileSync("./ArquivosTemporarios/"+DocumentoId+"_signed.pdf")
             const Base64PDFComCertificado = BufferDoPDFcomCertificado.toString('base64')
-            const Data = AssinarPDFcomCriptografiaAssimetrica(Base64PDFComCertificado)
-            const resultado = VerificarAutenticidadeDoPDF(Data.ChavePublica, Data.Assinatura, Base64PDFComCertificado)
-            console.log(resultado)
+            const DadosCriptografiaAssimetrica = AssinarPDFcomCriptografiaAssimetrica(Base64PDFComCertificado)
+
+            Documento.update({
+                DocumentoChaveAssinatura: DadosCriptografiaAssimetrica.Assinatura,
+                DocumentoChavePublica: DadosCriptografiaAssimetrica.ChavePublica
+            }, {
+                where: {
+                    DocumentoId
+                }
+            })
+
+            PDFBase64.update({
+                PDFBase64Assinado: Base64PDFComCertificado
+            }, {
+                where: {
+                    DocumentoId
+                }
+            })
+
+            //const resultado = VerificarAutenticidadeDoPDF(Data.ChavePublica, Data.Assinatura, Base64PDFComCertificado)
+            //console.log(resultado)
         }
 
 

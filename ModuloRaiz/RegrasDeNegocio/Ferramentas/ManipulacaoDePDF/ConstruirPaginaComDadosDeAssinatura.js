@@ -11,14 +11,14 @@ module.exports = async (DocumentoBase64) =>  {
     const pagina = PDF.addPage();
 
     pagina.drawText('(Assina AI Logo)', {
-        x: 30,
+        x: 15,
         y: 800,
         size: 15,
         font: HelveticaBold
     })
 
     pagina.drawText('Relatório de Assinaturas', {
-        x: 155,
+        x: 140,
         y: 800,
         size: 10,
         font: Helvetica
@@ -37,6 +37,19 @@ module.exports = async (DocumentoBase64) =>  {
         size: 7,
         font: Helvetica
     })
+
+    const QuantidadeDePaginas = PDF.getPageIndices()
+
+    for (const PaginaAtual of QuantidadeDePaginas) {
+        const Pagina = PDF.getPage(PaginaAtual)
+
+        Pagina.drawText('Assina AI 123ahsdu-123siaud-saduashi',  {
+            x: 15,
+            y: 10,
+            size: 7,
+            font: Helvetica
+        })
+    }
 
     const BytesDoPDF = await PDF.save()
     const DocumentoBase64Atualizado = Buffer.from(BytesDoPDF).toString('base64')

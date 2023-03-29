@@ -1,22 +1,18 @@
-const { Documento, Signatario } = require("../Conector").Tabelas;
+const { Documento, Signatario, PDFBase64 } = require("../Conector").Tabelas;
 
-exports.Documento = async (DocumentoNome, DocumentoBase64) => {
+exports.Documento = async (RegistroDoDocumento) => {
 
-    let Registro = {
-        DocumentoNome,
-        DocumentoBase64
-    }
+    const { DocumentoId } = await Documento.create(RegistroDoDocumento)
 
-    const { id } = await Documento.create(Registro)
+    return DocumentoId
+};
 
-    return id
+exports.PDFBase64 = async (RegistroDoPDFBase64) => {
+    PDFBase64.create(RegistroDoPDFBase64)
 };
 
 exports.Signatario = async (DadosDoSignatario) => {
-
-    const { id } = await Signatario.create(DadosDoSignatario)
-
-    return id
+    Signatario.create(DadosDoSignatario)
 };
 
 

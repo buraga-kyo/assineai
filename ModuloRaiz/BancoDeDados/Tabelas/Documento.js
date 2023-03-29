@@ -1,6 +1,12 @@
 module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
   const Documento = InstanciaConfiguradaDoSequelize.define("Documento", {
-    DocumentoToken: {
+    DocumentoId: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true
+    },
+    DocumentoGUID: {
       type: Sequelize.TEXT,
     },
     DocumentoNome: {
@@ -9,14 +15,11 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
     DocumentoChavePublica: {
       type: Sequelize.TEXT,
     },
+    DocumentoChaveAssinatura: {
+      type: Sequelize.TEXT,
+    },
     DocumentoStatusAssinatura: {
       type: Sequelize.STRING,
-    },
-    DocumentoBase64: {
-      type: Sequelize.TEXT,
-    },
-    DocumentoAssinadoBase64: {
-      type: Sequelize.TEXT,
     }
   });
 
