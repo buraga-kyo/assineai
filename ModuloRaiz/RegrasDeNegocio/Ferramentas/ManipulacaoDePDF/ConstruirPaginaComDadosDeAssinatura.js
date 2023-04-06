@@ -1,6 +1,18 @@
+const { Documento, Signatario, Arquivo } = require("../../../BancoDeDados/Conector").Tabelas;
 const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
 
-module.exports = async (DocumentoBase64) =>  {
+module.exports = async (DocumentoBase64, DocumentoId) =>  {
+
+
+    const RegistroData = await Documento.findByPk(DocumentoId)
+
+    // const RegistroData = await Documento.findAll({
+    //     where: {
+    //         DocumentoId
+    //     }
+    // })
+
+    console.log(RegistroData)
 
     const BufferDoBase64 = Buffer.from(DocumentoBase64, 'base64');
 
