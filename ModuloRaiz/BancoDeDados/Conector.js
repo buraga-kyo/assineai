@@ -3,7 +3,7 @@ const Sequelize = require("sequelize");
 const Documento = require("./Tabelas/Documento");
 const Signatario = require("./Tabelas/Signatario");
 const Usuario = require("./Tabelas/Usuario");
-const PDFBase64 = require("./Tabelas/PDFBase64");
+const Arquivo = require("./Tabelas/Arquivo");
 const BancoDeDados = {};
 
 const InstanciaConfiguradaDoSequelize = new Sequelize(
@@ -28,14 +28,19 @@ BancoDeDados.InstanciaConfiguradaDoSequelize = InstanciaConfiguradaDoSequelize;
 
 BancoDeDados.Tabelas = {
   Documento: Documento(InstanciaConfiguradaDoSequelize, Sequelize),
-  PDFBase64: PDFBase64(InstanciaConfiguradaDoSequelize, Sequelize),
+  Arquivo: Arquivo(InstanciaConfiguradaDoSequelize, Sequelize),
   Signatario: Signatario(InstanciaConfiguradaDoSequelize, Sequelize),
   Usuario: Usuario(InstanciaConfiguradaDoSequelize, Sequelize),
 };
 
-BancoDeDados.Tabelas.PDFBase64.belongsTo(BancoDeDados.Tabelas.Documento, {
+BancoDeDados.Tabelas.Documento.belongsTo(BancoDeDados.Tabelas.Arquivo, {
     constraint: true,
-    foreignKey: 'DocumentoId'    
+    foreignKey: 'ArquivoOriginalId'    
+})
+
+BancoDeDados.Tabelas.Documento.belongsTo(BancoDeDados.Tabelas.Arquivo, {
+    constraint: true,
+    foreignKey: 'ArquivoAssinadoId'    
 })
 
 // Um signatario para um documento
