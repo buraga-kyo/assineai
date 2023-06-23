@@ -4,7 +4,7 @@ const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
 module.exports = async (DocumentoBase64, DocumentoId) =>  {
 
 
-    const RegistroData = await Documento.findByPk(DocumentoId)
+    const { dataValues: { DocumentoGUID } } = await Documento.findByPk(DocumentoId)
 
     // const RegistroData = await Documento.findAll({
     //     where: {
@@ -12,7 +12,7 @@ module.exports = async (DocumentoBase64, DocumentoId) =>  {
     //     }
     // })
 
-    console.log(RegistroData)
+    console.log(DocumentoGUID)
 
     const BufferDoBase64 = Buffer.from(DocumentoBase64, 'base64');
 
