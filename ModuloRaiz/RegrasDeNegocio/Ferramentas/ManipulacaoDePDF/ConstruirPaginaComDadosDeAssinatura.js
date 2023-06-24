@@ -6,13 +6,7 @@ module.exports = async (DocumentoBase64, DocumentoId) =>  {
 
     const { dataValues: { DocumentoGUID } } = await Documento.findByPk(DocumentoId)
 
-    // const RegistroData = await Documento.findAll({
-    //     where: {
-    //         DocumentoId
-    //     }
-    // })
-
-    console.log(DocumentoGUID)
+    console.log("DocumentoGUID: "+DocumentoGUID)
 
     const BufferDoBase64 = Buffer.from(DocumentoBase64, 'base64');
 
