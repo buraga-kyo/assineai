@@ -4,6 +4,8 @@ const Documento = require("./Tabelas/Documento");
 const Signatario = require("./Tabelas/Signatario");
 const Usuario = require("./Tabelas/Usuario");
 const Arquivo = require("./Tabelas/Arquivo");
+const DocumentoExtra = require("./Tabelas/DocumentoExtra");
+
 const BancoDeDados = {};
 
 const InstanciaConfiguradaDoSequelize = new Sequelize(
@@ -31,11 +33,32 @@ BancoDeDados.Tabelas = {
   Arquivo: Arquivo(InstanciaConfiguradaDoSequelize, Sequelize),
   Signatario: Signatario(InstanciaConfiguradaDoSequelize, Sequelize),
   Usuario: Usuario(InstanciaConfiguradaDoSequelize, Sequelize),
+  DocumentoExtra: DocumentoExtra(InstanciaConfiguradaDoSequelize, Sequelize)
 };
+
+BancoDeDados.Tabelas.DocumentoExtra.belongsTo(BancoDeDados.Tabelas.Documento, {
+    constraint: true,
+    foreignKey: 'DocumentoId'    
+})
+
+BancoDeDados.Tabelas.DocumentoExtra.belongsTo(BancoDeDados.Tabelas.Arquivo, {
+    constraint: true,
+    foreignKey: 'ArquivoOriginalId'    
+})
+
+BancoDeDados.Tabelas.DocumentoExtra.belongsTo(BancoDeDados.Tabelas.Arquivo, {
+    constraint: true,
+    foreignKey: 'ArquivoAssinadoId'    
+})
 
 BancoDeDados.Tabelas.Documento.belongsTo(BancoDeDados.Tabelas.Arquivo, {
     constraint: true,
     foreignKey: 'ArquivoOriginalId'    
+})
+
+BancoDeDados.Tabelas.Documento.belongsTo(BancoDeDados.Tabelas.Arquivo, {
+    constraint: true,
+    foreignKey: 'ArquivoEmAndamentoId'    
 })
 
 BancoDeDados.Tabelas.Documento.belongsTo(BancoDeDados.Tabelas.Arquivo, {

@@ -15,6 +15,9 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
         SignatarioEmail: {
             type: Sequelize.STRING,
         },
+        SignatarioQualificacao: {
+            type: Sequelize.STRING,
+        },
         SignatarioModoAutenticacao: {
             type: Sequelize.STRING,
         },
