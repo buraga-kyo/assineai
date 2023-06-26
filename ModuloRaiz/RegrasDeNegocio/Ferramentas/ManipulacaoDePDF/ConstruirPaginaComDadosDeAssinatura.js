@@ -1,12 +1,10 @@
 const { Documento, Signatario, Arquivo } = require("../../../BancoDeDados/Conector").Tabelas;
-const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
+const { PDFDocument, StandardFonts, rgb, PDFName, PDFString } = require("pdf-lib");
+const GeradorDeQRCode = require("../FuncoesGenericas/GeradorDeQRCode");
 
 module.exports = async (DocumentoBase64, DocumentoId) =>  {
 
-
-    const { dataValues: { DocumentoGUID } } = await Documento.findByPk(DocumentoId)
-
-    console.log("DocumentoGUID: "+DocumentoGUID)
+    const { dataValues: { DocumentoGUID, DocumentoNome } } = await Documento.findByPk(DocumentoId)
 
     const BufferDoBase64 = Buffer.from(DocumentoBase64, 'base64');
 
@@ -27,7 +25,7 @@ module.exports = async (DocumentoBase64, DocumentoId) =>  {
         x: 140,
         y: 800,
         size: 10,
-        font: Helvetica
+        font: HelveticaBold
     })
 
     pagina.drawText('Datas e Horários em UTC-0300 (America/Sao_Paulo)', {
@@ -44,12 +42,72 @@ module.exports = async (DocumentoBase64, DocumentoId) =>  {
         font: Helvetica
     })
 
+    pagina.drawLine({ start: { x: 17, y: 780 }, end: { x: 570, y: 780 } })
+
+    pagina.drawText(DocumentoNome, {
+        x: 17,
+        y: 750,
+        size: 15,
+        font: HelveticaBold
+    })
+
+    pagina.drawText('Identificação do Documento: '+DocumentoGUID, {
+        x: 17,
+        y: 735,
+        size: 8,
+        font: Helvetica
+    })
+
+    const QRCodeBuffer = await GeradorDeQRCode(DocumentoGUID, 'https://pdf-lib.js.org/#examples')
+
+    const QRCodeImage = await PDF.embedPng(QRCodeBuffer)
+
+    pagina.drawImage(QRCodeImage, {
+        x: 495,
+        y: 695,
+        width: 80,
+        height: 80,
+    })
+
+    pagina.drawLine({ start: { x: 17, y: 690 }, end: { x: 570, y: 690 } })
+
+    /* (3) Define constants for the page's width and height */
+    const PAGE_WIDTH = 500;
+    const PAGE_HEIGHT = 500;
+
+    /* (4) Create the link annotation object and ref */
+    const linkAnnotation = PDF.context.obj({
+        Type: 'Annot',
+        Subtype: 'Link',
+        Rect: [100, PAGE_HEIGHT / 2 - 5, 700, PAGE_HEIGHT / 2 + 15],
+        Border: [0, 0, 2],
+        C: [0, 0, 1],
+        A: {
+        Type: 'Action',
+        S: 'URI',
+        URI: PDFString.of('https://github.com/Hopding/pdf-lib'),
+        },
+    });
+    const linkAnnotationRef = PDF.context.register(linkAnnotation);
+
+    /* (6) Draw some text for the link to be placed over */
+    pagina.drawText('Link to the pdf-lib GitHub Repo', {
+        x: 150,
+        y: PAGE_HEIGHT / 2,
+        font: Helvetica,
+        size: 15,
+        color: rgb(0, 0, 1),
+    });
+  
+    /* (7) Add the link to the page */
+    pagina.node.set(PDFName.of('Annots'), PDF.context.obj([linkAnnotationRef]));
+
     const QuantidadeDePaginas = PDF.getPageIndices()
 
     for (const PaginaAtual of QuantidadeDePaginas) {
         const Pagina = PDF.getPage(PaginaAtual)
 
-        Pagina.drawText('Assina AI 123ahsdu-123siaud-saduashi',  {
+        Pagina.drawText('Assina AI '+DocumentoGUID,  {
             x: 15,
             y: 10,
             size: 7,
@@ -62,3 +120,66 @@ module.exports = async (DocumentoBase64, DocumentoId) =>  {
 
     return DocumentoBase64Atualizado
 }
+
+    // const form = PDF.getForm();
+  
+    // const button = form.createButton('foo.bar');
+    // button.addToPage('Hello World!', pagina, {
+    //   width: 100,
+    //   height: 50,
+    //   x: pagina.getWidth() / 2 - 100 / 2,
+    //   y: pagina.getHeight() / 2 - 50 / 2,
+    // });
+  
+    // const helloWorldScript = "alert('teste')";
+    // button.acroField.getWidgets().forEach((widget) => {
+    //   widget.dict.set(
+    //     PDFName.of('AA'),
+    //     PDF.context.obj({
+    //       U: {
+    //         Type: 'Action',
+    //         S: 'JavaScript',
+    //         JS: PDFHexString.fromText(helloWorldScript),
+    //       },
+    //     }),
+    //   );
+    // });
+
+    // const PAGE_WIDTH = 500;
+    // const PAGE_HEIGHT = 750;
+    
+    // const createPageLinkAnnotation = (PDF, pageRef) => ////CREATE HYPERLINK METHOD
+    // pagina.context.register(
+    //     pagina.context.obj({
+    //       Type: 'Annot',
+    //       Subtype: 'Link',
+    //       /* Bounds of the link on the page */
+    //       Rect: [
+    //         145, // lower left x coord
+    //         PAGE_HEIGHT - 200 - 10, // lower left y coord
+    //         358, // upper right x coord
+    //         PAGE_HEIGHT - 200 + 25, // upper right y coord
+    //       ],
+    //       /* Give the link a 2-unit-wide border, with sharp corners */
+    //       Border: [0, 0, 2],
+    //       /* Make the border color blue: rgb(0, 0, 1) */
+    //       C: [0, 0, 1],
+    //       /* Page to be visited when the link is clicked */
+    //       Dest: ['www.google.com', 'XYZ', null, null, null],
+    //     }),
+    // );
+
+    // const form = PDF.getForm()
+    // const button = form.createButton('some.button.field')
+    
+    // button.addToPage('Do Stuff', pagina, {
+    //   x: 50,
+    //   y: 75,
+    //   width: 200,
+    //   height: 100,
+    //   textColor: rgb(1, 0, 0),
+    //   backgroundColor: rgb(0, 1, 0),
+    //   borderColor: rgb(0, 0, 1),
+    //   borderWidth: 2,
+    //   font: Helvetica,
+    // })
