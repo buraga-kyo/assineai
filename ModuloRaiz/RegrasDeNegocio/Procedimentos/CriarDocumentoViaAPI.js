@@ -1,7 +1,5 @@
 const { Documento, Signatario, Arquivo } = require("../../BancoDeDados/Conector").Tabelas;
 const ConstruirPaginaComDadosDeAssinatura = require("../Ferramentas/ManipulacaoDePDF/ConstruirPaginaComDadosDeAssinatura");
-
-const fs = require("fs");
 const crypto = require("crypto");
 
 module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
@@ -30,18 +28,14 @@ module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
 
         const { ArquivoId: ArquivoEmAndamentoId } = await Arquivo.create({ ArquivoBase64: DocumentoBase64Atualizado })
 
-        Documento.update({
-            ArquivoEmAndamentoId
-        }, {
-            where: {
-                DocumentoId
-            }
-        })
+        Documento.update({ ArquivoEmAndamentoId }, { where: { DocumentoId } })
+
+        Resposta.json(RegistroDoDocumento)
 
     } catch (Erro) {
         console.log(Erro)
+        Resposta.sendStatus(500)
     }
 
-    Resposta.sendStatus(200)
     
 }
