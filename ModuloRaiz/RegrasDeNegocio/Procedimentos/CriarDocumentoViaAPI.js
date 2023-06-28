@@ -24,7 +24,7 @@ module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
             Signatario.create(RegistroDoSignatario)
         })
         
-        const DocumentoBase64Atualizado = await ConstruirPaginaComDadosDeAssinatura(RegistroArquivo.ArquivoBase64, DocumentoId)
+        const DocumentoBase64Atualizado = await ConstruirPaginaComDadosDeAssinatura(RegistroArquivo.ArquivoBase64, DocumentoId, ColecaoDeSignatarios)
 
         const { ArquivoId: ArquivoEmAndamentoId } = await Arquivo.create({ ArquivoBase64: DocumentoBase64Atualizado })
 
