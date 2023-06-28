@@ -2,56 +2,66 @@ const { Documento, Signatario, Arquivo } = require("../../../BancoDeDados/Conect
 const { PDFDocument, StandardFonts, rgb, PDFName, PDFString } = require("pdf-lib");
 const GeradorDeQRCode = require("../FuncoesGenericas/GeradorDeQRCode");
 
-module.exports = async (DocumentoBase64, DocumentoId) =>  {
+module.exports = async (DocumentoBase64, DocumentoId, ColecaoDeSignatarios) =>  {
 
     const { dataValues: { DocumentoGUID, DocumentoNome } } = await Documento.findByPk(DocumentoId)
 
-    const BufferDoBase64 = Buffer.from(DocumentoBase64, 'base64');
-
+    const BufferDoBase64 = Buffer.from(DocumentoBase64, 'base64')
     const PDF = await PDFDocument.load(BufferDoBase64)
     const HelveticaBold = await PDF.embedFont(StandardFonts.HelveticaBold)
     const Helvetica = await PDF.embedFont(StandardFonts.Helvetica)
+    const Pagina = PDF.addPage()
 
-    const pagina = PDF.addPage();
+    await ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID)
+    ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, ColecaoDeSignatarios)
+    ConstruirRodaPe(PDF, Helvetica, DocumentoGUID)
 
-    pagina.drawText('(Assina AI Logo)', {
+    const BytesDoPDF = await PDF.save()
+    const DocumentoBase64Atualizado = Buffer.from(BytesDoPDF).toString('base64')
+
+    return DocumentoBase64Atualizado
+}
+
+
+async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID) {
+    Pagina.drawText('(Assina AI Logo)', {
         x: 15,
         y: 800,
         size: 15,
         font: HelveticaBold
     })
 
-    pagina.drawText('Relatório de Assinaturas', {
+    Pagina.drawText('Relatório de Assinaturas', {
         x: 140,
         y: 800,
         size: 10,
         font: HelveticaBold
     })
 
-    pagina.drawText('Datas e Horários em UTC-0300 (America/Sao_Paulo)', {
+    Pagina.drawText('Datas e Horários em UTC-0300 (America/Sao_Paulo)', {
         x: 400,
         y: 810,
         size: 7,
         font: Helvetica
     })
 
-    pagina.drawText('Última atualização em 28 Março 2023, 10:19', {
+    Pagina.drawText('Última atualização em 28 Março 2023, 10:19', {
         x: 427,
         y: 800,
         size: 7,
         font: Helvetica
     })
 
-    pagina.drawLine({ start: { x: 17, y: 780 }, end: { x: 570, y: 780 } })
+    Pagina.drawLine({ start: { x: 17, y: 780 }, end: { x: 570, y: 780 } })
 
-    pagina.drawText(DocumentoNome, {
+    Pagina.drawText(DocumentoNome, {
         x: 17,
         y: 750,
         size: 15,
         font: HelveticaBold
     })
 
-    pagina.drawText('Identificação do Documento: '+DocumentoGUID, {
+    Pagina.drawText('Identificação do Documento: '+DocumentoGUID, {
         x: 17,
         y: 735,
         size: 8,
@@ -62,46 +72,46 @@ module.exports = async (DocumentoBase64, DocumentoId) =>  {
 
     const QRCodeImage = await PDF.embedPng(QRCodeBuffer)
 
-    pagina.drawImage(QRCodeImage, {
+    Pagina.drawImage(QRCodeImage, {
         x: 495,
         y: 695,
         width: 80,
         height: 80,
     })
 
-    pagina.drawLine({ start: { x: 17, y: 690 }, end: { x: 570, y: 690 } })
-
-    /* (3) Define constants for the page's width and height */
-    const PAGE_WIDTH = 500;
-    const PAGE_HEIGHT = 500;
-
-    /* (4) Create the link annotation object and ref */
-    const linkAnnotation = PDF.context.obj({
+    const LinkQRCode = PDF.context.obj({
         Type: 'Annot',
         Subtype: 'Link',
-        Rect: [100, PAGE_HEIGHT / 2 - 5, 700, PAGE_HEIGHT / 2 + 15],
-        Border: [0, 0, 2],
-        C: [0, 0, 1],
+        Rect: [500, 770, 700, 700],
+        Border: [2, 2, 2],
+        C: [1, 1, 1],
         A: {
-        Type: 'Action',
-        S: 'URI',
-        URI: PDFString.of('https://github.com/Hopding/pdf-lib'),
+            Type: 'Action',
+            S: 'URI',
+            URI: PDFString.of('https://github.com/Hopding/pdf-lib'),
         },
     });
-    const linkAnnotationRef = PDF.context.register(linkAnnotation);
+    const ReferenciaDoLinkQRCode = PDF.context.register(LinkQRCode);
 
-    /* (6) Draw some text for the link to be placed over */
-    pagina.drawText('Link to the pdf-lib GitHub Repo', {
-        x: 150,
-        y: PAGE_HEIGHT / 2,
-        font: Helvetica,
+    Pagina.node.set(PDFName.of('Annots'), PDF.context.obj([ReferenciaDoLinkQRCode]));
+
+    Pagina.drawLine({ start: { x: 17, y: 690 }, end: { x: 570, y: 690 } })    
+}
+
+function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, ColecaoDeSignatarios) {
+    Pagina.drawText('Assinaturas', {
+        x: 17,
+        y: 670,
         size: 15,
-        color: rgb(0, 0, 1),
-    });
-  
-    /* (7) Add the link to the page */
-    pagina.node.set(PDFName.of('Annots'), PDF.context.obj([linkAnnotationRef]));
+        font: HelveticaBold
+    })
 
+    ColecaoDeSignatarios.forEach((Signatario) => {
+
+    })
+}
+
+function ConstruirRodaPe(PDF, Helvetica, DocumentoGUID) {
     const QuantidadeDePaginas = PDF.getPageIndices()
 
     for (const PaginaAtual of QuantidadeDePaginas) {
@@ -114,13 +124,7 @@ module.exports = async (DocumentoBase64, DocumentoId) =>  {
             font: Helvetica
         })
     }
-
-    const BytesDoPDF = await PDF.save()
-    const DocumentoBase64Atualizado = Buffer.from(BytesDoPDF).toString('base64')
-
-    return DocumentoBase64Atualizado
 }
-
     // const form = PDF.getForm();
   
     // const button = form.createButton('foo.bar');
