@@ -15,6 +15,7 @@ const InstanciaConfiguradaDoSequelize = new Sequelize(
   {
     host: Configuracao.HOST,
     dialect: Configuracao.dialect,
+    logging: false,
     operatorsAliases: false,
     pool: {
       max: Configuracao.pool.max,

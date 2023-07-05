@@ -3,18 +3,17 @@ const { PDFDocument, StandardFonts, rgb, PDFName, PDFString } = require("pdf-lib
 const GeradorDeQRCode = require("../FuncoesGenericas/GeradorDeQRCode");
 
 module.exports = async (DocumentoBase64, DocumentoId, ColecaoDeSignatarios) =>  {
-
     const { dataValues: { DocumentoGUID, DocumentoNome } } = await Documento.findByPk(DocumentoId)
 
     const BufferDoBase64 = Buffer.from(DocumentoBase64, 'base64')
     const PDF = await PDFDocument.load(BufferDoBase64)
     const HelveticaBold = await PDF.embedFont(StandardFonts.HelveticaBold)
     const Helvetica = await PDF.embedFont(StandardFonts.Helvetica)
-    const Pagina = PDF.addPage()
+    var Pagina = PDF.addPage()
 
     await ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID)
-    ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, ColecaoDeSignatarios)
-    ConstruirRodaPe(PDF, Helvetica, DocumentoGUID)
+    PosicaoY = ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, ColecaoDeSignatarios)
+    ConstruirRodaPe(PDF, Pagina, Helvetica, DocumentoGUID, PosicaoY)
 
     const BytesDoPDF = await PDF.save()
     const DocumentoBase64Atualizado = Buffer.from(BytesDoPDF).toString('base64')
@@ -106,12 +105,48 @@ function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, Do
         font: HelveticaBold
     })
 
+    let PosicaoY = 630
+    let QuantidadeSignatario = 0
+    let QuantidadeMaximaSignatario = 12
+
     ColecaoDeSignatarios.forEach((Signatario) => {
 
+        QuantidadeSignatario++
+
+        if (QuantidadeSignatario == QuantidadeMaximaSignatario) {
+            QuantidadeSignatario = 1
+            QuantidadeMaximaSignatario = 16
+            PosicaoY = 800
+            Pagina = PDF.addPage()
+        }
+
+        Pagina.drawText(Signatario.SignatarioNome, {
+            x: 50,
+            y: PosicaoY,
+            size: 12,
+            font: Helvetica
+        })
+
+        Pagina.drawText('Pendente', {
+            x: 50,
+            y: PosicaoY-15,
+            size: 10,
+            font: Helvetica
+        })        
+
+        PosicaoY = PosicaoY-50
+
     })
+
+    return PosicaoY
 }
 
-function ConstruirRodaPe(PDF, Helvetica, DocumentoGUID) {
+function ConstruirRodaPe(PDF, Pagina, Helvetica, DocumentoGUID, PosicaoY) {
+
+    PosicaoY = PosicaoY-20
+
+    Pagina.drawLine({ start: { x: 17, y: PosicaoY }, end: { x: 570, y: PosicaoY } })
+
     const QuantidadeDePaginas = PDF.getPageIndices()
 
     for (const PaginaAtual of QuantidadeDePaginas) {
