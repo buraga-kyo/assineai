@@ -23,18 +23,24 @@ module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
         }
         const { DocumentoId } = await Documento.create(RegistroDoDocumento)
 
-        const RegistroDoSignatario = {
-            SignatarioNome: Requisicao.body.SignatarioNome,
-            SignatarioEmail: Requisicao.body.SignatarioEmail,
-            SignatarioModoAutenticacao: Requisicao.body.SignatarioModoAutenticacao,
-            SignatarioIp: Requisicao.connection.remoteAddress || Requisicao.socket.remoteAddress || Requisicao.connection.socket.remoteAddress,
-            SignatarioDispositivo: JSON.stringify(Requisicao.headers),
-            SignatarioToken: Requisicao.body.SignatarioToken,
-            DocumentoId
-        }; 
-        Signatario.create(RegistroDoSignatario)
+        // const RegistroDoSignatario = {
+        //     SignatarioNome: Requisicao.body.SignatarioNome,
+        //     SignatarioEmail: Requisicao.body.SignatarioEmail,
+        //     SignatarioModoAutenticacao: Requisicao.body.SignatarioModoAutenticacao,
+        //     SignatarioIp: Requisicao.connection.remoteAddress || Requisicao.socket.remoteAddress || Requisicao.connection.socket.remoteAddress,
+        //     SignatarioDispositivo: JSON.stringify(Requisicao.headers),
+        //     SignatarioToken: Requisicao.body.SignatarioToken,
+        //     DocumentoId
+        // }; 
+        // Signatario.create(RegistroDoSignatario)
 
-        const DocumentoBase64Atualizado = await ConstruirPaginaComDadosDeAssinatura(RegistroArquivo.ArquivoBase64, DocumentoId)
+        const ColecaoDeSignatarios = Requisicao.body.Signatarios
+        
+        ColecaoDeSignatarios.forEach((RegistroDoSignatario) => {
+            Signatario.create(RegistroDoSignatario)
+        })
+
+        const DocumentoBase64Atualizado = await ConstruirPaginaComDadosDeAssinatura(RegistroArquivo.ArquivoBase64, DocumentoId, ColecaoDeSignatarios)
 
         const NomeDoArquivo = DocumentoId+".pdf"
         const CaminhoDoArquivo = "./ArquivosTemporarios/"+NomeDoArquivo
@@ -45,7 +51,6 @@ module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
             const PDFAssinadoComSucesso = await AssinarPDFcomCertificadoDigital(NomeDoArquivo)
 
             if (PDFAssinadoComSucesso) {
-                console.log("entrou")
                 const BufferDoPDFcomCertificado =  fs.readFileSync("./ArquivosTemporarios/"+DocumentoId+"_signed.pdf")
                 const Base64PDFComCertificado = BufferDoPDFcomCertificado.toString('base64')
                 const DadosCriptografiaAssimetrica = AssinarPDFcomCriptografiaAssimetrica(Base64PDFComCertificado)

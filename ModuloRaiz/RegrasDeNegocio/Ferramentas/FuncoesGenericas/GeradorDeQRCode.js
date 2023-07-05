@@ -9,8 +9,6 @@ module.exports = async (DocumentoGUID, link) =>  {
             errorCorrectionLevel: 'H'
         }, function(err) {
             if (err) throw err;
-            console.log('QR code saved!');
-
             const QRCodeBuffer = fs.readFileSync('./ArquivosTemporarios/'+DocumentoGUID+'_QRCode.png');
             resolve(QRCodeBuffer)
         });        
