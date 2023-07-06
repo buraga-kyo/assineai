@@ -143,9 +143,18 @@ function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, Do
 
 function ConstruirRodaPe(PDF, Pagina, Helvetica, DocumentoGUID, PosicaoY) {
 
-    PosicaoY = PosicaoY-20
+    Pagina = PDF.addPage()
 
-    Pagina.drawLine({ start: { x: 17, y: PosicaoY }, end: { x: 570, y: PosicaoY } })
+    //PosicaoY = PosicaoY-20
+
+    Pagina.drawText('Assina Aí', {
+        x: 17,
+        y: 40,
+        size: 20,
+        font: Helvetica
+    })
+
+    Pagina.drawLine({ start: { x: 17, y: 30 }, end: { x: 570, y: 30 } })
 
     const QuantidadeDePaginas = PDF.getPageIndices()
 
