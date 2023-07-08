@@ -23,13 +23,13 @@ module.exports = (DocumentoBase64) => {
         format: 'der',
     })
     
-    const Hash = crypto.createSign('SHA256')
-    Hash.update(DocumentoBase64)
-    Hash.end()
-    const Assinatura = Hash.sign(ChavePrivada)
+    const AssinaturaSHA256 = crypto.createSign('SHA256')
+    AssinaturaSHA256.update(DocumentoBase64)
+    AssinaturaSHA256.end()
+    const BufferDocumentoAssinado = AssinaturaSHA256.sign(ChavePrivada)
 
     return {
         ChavePublica,
-        Assinatura: Assinatura.toString('base64')
+        Assinatura: BufferDocumentoAssinado.toString('base64')
     }
 }
