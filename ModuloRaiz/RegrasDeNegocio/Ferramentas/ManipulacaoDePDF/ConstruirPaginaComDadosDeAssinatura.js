@@ -1,6 +1,8 @@
 const { Documento, Signatario, Arquivo } = require("../../../BancoDeDados/Conector").Tabelas;
 const { PDFDocument, StandardFonts, rgb, PDFName, PDFString } = require("pdf-lib");
 const GeradorDeQRCode = require("../FuncoesGenericas/GeradorDeQRCode");
+const fs = require("fs");
+
 
 module.exports = async (DocumentoBase64, DocumentoId, ColecaoDeSignatarios) =>  {
     const { dataValues: { DocumentoGUID, DocumentoNome } } = await Documento.findByPk(DocumentoId)
@@ -23,48 +25,79 @@ module.exports = async (DocumentoBase64, DocumentoId, ColecaoDeSignatarios) =>  
 
 
 async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID) {
-    Pagina.drawText('(Assina AI Logo)', {
-        x: 15,
-        y: 800,
-        size: 15,
-        font: HelveticaBold
+    
+    const BordaDoTopo = Pagina.getHeight() - 40
+    const BordaDaEsquerda = 26
+    
+    Pagina.drawText('assina aí', {
+        x: BordaDaEsquerda,
+        y: BordaDoTopo,
+        size: 20,
+        font: HelveticaBold,
+        color: rgb(0.14,0.14,0.14)
     })
 
-    Pagina.drawText('Relatório de Assinaturas', {
-        x: 140,
-        y: 800,
-        size: 10,
-        font: HelveticaBold
+    Pagina.drawText('Gerado em 28 de Junho de 2023, Hora 21:52', {
+        x: 422,
+        y: 810,
+        size: 7,
+        font: Helvetica,
+        color: rgb(0.46,0.46,0.46)
     })
 
     Pagina.drawText('Datas e Horários em UTC-0300 (America/Sao_Paulo)', {
-        x: 400,
-        y: 810,
-        size: 7,
-        font: Helvetica
-    })
-
-    Pagina.drawText('Última atualização em 28 Março 2023, 10:19', {
-        x: 427,
+        x: 397,
         y: 800,
         size: 7,
-        font: Helvetica
+        font: Helvetica,
+        color: rgb(0.46,0.46,0.46)
     })
 
-    Pagina.drawLine({ start: { x: 17, y: 780 }, end: { x: 570, y: 780 } })
+    Pagina.drawLine({ 
+        start: { x: BordaDaEsquerda, y: 785 }, 
+        end: { x: 570, y: 785 },
+        thickness: 0.5,
+        color: rgb(0.78,0.78,0.78)
+    })
 
-    Pagina.drawText(DocumentoNome, {
-        x: 17,
+    Pagina.drawText(DocumentoNome+'.pdf', {
+        x: BordaDaEsquerda,
         y: 750,
-        size: 15,
-        font: HelveticaBold
+        size: 12,
+        font: HelveticaBold,
+        color: rgb(0.14,0.14,0.14)
     })
 
-    Pagina.drawText('Identificação do Documento: '+DocumentoGUID, {
-        x: 17,
-        y: 735,
+    Pagina.drawText('Identificação do documento:', {
+        x: BordaDaEsquerda,
+        y: 737,
         size: 8,
-        font: Helvetica
+        font: HelveticaBold,
+        color: rgb(0.46,0.46,0.46)
+    })
+
+    Pagina.drawText(DocumentoGUID, {
+        x: 137,
+        y: 737,
+        size: 8,
+        font: Helvetica,
+        color: rgb(0.46,0.46,0.46)
+    })
+
+    Pagina.drawText('Hash do documento original (SHA256):', {
+        x: BordaDaEsquerda,
+        y: 727,
+        size: 8,
+        font: HelveticaBold,
+        color: rgb(0.46,0.46,0.46)
+    })
+
+    Pagina.drawText(DocumentoGUID, {
+        x: 177,
+        y: 727,
+        size: 8,
+        font: Helvetica,
+        color: rgb(0.46,0.46,0.46)
     })
 
     const QRCodeBuffer = await GeradorDeQRCode(DocumentoGUID, 'https://pdf-lib.js.org/#examples')
@@ -72,10 +105,10 @@ async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, Documen
     const QRCodeImage = await PDF.embedPng(QRCodeBuffer)
 
     Pagina.drawImage(QRCodeImage, {
-        x: 495,
-        y: 695,
-        width: 80,
-        height: 80,
+        x: 513,
+        y: 709,
+        width: 60,
+        height: 60,
     })
 
     const LinkQRCode = PDF.context.obj({
@@ -93,17 +126,26 @@ async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, Documen
     const ReferenciaDoLinkQRCode = PDF.context.register(LinkQRCode);
 
     Pagina.node.set(PDFName.of('Annots'), PDF.context.obj([ReferenciaDoLinkQRCode]));
-
-    Pagina.drawLine({ start: { x: 17, y: 690 }, end: { x: 570, y: 690 } })    
+    
+    Pagina.drawLine({ 
+        start: { x: BordaDaEsquerda, y: 690 }, 
+        end: { x: 570, y: 690 },
+        thickness: 0.5,
+        color: rgb(0.78,0.78,0.78)
+    })
 }
 
 function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, ColecaoDeSignatarios) {
+
+    const BordaDaEsquerda = 26    
+
     Pagina.drawText('Assinaturas', {
-        x: 17,
-        y: 670,
+        x: BordaDaEsquerda,
+        y: 660,
         size: 15,
-        font: HelveticaBold
-    })
+        font: HelveticaBold,
+        color: rgb(0.14,0.14,0.14)
+    })    
 
     let PosicaoY = 630
     let QuantidadeSignatario = 0
@@ -141,11 +183,45 @@ function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, Do
     return PosicaoY
 }
 
-function ConstruirRodaPe(PDF, Pagina, Helvetica, DocumentoGUID, PosicaoY) {
+async function ConstruirRodaPe(PDF, Pagina, Helvetica, DocumentoGUID, PosicaoY) {
 
     Pagina = PDF.addPage()
 
-    //PosicaoY = PosicaoY-20
+    Pagina.drawText('Hash do documento original', {
+        x: 80,
+        y: 125,
+        size: 7,
+        font: Helvetica
+    })
+
+    const ICPBuffer = fs.readFileSync('./ArquivosTemporarios/ICP.png');
+
+    const ICPPNG = await PDF.embedPng(ICPBuffer)
+
+    const DimensaoICPPNG = ICPPNG.scale(0.2)
+
+    Pagina.drawImage(ICPPNG, {
+        x: 17,
+        y: 110,
+        width: DimensaoICPPNG.width,
+        height: DimensaoICPPNG.height,
+    })
+
+    Pagina.drawLine({ start: { x: 17, y: 100 }, end: { x: 570, y: 100 } })
+
+    Pagina.drawText(`Este Log é exclusivo ao, e deve ser considerado parte do, documento número ${DocumentoGUID}`, {
+        x: 17,
+        y: 80,
+        size: 7,
+        font: Helvetica
+    })
+
+    Pagina.drawText('de acordo com os Termos de Uso da ZapSign disponível em zapsign.com.brí', {
+        x: 17,
+        y: 70,
+        size: 7,
+        font: Helvetica
+    })
 
     Pagina.drawText('Assina Aí', {
         x: 17,
