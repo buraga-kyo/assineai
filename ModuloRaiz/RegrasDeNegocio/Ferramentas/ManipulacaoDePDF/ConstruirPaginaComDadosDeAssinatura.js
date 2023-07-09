@@ -14,7 +14,7 @@ module.exports = async (DocumentoBase64, DocumentoId, ColecaoDeSignatarios) =>  
     var Pagina = PDF.addPage()
 
     await ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID)
-    PosicaoY = ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, ColecaoDeSignatarios)
+    PosicaoY = await ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, ColecaoDeSignatarios)
     ConstruirRodaPe(PDF, Pagina, Helvetica, DocumentoGUID, PosicaoY)
 
     const BytesDoPDF = await PDF.save()
@@ -135,7 +135,7 @@ async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, Documen
     })
 }
 
-function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, ColecaoDeSignatarios) {
+async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, ColecaoDeSignatarios) {
 
     const BordaDaEsquerda = 26    
 
@@ -151,7 +151,16 @@ function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, Do
     let QuantidadeSignatario = 0
     let QuantidadeMaximaSignatario = 12
 
-    ColecaoDeSignatarios.forEach((Signatario) => {
+    PosicaoY = await ConstruirSignatariosPendentesAssinatura(ColecaoDeSignatarios, PDF, Pagina, PosicaoY, QuantidadeSignatario, QuantidadeMaximaSignatario, HelveticaBold, Helvetica)
+
+    return PosicaoY
+}
+
+async function ConstruirSignatariosPendentesAssinatura(ColecaoDeSignatarios, PDF, Pagina, PosicaoY, QuantidadeSignatario, QuantidadeMaximaSignatario, HelveticaBold, Helvetica) {
+    ColecaoDeSignatarios.forEach(async (Signatario) => {
+
+        const BufferAssinaturaPendente = fs.readFileSync('./ArquivosTemporarios/pendente.png');
+        const AssinaturaPendentePNG = await PDF.embedPng(BufferAssinaturaPendente)
 
         QuantidadeSignatario++
 
@@ -161,19 +170,28 @@ function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, Do
             PosicaoY = 800
             Pagina = PDF.addPage()
         }
-
-        Pagina.drawText(Signatario.SignatarioNome, {
-            x: 50,
-            y: PosicaoY,
-            size: 12,
-            font: Helvetica
+    
+        Pagina.drawImage(AssinaturaPendentePNG, {
+            x: 25,
+            y: PosicaoY-7,
+            width: 15,
+            height: 15,
         })
 
-        Pagina.drawText('Pendente', {
-            x: 50,
-            y: PosicaoY-15,
+        Pagina.drawText(Signatario.SignatarioNome, {
+            x: 47,
+            y: PosicaoY,
             size: 10,
-            font: Helvetica
+            font: HelveticaBold,
+            color: rgb(0.14,0.14,0.14)
+        })
+
+        Pagina.drawText('Assinatura pendente', {
+            x: 47,
+            y: PosicaoY-10,
+            size: 7,
+            font: Helvetica,
+            color: rgb(0.46,0.46,0.46)
         })        
 
         PosicaoY = PosicaoY-50
