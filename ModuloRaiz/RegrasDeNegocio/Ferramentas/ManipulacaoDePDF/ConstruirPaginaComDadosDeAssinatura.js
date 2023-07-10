@@ -2,18 +2,19 @@ const { Documento, Signatario, Arquivo } = require("../../../BancoDeDados/Conect
 const { PDFDocument, StandardFonts, rgb, PDFName, PDFString } = require("pdf-lib");
 const GeradorDeQRCode = require("../FuncoesGenericas/GeradorDeQRCode");
 const fs = require("fs");
-
+const crypto = require("crypto");
 
 module.exports = async (DocumentoBase64, DocumentoId, ColecaoDeSignatarios) =>  {
     const { dataValues: { DocumentoGUID, DocumentoNome } } = await Documento.findByPk(DocumentoId)
 
+    const HashDocumentoOriginal = await RetornarHashDocumentoOriginal(DocumentoId)
     const BufferDoBase64 = Buffer.from(DocumentoBase64, 'base64')
     const PDF = await PDFDocument.load(BufferDoBase64)
     const HelveticaBold = await PDF.embedFont(StandardFonts.HelveticaBold)
     const Helvetica = await PDF.embedFont(StandardFonts.Helvetica)
     var Pagina = PDF.addPage()
 
-    await ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID)
+    await ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, HashDocumentoOriginal)
     PosicaoY = await ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, ColecaoDeSignatarios)
     ConstruirRodaPe(PDF, Pagina, Helvetica, DocumentoGUID, PosicaoY)
 
@@ -23,9 +24,23 @@ module.exports = async (DocumentoBase64, DocumentoId, ColecaoDeSignatarios) =>  
     return DocumentoBase64Atualizado
 }
 
+async function RetornarHashDocumentoOriginal(DocumentoId) {
+    return new Promise((resolve, reject) => {
+    // the file you want to get the hash    
+        var fd = fs.createReadStream("./ArquivosTemporarios/"+DocumentoId+"_A.pdf");
+        var hash = crypto.createHash('sha256');
+        hash.setEncoding('hex');
+        // read all file and pipe it (write it) to the hash object
+        fd.pipe(hash);
+        fd.on('end', function() {
+            hash.end();
+            resolve(hash.read()) // the desired sha1sum
+        });
+    })
+}
 
-async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID) {
-    
+async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, HashDocumentoOriginal) {
+
     const BordaDoTopo = Pagina.getHeight() - 40
     const BordaDaEsquerda = 26
     
@@ -37,16 +52,16 @@ async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, Documen
         color: rgb(0.14,0.14,0.14)
     })
 
-    Pagina.drawText('Gerado em 28 de Junho de 2023, Hora 21:52', {
-        x: 422,
+    Pagina.drawText(`Gerado: ${dataAtualFormatada()}`, {
+        x: 465,
         y: 810,
         size: 7,
         font: Helvetica,
         color: rgb(0.46,0.46,0.46)
     })
 
-    Pagina.drawText('Datas e Horários em UTC-0300 (America/Sao_Paulo)', {
-        x: 397,
+    Pagina.drawText('Datas e Horários em UTC-0300', {
+        x: 470,
         y: 800,
         size: 7,
         font: Helvetica,
@@ -92,7 +107,7 @@ async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, Documen
         color: rgb(0.46,0.46,0.46)
     })
 
-    Pagina.drawText(DocumentoGUID, {
+    Pagina.drawText(HashDocumentoOriginal, {
         x: 177,
         y: 727,
         size: 8,
@@ -100,7 +115,9 @@ async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, Documen
         color: rgb(0.46,0.46,0.46)
     })
 
-    const QRCodeBuffer = await GeradorDeQRCode(DocumentoGUID, 'https://pdf-lib.js.org/#examples')
+    const LinkVerificadorDeAutenticidade = process.env.ORIGIN+'/verificar/autenticidade?doc='+DocumentoGUID
+
+    const QRCodeBuffer = await GeradorDeQRCode(DocumentoGUID, LinkVerificadorDeAutenticidade)
 
     const QRCodeImage = await PDF.embedPng(QRCodeBuffer)
 
@@ -120,7 +137,7 @@ async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, Documen
         A: {
             Type: 'Action',
             S: 'URI',
-            URI: PDFString.of('https://github.com/Hopding/pdf-lib'),
+            URI: PDFString.of(LinkVerificadorDeAutenticidade),
         },
     });
     const ReferenciaDoLinkQRCode = PDF.context.register(LinkQRCode);
@@ -133,6 +150,21 @@ async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, Documen
         thickness: 0.5,
         color: rgb(0.78,0.78,0.78)
     })
+}
+
+function dataAtualFormatada(){
+    var data = new Date(),
+        dia  = data.getDate().toString(),
+        diaF = (dia.length == 1) ? '0'+dia : dia,
+        mes  = (data.getMonth()+1).toString(), //+1 pois no getMonth Janeiro começa com zero.
+        mesF = (mes.length == 1) ? '0'+mes : mes,
+        anoF = data.getFullYear();
+        Hora = data.getHours().toString()
+        HoraF = (Hora.length == 1) ? '0'+Hora : Hora
+        Minuto = data.getMinutes().toString()
+        MinutoF = (Minuto.length == 1) ? '0'+Minuto : Minuto
+
+    return diaF+"/"+mesF+"/"+anoF+' às '+HoraF+'h'+MinutoF+'min';
 }
 
 async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, ColecaoDeSignatarios) {
