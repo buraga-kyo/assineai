@@ -1,5 +1,6 @@
 const { Documento, Signatario, Arquivo } = require("../../BancoDeDados/Conector").Tabelas;
 const ConstruirPaginaComDadosDeAssinatura = require("../Ferramentas/ManipulacaoDePDF/ConstruirPaginaComDadosDeAssinatura");
+const RecuperarHashDeArquivoApartirDeBase64 = require("../Ferramentas/FuncoesGenericas/RecuperarHashDeArquivoApartirDeBase64");
 const crypto = require("crypto");
 
 module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
@@ -10,6 +11,8 @@ module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
             ArquivoBase64: Requisicao.body.DocumentoBase64,
         }
         const { ArquivoId } = await Arquivo.create(RegistroArquivo)
+
+        RecuperarHashDeArquivoApartirDeBase64(ArquivoBase64)
 
         const RegistroDoDocumento = {
             DocumentoNome: Requisicao.body.DocumentoNome,

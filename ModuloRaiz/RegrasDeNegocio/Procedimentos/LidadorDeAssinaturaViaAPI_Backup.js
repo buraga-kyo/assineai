@@ -4,6 +4,7 @@ const ConstruirPaginaComDadosDeAssinatura = require("../Ferramentas/ManipulacaoD
 const CriarArquivoPDFApartirDoBase64 = require("../Ferramentas/ManipulacaoDePDF/CriarArquivoPDFApartirDoBase64");
 const AssinarPDFcomCertificadoDigital = require("../Ferramentas/LidadorDeAssinatura/CertificadoDigital");
 const AssinarPDFcomCriptografiaAssimetrica = require("../Ferramentas/LidadorDeAssinatura/CriptografiaAssimetrica");
+const RecuperarHashDeArquivoApartirDeBase64 = require("../Ferramentas/FuncoesGenericas/RecuperarHashDeArquivoApartirDeBase64");
 
 const fs = require("fs");
 const crypto = require("crypto");
@@ -22,6 +23,9 @@ module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
             ArquivoOriginalId: ArquivoId
         }
         const { DocumentoId } = await Documento.create(RegistroDoDocumento)
+
+        CriarArquivoPDFApartirDoBase64("./ArquivosTemporarios/"+DocumentoId+"_A.pdf", RegistroArquivo.ArquivoBase64)
+
 
         // const RegistroDoSignatario = {
         //     SignatarioNome: Requisicao.body.SignatarioNome,
