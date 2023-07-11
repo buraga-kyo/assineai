@@ -16,7 +16,7 @@ module.exports = async (DocumentoBase64, DocumentoId, ColecaoDeSignatarios) =>  
 
     await ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, HashDocumentoOriginal)
     PosicaoY = await ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, ColecaoDeSignatarios)
-    ConstruirRodaPe(PDF, Pagina, Helvetica, DocumentoGUID, PosicaoY)
+    ConstruirRodaPe(PDF, Pagina, Helvetica, DocumentoGUID, PosicaoY, 26, HelveticaBold)
 
     const BytesDoPDF = await PDF.save()
     const DocumentoBase64Atualizado = Buffer.from(BytesDoPDF).toString('base64')
@@ -27,7 +27,7 @@ module.exports = async (DocumentoBase64, DocumentoId, ColecaoDeSignatarios) =>  
 async function RetornarHashDocumentoOriginal(DocumentoId) {
     return new Promise((resolve, reject) => {
     // the file you want to get the hash    
-        var fd = fs.createReadStream("./ArquivosTemporarios/"+DocumentoId+"_A.pdf");
+        var fd = fs.createReadStream("./Arquivos/Temporario/"+DocumentoId+"_A.pdf");
         var hash = crypto.createHash('sha256');
         hash.setEncoding('hex');
         // read all file and pipe it (write it) to the hash object
@@ -152,7 +152,7 @@ async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, Documen
     })
 }
 
-function dataAtualFormatada(){
+function dataAtualFormatada() {
     var data = new Date(),
         dia  = data.getDate().toString(),
         diaF = (dia.length == 1) ? '0'+dia : dia,
@@ -191,7 +191,7 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNo
 async function ConstruirSignatariosPendentesAssinatura(ColecaoDeSignatarios, PDF, Pagina, PosicaoY, QuantidadeSignatario, QuantidadeMaximaSignatario, HelveticaBold, Helvetica) {
     ColecaoDeSignatarios.forEach(async (Signatario) => {
 
-        const BufferAssinaturaPendente = fs.readFileSync('./ArquivosTemporarios/pendente.png');
+        const BufferAssinaturaPendente = fs.readFileSync('./Arquivos/Permanente/pendente.png');
         const AssinaturaPendentePNG = await PDF.embedPng(BufferAssinaturaPendente)
 
         QuantidadeSignatario++
@@ -233,7 +233,7 @@ async function ConstruirSignatariosPendentesAssinatura(ColecaoDeSignatarios, PDF
     return PosicaoY
 }
 
-async function ConstruirRodaPe(PDF, Pagina, Helvetica, DocumentoGUID, PosicaoY) {
+async function ConstruirRodaPe(PDF, Pagina, Helvetica, DocumentoGUID, PosicaoY, BordaDaEsquerda, HelveticaBold) {
 
     Pagina = PDF.addPage()
 
@@ -244,57 +244,51 @@ async function ConstruirRodaPe(PDF, Pagina, Helvetica, DocumentoGUID, PosicaoY) 
         font: Helvetica
     })
 
-    const ICPBuffer = fs.readFileSync('./ArquivosTemporarios/ICP.png');
+    const ICPBuffer = fs.readFileSync('./Arquivos/Permanente/ICP.png');
 
     const ICPPNG = await PDF.embedPng(ICPBuffer)
 
-    const DimensaoICPPNG = ICPPNG.scale(0.2)
+    const DimensaoICPPNG = ICPPNG.scale(0.05)
 
     Pagina.drawImage(ICPPNG, {
-        x: 17,
-        y: 110,
+        x: 26,
+        y: 30,
         width: DimensaoICPPNG.width,
         height: DimensaoICPPNG.height,
     })
 
-    Pagina.drawLine({ start: { x: 17, y: 100 }, end: { x: 570, y: 100 } })
+    Pagina.drawLine({
+        start: { x: 26, y: 10 }, 
+        end: { x: 570, y: 10 },
+        thickness: 0.5,
+        color: rgb(0.78,0.78,0.78)
+    })
 
-    Pagina.drawText(`Este Log é exclusivo ao, e deve ser considerado parte do, documento número ${DocumentoGUID}`, {
+    Pagina.drawText(`Documento assinado com validade juridica`, {
         x: 17,
         y: 80,
         size: 7,
-        font: Helvetica
+        font: HelveticaBold,
+        color: rgb(0.46,0.46,0.46)
     })
-
-    Pagina.drawText('de acordo com os Termos de Uso da ZapSign disponível em zapsign.com.brí', {
-        x: 17,
-        y: 70,
-        size: 7,
-        font: Helvetica
-    })
-
-    Pagina.drawText('Assina Aí', {
-        x: 17,
-        y: 40,
-        size: 20,
-        font: Helvetica
-    })
-
-    Pagina.drawLine({ start: { x: 17, y: 30 }, end: { x: 570, y: 30 } })
 
     const QuantidadeDePaginas = PDF.getPageIndices()
 
     for (const PaginaAtual of QuantidadeDePaginas) {
         const Pagina = PDF.getPage(PaginaAtual)
 
-        Pagina.drawText('Assina AI '+DocumentoGUID,  {
+        Pagina.drawText('assina aí '+DocumentoGUID,  {
             x: 15,
-            y: 10,
+            y: 5,
             size: 7,
             font: Helvetica
         })
     }
 }
+
+
+
+
     // const form = PDF.getForm();
   
     // const button = form.createButton('foo.bar');

@@ -24,7 +24,7 @@ module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
         }
         const { DocumentoId } = await Documento.create(RegistroDoDocumento)
 
-        CriarArquivoPDFApartirDoBase64("./ArquivosTemporarios/"+DocumentoId+"_A.pdf", RegistroArquivo.ArquivoBase64)
+        CriarArquivoPDFApartirDoBase64("./Arquivos/Temporario/"+DocumentoId+"_A.pdf", RegistroArquivo.ArquivoBase64)
 
 
         // const RegistroDoSignatario = {
@@ -47,7 +47,7 @@ module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
         const DocumentoBase64Atualizado = await ConstruirPaginaComDadosDeAssinatura(RegistroArquivo.ArquivoBase64, DocumentoId, ColecaoDeSignatarios)
 
         const NomeDoArquivo = DocumentoId+".pdf"
-        const CaminhoDoArquivo = "./ArquivosTemporarios/"+NomeDoArquivo
+        const CaminhoDoArquivo = "./Arquivos/Temporario/"+NomeDoArquivo
 
         const ArquivoPDFCriadoComSucesso = await CriarArquivoPDFApartirDoBase64(CaminhoDoArquivo, DocumentoBase64Atualizado)
 
@@ -55,7 +55,7 @@ module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
             const PDFAssinadoComSucesso = await AssinarPDFcomCertificadoDigital(NomeDoArquivo)
 
             if (PDFAssinadoComSucesso) {
-                const BufferDoPDFcomCertificado =  fs.readFileSync("./ArquivosTemporarios/"+DocumentoId+"_signed.pdf")
+                const BufferDoPDFcomCertificado =  fs.readFileSync("./Arquivos/Temporario/"+DocumentoId+"_signed.pdf")
                 const Base64PDFComCertificado = BufferDoPDFcomCertificado.toString('base64')
                 const DadosCriptografiaAssimetrica = AssinarPDFcomCriptografiaAssimetrica(Base64PDFComCertificado)
 
