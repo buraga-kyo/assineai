@@ -6,7 +6,7 @@ module.exports = (NomeDoArquivo) => {
    
     return new Promise((resolve, reject) => {
 
-        cmd.run('cd ./ArquivosTemporarios & java -jar JSignPdf.jar -kst PKCS12 -ksf cert.pfx -ksp '+process.env.SENHA_DO_CERTIFICADO+' -pr DISALLOW_PRINTING '+NomeDoArquivo, (err, data, stderr) => {
+        cmd.run('cd ./Arquivos/Permanente & java -jar JSignPdf.jar -d ../Temporario -kst PKCS12 -ksf cert.pfx -ksp '+process.env.SENHA_DO_CERTIFICADO+' -pr DISALLOW_PRINTING ../Temporario/'+NomeDoArquivo, (err, data, stderr) => {
             if (err == null) {
                 resolve(true);
             } else {
