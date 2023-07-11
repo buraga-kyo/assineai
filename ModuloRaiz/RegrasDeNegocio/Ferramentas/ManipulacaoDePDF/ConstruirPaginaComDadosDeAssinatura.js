@@ -143,13 +143,7 @@ async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, Documen
     const ReferenciaDoLinkQRCode = PDF.context.register(LinkQRCode);
 
     Pagina.node.set(PDFName.of('Annots'), PDF.context.obj([ReferenciaDoLinkQRCode]));
-    
-    Pagina.drawLine({ 
-        start: { x: BordaDaEsquerda, y: 690 }, 
-        end: { x: 570, y: 690 },
-        thickness: 0.5,
-        color: rgb(0.78,0.78,0.78)
-    })
+
 }
 
 function dataAtualFormatada() {
@@ -171,15 +165,29 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNo
 
     const BordaDaEsquerda = 26    
 
+    Pagina.drawLine({ 
+        start: { x: BordaDaEsquerda, y: 690 }, 
+        end: { x: 240, y: 690 },
+        thickness: 0.5,
+        color: rgb(0.78,0.78,0.78)
+    })
+
     Pagina.drawText('Assinaturas', {
-        x: BordaDaEsquerda,
-        y: 660,
+        x: 250,
+        y: 685,
         size: 15,
         font: HelveticaBold,
         color: rgb(0.14,0.14,0.14)
     })    
 
-    let PosicaoY = 630
+    Pagina.drawLine({ 
+        start: { x: 345, y: 690 }, 
+        end: { x: 570, y: 690 },
+        thickness: 0.5,
+        color: rgb(0.78,0.78,0.78)
+    })
+
+    let PosicaoY = 650
     let QuantidadeSignatario = 0
     let QuantidadeMaximaSignatario = 12
 
@@ -237,38 +245,55 @@ async function ConstruirRodaPe(PDF, Pagina, Helvetica, DocumentoGUID, PosicaoY, 
 
     Pagina = PDF.addPage()
 
-    Pagina.drawText('Hash do documento original', {
-        x: 80,
-        y: 125,
-        size: 7,
-        font: Helvetica
-    })
-
     const ICPBuffer = fs.readFileSync('./Arquivos/Permanente/ICP.png');
 
     const ICPPNG = await PDF.embedPng(ICPBuffer)
 
-    const DimensaoICPPNG = ICPPNG.scale(0.05)
+    const DimensaoICPPNG = ICPPNG.scale(0.06)
 
     Pagina.drawImage(ICPPNG, {
         x: 26,
-        y: 30,
+        y: 24,
         width: DimensaoICPPNG.width,
         height: DimensaoICPPNG.height,
     })
 
     Pagina.drawLine({
-        start: { x: 26, y: 10 }, 
-        end: { x: 570, y: 10 },
+        start: { x: 26, y: 20 }, 
+        end: { x: 570, y: 20 },
         thickness: 0.5,
         color: rgb(0.78,0.78,0.78)
     })
 
-    Pagina.drawText(`Documento assinado com validade juridica`, {
-        x: 17,
-        y: 80,
-        size: 7,
+    Pagina.drawText(`Documento assinado com validade jurídica`, {
+        x: 70,
+        y: 61,
+        size: 9,
         font: HelveticaBold,
+        color: rgb(0.46,0.46,0.46)
+    })
+
+    Pagina.drawText('Integridade do documento certificada digitalmente pelo Assina Aí (ICP Brasil):', {
+        x: 70,
+        y: 47,
+        size: 9,
+        font: Helvetica,
+        color: rgb(0.46,0.46,0.46)
+    })
+
+    Pagina.drawText('Este log é exclusivo e deve ser considerado como parte do documento '+DocumentoGUID, {
+        x: 70,
+        y: 37,
+        size: 9,
+        font: Helvetica,
+        color: rgb(0.46,0.46,0.46)
+    })
+
+    Pagina.drawText('De acordo com os termos de uso do Assina Aí, disponivel em www.assinaai.com.br', {
+        x: 70,
+        y: 27,
+        size: 9,
+        font: Helvetica,
         color: rgb(0.46,0.46,0.46)
     })
 
@@ -278,16 +303,14 @@ async function ConstruirRodaPe(PDF, Pagina, Helvetica, DocumentoGUID, PosicaoY, 
         const Pagina = PDF.getPage(PaginaAtual)
 
         Pagina.drawText('assina aí '+DocumentoGUID,  {
-            x: 15,
+            x: 26,
             y: 5,
-            size: 7,
-            font: Helvetica
+            size: 6,
+            font: Helvetica,
+            color: rgb(0.46,0.46,0.46)
         })
     }
 }
-
-
-
 
     // const form = PDF.getForm();
   
