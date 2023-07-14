@@ -1,9 +1,7 @@
 const { Documento, Signatario, Arquivo } = require("../../BancoDeDados/Conector").Tabelas;
-const ConstruirPaginaComDadosDeAssinatura = require("../Ferramentas/ManipulacaoDePDF/ConstruirPaginaComDadosDeAssinatura");
-const RecuperarHashDeArquivoApartirDeBase64 = require("../Ferramentas/FuncoesGenericas/RecuperarHashDeArquivoApartirDeBase64");
 const crypto = require("crypto");
 
-module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
+module.exports = async (Requisicao, Resposta) => {
     
     try {
 
@@ -12,28 +10,31 @@ module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
         }
         const { ArquivoId } = await Arquivo.create(RegistroArquivo)
 
-        RecuperarHashDeArquivoApartirDeBase64(ArquivoBase64)
-
         const RegistroDoDocumento = {
             DocumentoNome: Requisicao.body.DocumentoNome,
-            DocumentoGUID: crypto.randomUUID(),
+            DocumentoToken: crypto.randomUUID(),
             ArquivoOriginalId: ArquivoId
         }
         const { DocumentoId } = await Documento.create(RegistroDoDocumento)
 
-        const ColecaoDeSignatarios = Requisicao.body.Signatarios
+        const ColecaoDeSignatarios = Requisicao.body.Signatarios.map((RegistroDoSignatario) => {
+            return {
+                ...RegistroDoSignatario,
+                SignatarioToken: crypto.randomUUID(),
+                DocumentoId: DocumentoId
+            }
+        })
 
         ColecaoDeSignatarios.forEach((RegistroDoSignatario) => {
             Signatario.create(RegistroDoSignatario)
         })
 
-        const DocumentoBase64Atualizado = await ConstruirPaginaComDadosDeAssinatura(RegistroArquivo.ArquivoBase64, DocumentoId, ColecaoDeSignatarios)
+        const JSONResposta = {
+            Documento: RegistroDoDocumento,
+            Signatarios: ColecaoDeSignatarios 
+        }
 
-        const { ArquivoId: ArquivoEmAndamentoId } = await Arquivo.create({ ArquivoBase64: DocumentoBase64Atualizado })
-
-        Documento.update({ ArquivoEmAndamentoId }, { where: { DocumentoId } })
-
-        Resposta.json(RegistroDoDocumento)
+        Resposta.json(JSONResposta)
 
     } catch (Erro) {
         console.log(Erro)
