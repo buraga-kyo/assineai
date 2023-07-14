@@ -47,6 +47,9 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
         },
         SignatarioGeoLongitude: {
             type: Sequelize.TEXT
+        },
+        SignatarioStatusAssinatura: {
+            type: Sequelize.STRING
         }
     });
 

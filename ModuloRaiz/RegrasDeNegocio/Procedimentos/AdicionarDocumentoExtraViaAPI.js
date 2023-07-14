@@ -5,6 +5,8 @@ module.exports = async (Requisicao, Resposta) => {
     
     try {
 
+        console.log(Requisicao.params)
+
         const { dataValues: { DocumentoId } } = await Documento.findOne({ where: { DocumentoToken: Requisicao.params.DocumentoToken } })
 
         const RegistroArquivo = {
