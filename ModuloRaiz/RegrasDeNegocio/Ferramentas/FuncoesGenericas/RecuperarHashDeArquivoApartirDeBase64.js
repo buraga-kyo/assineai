@@ -1,13 +1,15 @@
 const crypto = require("crypto");
 const fs = require("fs");
 
-module.exports = async (DocumentoBase64) =>  {
-    const base64SemHeader = DocumentoBase64.split(';base64,').pop();
-
-    fs.write('documento.pdf', base64SemHeader, {encoding: 'base64'}, (err) => {
-        if (err) {
-            console.log(err)
-        }
+module.exports = async (CaminhoDoArquivo) =>  {
+    return new Promise((resolve, reject) => {
+        var fd = fs.createReadStream(CaminhoDoArquivo);
+        var hash = crypto.createHash('sha256');
+        hash.setEncoding('hex');
+        fd.pipe(hash);
+        fd.on('end', function() {
+            hash.end();
+            resolve(hash.read())
+        });
     })
-    
 }
