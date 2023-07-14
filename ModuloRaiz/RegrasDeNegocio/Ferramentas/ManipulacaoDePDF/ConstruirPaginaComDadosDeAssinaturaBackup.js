@@ -15,7 +15,8 @@ module.exports = async (DocumentoBase64, DocumentoId, ColecaoDeSignatarios) =>  
     var Pagina = PDF.addPage()
 
     await ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, HashDocumentoOriginal)
-    await ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, ColecaoDeSignatarios, DocumentoGUID)
+    PosicaoY = await ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, ColecaoDeSignatarios)
+    ConstruirRodaPe(PDF, Pagina, Helvetica, DocumentoGUID, PosicaoY, 26, HelveticaBold)
 
     const BytesDoPDF = await PDF.save()
     const DocumentoBase64Atualizado = Buffer.from(BytesDoPDF).toString('base64')
@@ -145,10 +146,27 @@ async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, Documen
 
 }
 
-async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, ColecaoDeSignatarios, DocumentoGUID) {
+function dataAtualFormatada() {
+    var data = new Date(),
+        dia  = data.getDate().toString(),
+        diaF = (dia.length == 1) ? '0'+dia : dia,
+        mes  = (data.getMonth()+1).toString(), //+1 pois no getMonth Janeiro começa com zero.
+        mesF = (mes.length == 1) ? '0'+mes : mes,
+        anoF = data.getFullYear();
+        Hora = data.getHours().toString()
+        HoraF = (Hora.length == 1) ? '0'+Hora : Hora
+        Minuto = data.getMinutes().toString()
+        MinutoF = (Minuto.length == 1) ? '0'+Minuto : Minuto
+
+    return diaF+"/"+mesF+"/"+anoF+' às '+HoraF+'h'+MinutoF+'min';
+}
+
+async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoGUID, ColecaoDeSignatarios) {
+
+    const BordaDaEsquerda = 26    
 
     Pagina.drawLine({ 
-        start: { x: 26, y: 690 }, 
+        start: { x: BordaDaEsquerda, y: 690 }, 
         end: { x: 240, y: 690 },
         thickness: 0.5,
         color: rgb(0.78,0.78,0.78)
@@ -169,33 +187,38 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, ColecaoDeSi
         color: rgb(0.78,0.78,0.78)
     })
 
-    await ConstruirSignatariosPendentesAssinatura(ColecaoDeSignatarios, PDF, Pagina, HelveticaBold, Helvetica, DocumentoGUID)
+    let PosicaoY = 650
+    let QuantidadeSignatario = 0
+    let QuantidadeMaximaSignatario = 12
 
+    PosicaoY = await ConstruirSignatariosPendentesAssinatura(ColecaoDeSignatarios, PDF, Pagina, PosicaoY, QuantidadeSignatario, QuantidadeMaximaSignatario, HelveticaBold, Helvetica)
+
+    return PosicaoY
 }
 
-async function ConstruirSignatariosPendentesAssinatura(ColecaoDeSignatarios, PDF, Pagina, HelveticaBold, Helvetica, DocumentoGUID) {
-
-    let PosicaoY = 600
-    var PaginaAtual = Pagina
-
+async function ConstruirSignatariosPendentesAssinatura(ColecaoDeSignatarios, PDF, Pagina, PosicaoY, QuantidadeSignatario, QuantidadeMaximaSignatario, HelveticaBold, Helvetica) {
     ColecaoDeSignatarios.forEach(async (Signatario) => {
 
         const BufferAssinaturaPendente = fs.readFileSync('./Arquivos/Permanente/pendente.png');
         const AssinaturaPendentePNG = await PDF.embedPng(BufferAssinaturaPendente)
 
-        if (PosicaoY == 0) {
+        QuantidadeSignatario++
+
+        if (QuantidadeSignatario == QuantidadeMaximaSignatario) {
+            QuantidadeSignatario = 1
+            QuantidadeMaximaSignatario = 16
             PosicaoY = 800
-            PaginaAtual = PDF.addPage()
+            Pagina = PDF.addPage()
         }
     
-        PaginaAtual.drawImage(AssinaturaPendentePNG, {
+        Pagina.drawImage(AssinaturaPendentePNG, {
             x: 25,
             y: PosicaoY-7,
             width: 15,
             height: 15,
         })
 
-        PaginaAtual.drawText(Signatario.SignatarioNome, {
+        Pagina.drawText(Signatario.SignatarioNome, {
             x: 47,
             y: PosicaoY,
             size: 10,
@@ -203,7 +226,7 @@ async function ConstruirSignatariosPendentesAssinatura(ColecaoDeSignatarios, PDF
             color: rgb(0.14,0.14,0.14)
         })
 
-        PaginaAtual.drawText('Assinatura pendente', {
+        Pagina.drawText('Assinatura pendente', {
             x: 47,
             y: PosicaoY-10,
             size: 7,
@@ -215,87 +238,12 @@ async function ConstruirSignatariosPendentesAssinatura(ColecaoDeSignatarios, PDF
 
     })
 
-    if (PosicaoY < 100) {
-        PaginaAtual = PDF.addPage()
-        PosicaoY = 800
-    }
-
-    const ICPBuffer = fs.readFileSync('./Arquivos/Permanente/ICP.png');
-
-    const ICPPNG = await PDF.embedPng(ICPBuffer)
-
-    const DimensaoICPPNG = ICPPNG.scale(0.06)
-
-    PaginaAtual.drawImage(ICPPNG, {
-        x: 26,
-        y: PosicaoY-25,
-        width: DimensaoICPPNG.width,
-        height: DimensaoICPPNG.height,
-    })
-
-    PaginaAtual.drawLine({
-        start: { x: 26, y: PosicaoY-35 }, 
-        end: { x: 570, y: PosicaoY-35 },
-        thickness: 0.5,
-        color: rgb(0.78,0.78,0.78)
-    })
-
-    PaginaAtual.drawText(`Documento assinado com validade jurídica`, {
-        x: 70,
-        y: PosicaoY+13,
-        size: 9,
-        font: HelveticaBold,
-        color: rgb(0.46,0.46,0.46)
-    })
-
-    PaginaAtual.drawText('Integridade do documento certificada digitalmente pelo Assina Aí (ICP Brasil):', {
-        x: 70,
-        y: PosicaoY,
-        size: 9,
-        font: Helvetica,
-        color: rgb(0.46,0.46,0.46)
-    })
-
-    PaginaAtual.drawText('Este log é exclusivo e deve ser considerado como parte do documento '+DocumentoGUID, {
-        x: 70,
-        y: PosicaoY-12,
-        size: 9,
-        font: Helvetica,
-        color: rgb(0.46,0.46,0.46)
-    })
-
-    PaginaAtual.drawText('De acordo com os termos de uso do Assina Aí, disponivel em www.assinaai.com.br', {
-        x: 70,
-        y: PosicaoY-25,
-        size: 9,
-        font: Helvetica,
-        color: rgb(0.46,0.46,0.46)
-    })
-
-    const QuantidadeDePaginas = PDF.getPageIndices()
-
-    for (const PaginaAtual of QuantidadeDePaginas) {
-        const Pagina = PDF.getPage(PaginaAtual)
-
-        Pagina.drawText('assina aí '+DocumentoGUID,  {
-            x: 26,
-            y: 5,
-            size: 6,
-            font: Helvetica,
-            color: rgb(0.46,0.46,0.46)
-        })
-    }
-
-    //ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaBold, DocumentoGUID)
-
+    return PosicaoY
 }
 
-async function ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaBold, DocumentoGUID) {
+async function ConstruirRodaPe(PDF, Pagina, Helvetica, DocumentoGUID, PosicaoY, BordaDaEsquerda, HelveticaBold) {
 
-    if (PosicaoY < 100) {
-        PaginaAtual = PDF.addPage()
-        PosicaoY = 800
-    }
+    Pagina = PDF.addPage()
 
     const ICPBuffer = fs.readFileSync('./Arquivos/Permanente/ICP.png');
 
@@ -303,47 +251,47 @@ async function ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaB
 
     const DimensaoICPPNG = ICPPNG.scale(0.06)
 
-    PaginaAtual.drawImage(ICPPNG, {
+    Pagina.drawImage(ICPPNG, {
         x: 26,
-        y: PosicaoY,
+        y: 24,
         width: DimensaoICPPNG.width,
         height: DimensaoICPPNG.height,
     })
 
-    PaginaAtual.drawLine({
-        start: { x: 26, y: PosicaoY }, 
-        end: { x: 570, y: PosicaoY },
+    Pagina.drawLine({
+        start: { x: 26, y: 20 }, 
+        end: { x: 570, y: 20 },
         thickness: 0.5,
         color: rgb(0.78,0.78,0.78)
     })
 
-    PaginaAtual.drawText(`Documento assinado com validade jurídica`, {
+    Pagina.drawText(`Documento assinado com validade jurídica`, {
         x: 70,
-        y: PosicaoY,
+        y: 61,
         size: 9,
         font: HelveticaBold,
         color: rgb(0.46,0.46,0.46)
     })
 
-    PaginaAtual.drawText('Integridade do documento certificada digitalmente pelo Assina Aí (ICP Brasil):', {
+    Pagina.drawText('Integridade do documento certificada digitalmente pelo Assina Aí (ICP Brasil):', {
         x: 70,
-        y: PosicaoY,
+        y: 47,
         size: 9,
         font: Helvetica,
         color: rgb(0.46,0.46,0.46)
     })
 
-    PaginaAtual.drawText('Este log é exclusivo e deve ser considerado como parte do documento '+DocumentoGUID, {
+    Pagina.drawText('Este log é exclusivo e deve ser considerado como parte do documento '+DocumentoGUID, {
         x: 70,
-        y: PosicaoY,
+        y: 37,
         size: 9,
         font: Helvetica,
         color: rgb(0.46,0.46,0.46)
     })
 
-    PaginaAtual.drawText('De acordo com os termos de uso do Assina Aí, disponivel em www.assinaai.com.br', {
+    Pagina.drawText('De acordo com os termos de uso do Assina Aí, disponivel em www.assinaai.com.br', {
         x: 70,
-        y: PosicaoY,
+        y: 27,
         size: 9,
         font: Helvetica,
         color: rgb(0.46,0.46,0.46)
@@ -364,20 +312,6 @@ async function ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaB
     }
 }
 
-function dataAtualFormatada() {
-    var data = new Date(),
-        dia  = data.getDate().toString(),
-        diaF = (dia.length == 1) ? '0'+dia : dia,
-        mes  = (data.getMonth()+1).toString(), //+1 pois no getMonth Janeiro começa com zero.
-        mesF = (mes.length == 1) ? '0'+mes : mes,
-        anoF = data.getFullYear();
-        Hora = data.getHours().toString()
-        HoraF = (Hora.length == 1) ? '0'+Hora : Hora
-        Minuto = data.getMinutes().toString()
-        MinutoF = (Minuto.length == 1) ? '0'+Minuto : Minuto
-
-    return diaF+"/"+mesF+"/"+anoF+' às '+HoraF+'h'+MinutoF+'min';
-}
     // const form = PDF.getForm();
   
     // const button = form.createButton('foo.bar');

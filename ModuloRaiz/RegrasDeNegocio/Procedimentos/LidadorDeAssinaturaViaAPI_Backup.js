@@ -26,21 +26,11 @@ module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
 
         CriarArquivoPDFApartirDoBase64("./Arquivos/Temporario/"+DocumentoId+"_A.pdf", RegistroArquivo.ArquivoBase64)
 
-
-        // const RegistroDoSignatario = {
-        //     SignatarioNome: Requisicao.body.SignatarioNome,
-        //     SignatarioEmail: Requisicao.body.SignatarioEmail,
-        //     SignatarioModoAutenticacao: Requisicao.body.SignatarioModoAutenticacao,
-        //     SignatarioIp: Requisicao.connection.remoteAddress || Requisicao.socket.remoteAddress || Requisicao.connection.socket.remoteAddress,
-        //     SignatarioDispositivo: JSON.stringify(Requisicao.headers),
-        //     SignatarioToken: Requisicao.body.SignatarioToken,
-        //     DocumentoId
-        // }; 
-        // Signatario.create(RegistroDoSignatario)
-
         const ColecaoDeSignatarios = Requisicao.body.Signatarios
         
         ColecaoDeSignatarios.forEach((RegistroDoSignatario) => {
+            RegistroDoSignatario.SignatarioToken = crypto.randomUUID()
+            RegistroDoSignatario.DocumentoId = DocumentoId
             Signatario.create(RegistroDoSignatario)
         })
 
