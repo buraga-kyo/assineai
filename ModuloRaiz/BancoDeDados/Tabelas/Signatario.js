@@ -37,7 +37,7 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
             type: Sequelize.TEXT,
         },
         SignatarioDispositivo: {
-            type: Sequelize.JSON,
+            type: Sequelize.TEXT,
         },
         SignatarioGeoLatitude: {
             type: Sequelize.TEXT

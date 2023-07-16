@@ -17,8 +17,9 @@ module.exports = async (DocumentoId, SignatarioId) =>  {
     
     var Pagina = PDF.addPage()
 
-    await ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, RegistrosDoDocumento.DocumentoNome, RegistrosDoDocumento.DocumentoToken, RegistrosDoDocumento.DocumentoHashDoPDFOriginal)
-    await ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoId, RegistrosDoDocumento.DocumentoToken)
+    await ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, RegistrosDoDocumento.DocumentoTitulo, RegistrosDoDocumento.DocumentoNome, RegistrosDoDocumento.DocumentoToken, RegistrosDoDocumento.DocumentoHashDoPDFOriginal)
+    const { PaginaAtual, PosicaoY } = await ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoId, RegistrosDoDocumento.DocumentoToken)
+    await ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaBold, RegistrosDoDocumento.DocumentoToken)
 
     const BytesDoPDF = await PDF.save()
     const DocumentoBase64Atualizado = Buffer.from(BytesDoPDF).toString('base64')
@@ -26,12 +27,12 @@ module.exports = async (DocumentoId, SignatarioId) =>  {
     return DocumentoBase64Atualizado
 }
 
-async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoNome, DocumentoToken, HashDocumentoOriginal) {
+async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoTitulo, DocumentoNome, DocumentoToken, HashDocumentoOriginal) {
 
     const BordaDoTopo = Pagina.getHeight() - 40
     const BordaDaEsquerda = 26
     
-    Pagina.drawText('assina aí', {
+    Pagina.drawText(DocumentoTitulo, {
         x: BordaDaEsquerda,
         y: BordaDoTopo,
         size: 20,
@@ -135,15 +136,8 @@ async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, Documen
 
 async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoId, DocumentoToken) {
 
-    Pagina.drawLine({ 
-        start: { x: 26, y: 690 }, 
-        end: { x: 240, y: 690 },
-        thickness: 0.5,
-        color: rgb(0.78,0.78,0.78)
-    })
-
     Pagina.drawText('Assinaturas', {
-        x: 250,
+        x: 26,
         y: 685,
         size: 15,
         font: HelveticaBold,
@@ -151,23 +145,23 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoId
     })    
 
     Pagina.drawLine({ 
-        start: { x: 345, y: 690 }, 
+        start: { x: 120, y: 690 }, 
         end: { x: 570, y: 690 },
         thickness: 0.5,
         color: rgb(0.78,0.78,0.78)
     })
 
-    await ConstruirEspacoDeAssinatura(DocumentoId, PDF, Pagina, HelveticaBold, Helvetica, DocumentoToken)
-
-}
-
-async function ConstruirEspacoDeAssinatura(DocumentoId, PDF, Pagina, HelveticaBold, Helvetica, DocumentoToken) {
-
-    let PosicaoY = 600
+    let PosicaoY = 650
     var PaginaAtual = Pagina
 
-    const ColecaoDeSignatarios = await Signatario.findAll({ where: { DocumentoId } , order: [ ['SignatarioStatusAssinatura', 'ASC'] ]})
-    
+    const ColecaoDeSignatarios = await Signatario.findAll({ where: { DocumentoId } , 
+        order: [ 
+            ['SignatarioStatusAssinatura', 'ASC'],
+            ['SignatarioQualificacao', 'ASC'],
+            ['SignatarioId', 'ASC']
+        ]
+    })
+
     await Promise.all(ColecaoDeSignatarios.map(async (Signatario) => {
 
         const BufferAssinaturaPendente = fs.readFileSync('./Arquivos/Permanente/pendente.png')
@@ -217,7 +211,7 @@ async function ConstruirEspacoDeAssinatura(DocumentoId, PDF, Pagina, HelveticaBo
                 height: 16,
             })
 
-            PaginaAtual.drawText('documento assinado', {
+            PaginaAtual.drawText('Documento assinado', {
                 x: 47,
                 y: PosicaoY-10,
                 size: 7,
@@ -225,9 +219,75 @@ async function ConstruirEspacoDeAssinatura(DocumentoId, PDF, Pagina, HelveticaBo
                 color: rgb(0.46,0.46,0.46)
             })   
 
+            PosicaoY = PosicaoY-10
+
+            PaginaAtual.drawText('Pontos de autenticação:', {
+                x: 47,
+                y: PosicaoY-10,
+                size: 7,
+                font: Helvetica,
+                color: rgb(0.46,0.46,0.46)
+            })  
+
+            PosicaoY = PosicaoY-10
+
+            PaginaAtual.drawText('IP: '+Signatario.SignatarioIp, {
+                x: 47,
+                y: PosicaoY-10,
+                size: 7,
+                font: Helvetica,
+                color: rgb(0.46,0.46,0.46)
+            })   
+
+            PosicaoY = PosicaoY-10
+
+            PaginaAtual.drawText('Dispositivo: '+Signatario.SignatarioDispositivo, {
+                x: 47,
+                y: PosicaoY-10,
+                size: 7,
+                font: Helvetica,
+                color: rgb(0.46,0.46,0.46)
+            })  
+
+            PosicaoY = PosicaoY-10
+
+            PaginaAtual.drawText('Data e Hora: '+Signatario.SignatarioDataAssinatura, {
+                x: 47,
+                y: PosicaoY-10,
+                size: 7,
+                font: Helvetica,
+                color: rgb(0.46,0.46,0.46)
+            }) 
+
+            PosicaoY = PosicaoY-10
+
+            PaginaAtual.drawText('Email: '+Signatario.SignatarioEmail, {
+                x: 47,
+                y: PosicaoY-10,
+                size: 7,
+                font: Helvetica,
+                color: rgb(0.46,0.46,0.46)
+            })  
+
+            PosicaoY = PosicaoY-10
+
+            PaginaAtual.drawText('Token: '+Signatario.SignatarioToken, {
+                x: 47,
+                y: PosicaoY-10,
+                size: 7,
+                font: Helvetica,
+                color: rgb(0.46,0.46,0.46)
+            })  
+
             PosicaoY = PosicaoY-50
         }
+
     }));
+
+    return {PaginaAtual, PosicaoY}
+}
+
+async function ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaBold, DocumentoToken) {
 
     PosicaoY = PosicaoY - 20
 
@@ -294,83 +354,6 @@ async function ConstruirEspacoDeAssinatura(DocumentoId, PDF, Pagina, HelveticaBo
         const Pagina = PDF.getPage(PaginaAtual)
 
         Pagina.drawText('assina aí '+DocumentoToken,  {
-            x: 26,
-            y: 5,
-            size: 6,
-            font: Helvetica,
-            color: rgb(0.46,0.46,0.46)
-        })
-    }
-
-    //ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaBold, DocumentoToken)
-
-}
-
-async function ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaBold, DocumentoToken) {
-
-    if (PosicaoY < 100) {
-        PaginaAtual = PDF.addPage()
-        PosicaoY = 800
-    }
-
-    const ICPBuffer = fs.readFileSync('./Arquivos/Permanente/ICP.png');
-
-    const ICPPNG = await PDF.embedPng(ICPBuffer)
-
-    const DimensaoICPPNG = ICPPNG.scale(0.06)
-
-    PaginaAtual.drawImage(ICPPNG, {
-        x: 26,
-        y: PosicaoY,
-        width: DimensaoICPPNG.width,
-        height: DimensaoICPPNG.height,
-    })
-
-    PaginaAtual.drawLine({
-        start: { x: 26, y: PosicaoY }, 
-        end: { x: 570, y: PosicaoY },
-        thickness: 0.5,
-        color: rgb(0.78,0.78,0.78)
-    })
-
-    PaginaAtual.drawText(`Documento assinado com validade jurídica`, {
-        x: 70,
-        y: PosicaoY,
-        size: 9,
-        font: HelveticaBold,
-        color: rgb(0.46,0.46,0.46)
-    })
-
-    PaginaAtual.drawText('Integridade do documento certificada digitalmente pelo Assina Aí (ICP Brasil):', {
-        x: 70,
-        y: PosicaoY,
-        size: 9,
-        font: Helvetica,
-        color: rgb(0.46,0.46,0.46)
-    })
-
-    PaginaAtual.drawText('Este log é exclusivo e deve ser considerado como parte do documento '+DocumentoToken, {
-        x: 70,
-        y: PosicaoY,
-        size: 9,
-        font: Helvetica,
-        color: rgb(0.46,0.46,0.46)
-    })
-
-    PaginaAtual.drawText('De acordo com os termos de uso do Assina Aí, disponivel em www.assinaai.com.br', {
-        x: 70,
-        y: PosicaoY,
-        size: 9,
-        font: Helvetica,
-        color: rgb(0.46,0.46,0.46)
-    })
-
-    const QuantidadeDePaginas = PDF.getPageIndices()
-
-    for (const PaginaAtual of QuantidadeDePaginas) {
-        const Pagina = PDF.getPage(PaginaAtual)
-
-        Pagina.drawText('assina aí '+DocumentoGUID,  {
             x: 26,
             y: 5,
             size: 6,
