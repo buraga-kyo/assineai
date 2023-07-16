@@ -13,7 +13,8 @@ module.exports = async (Requisicao, Resposta) => {
     const { dataValues: RegistrosDoDocumento } = await Documento.findOne({ where: { DocumentoId: RegistrosDoSignatario.DocumentoId } })
 
     RegistrosDoSignatario.SignatarioIp = Requisicao.connection.remoteAddress || Requisicao.socket.remoteAddress || Requisicao.connection.socket.remoteAddress
-    RegistrosDoSignatario.SignatarioDispositivo = Requisicao.headers
+    
+    RegistrosDoSignatario.SignatarioDispositivo = Requisicao.headers['user-agent']
     RegistrosDoSignatario.SignatarioDataAssinatura = DataAtualFormatada()
     RegistrosDoSignatario.SignatarioStatusAssinatura = "assinado"
     Signatario.update(RegistrosDoSignatario, { where: { SignatarioId: RegistrosDoSignatario.SignatarioId } })    

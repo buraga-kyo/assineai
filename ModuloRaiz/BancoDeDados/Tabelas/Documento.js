@@ -6,6 +6,9 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
         allowNull: false,
         primaryKey: true
     },
+    DocumentoTitulo: {
+        type: Sequelize.STRING,
+    },
     DocumentoToken: {
       type: Sequelize.TEXT,
     },
