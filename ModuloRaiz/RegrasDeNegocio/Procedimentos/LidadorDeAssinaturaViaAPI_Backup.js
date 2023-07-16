@@ -19,7 +19,7 @@ module.exports = async (Requisicao, Resposta, ProximaFuncao) => {
 
         const RegistroDoDocumento = {
             DocumentoNome: Requisicao.body.DocumentoNome,
-            DocumentoGUID: crypto.randomUUID(),
+            DocumentoToken: crypto.randomUUID(),
             ArquivoOriginalId: ArquivoId
         }
         const { DocumentoId } = await Documento.create(RegistroDoDocumento)
