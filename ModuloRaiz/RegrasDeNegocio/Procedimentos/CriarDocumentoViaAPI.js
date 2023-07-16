@@ -28,7 +28,8 @@ module.exports = async (Requisicao, Resposta) => {
             return {
                 ...RegistroDoSignatario,
                 SignatarioToken: crypto.randomUUID(),
-                DocumentoId: DocumentoId
+                DocumentoId: DocumentoId,
+                SignatarioStatusAssinatura: "pendente"
             }
         })
 

@@ -33,14 +33,11 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
         SignatarioUltimaVisualizacaoNoLinkDeAssinatura: {
             type: Sequelize.STRING
         },
-        SignatarioDataAssinatura: {
-            type: Sequelize.STRING
-        },
         SignatarioIp: {
             type: Sequelize.TEXT,
         },
         SignatarioDispositivo: {
-            type: Sequelize.TEXT,
+            type: Sequelize.JSON,
         },
         SignatarioGeoLatitude: {
             type: Sequelize.TEXT
