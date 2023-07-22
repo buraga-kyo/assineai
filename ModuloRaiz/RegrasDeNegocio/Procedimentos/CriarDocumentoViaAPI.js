@@ -21,7 +21,8 @@ module.exports = async (Requisicao, Resposta) => {
             DocumentoNome: Requisicao.body.DocumentoNome,
             DocumentoToken,
             DocumentoHashDoPDFOriginal: HashDoPDFOriginal,
-            ArquivoOriginalId: ArquivoId
+            ArquivoOriginalId: ArquivoId,
+            DocumentoStatusAssinatura: "Pendente"
         }
         const { DocumentoId } = await Documento.create(RegistroDoDocumento)
 
@@ -30,7 +31,7 @@ module.exports = async (Requisicao, Resposta) => {
                 ...RegistroDoSignatario,
                 SignatarioToken: crypto.randomUUID(),
                 DocumentoId: DocumentoId,
-                SignatarioStatusAssinatura: "pendente"
+                SignatarioStatusAssinatura: "Pendente"
             }
         })
 
