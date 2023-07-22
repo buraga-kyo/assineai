@@ -18,6 +18,7 @@ module.exports = async (Requisicao, Resposta) => {
     RegistrosDoSignatario.SignatarioDataAssinatura = DataAtualFormatada()
     RegistrosDoSignatario.SignatarioStatusAssinatura = "assinado"
     Signatario.update(RegistrosDoSignatario, { where: { SignatarioId: RegistrosDoSignatario.SignatarioId } })    
+    Documento.update({ DocumentoStatusAssinatura: "Em Processo" }, { where: { DocumentoId: RegistrosDoSignatario.DocumentoId } })
 
     const DocumentoBase64Atualizado = await ConstruirPaginaComDadosDeAssinatura(RegistrosDoDocumento.DocumentoId, RegistrosDoSignatario.SignatarioId)
 
