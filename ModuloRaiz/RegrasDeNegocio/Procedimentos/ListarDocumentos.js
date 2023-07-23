@@ -1,13 +1,23 @@
 const { Documento, Signatario, Arquivo } = require("../../BancoDeDados/Conector").Tabelas;
+const Op = require("sequelize").Op;
 
 module.exports = async (Requisicao, Resposta) => {
     
     try {
 
-        let Documentos = await Documento.findAndCountAll({ 
+        let Filtros = {}
+
+        if (Requisicao.body.FiltroDeStatus != null || Requisicao.body.FiltroDeStatus != '') {
+            Filtros.DocumentoStatusAssinatura = Requisicao.body.FiltroDeStatus
+        }
+
+        console.log(Filtros)
+
+        let Documentos = await Documento.findAndCountAll({
+            where: { [Op.and]: Filtros },
             offset: Requisicao.body.QtdPularRegistrosPular,
             limit: Requisicao.body.limiteRegistros,
-            attributes: ["DocumentoId","DocumentoNome","DocumentoStatusAssinatura","createdAt"]
+            attributes: ["DocumentoId","DocumentoNome","DocumentoStatusAssinatura","DocumentoToken","createdAt"]
         })
         let Signatarios = []
         
