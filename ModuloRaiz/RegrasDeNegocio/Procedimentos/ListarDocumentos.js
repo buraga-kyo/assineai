@@ -19,7 +19,7 @@ module.exports = async (Requisicao, Resposta) => {
                     {
                         [Op.or]: [
                             {
-                                DocumentoTitulo: {
+                                DocumentoNome: {
                                     [Op.iLike] : FiltroDeProcura + "%"
                                 }
                             },
@@ -33,7 +33,7 @@ module.exports = async (Requisicao, Resposta) => {
             where = {
                 [Op.or]: [
                     {
-                        DocumentoTitulo: {
+                        DocumentoNome: {
                             [Op.iLike] : FiltroDeProcura + "%"
                         }
                     },
@@ -63,8 +63,8 @@ module.exports = async (Requisicao, Resposta) => {
         Documentos.TotalDeDocumentos = await Documento.count()
         Documentos.DocumentosAssinados = await Documento.count({ where: { DocumentoStatusAssinatura: 'Assinado' } })
         Documentos.DocumentosEmProcesso = await Documento.count({ where: { DocumentoStatusAssinatura: 'Em Processo' } })
+        Documentos.DocumentosExcluidos = await Documento.count({ where: { DocumentoStatusAssinatura: 'Excluido' } })
 
-        console.log(Documentos)
         Resposta.json(Documentos)
 
     } catch (Erro) {
