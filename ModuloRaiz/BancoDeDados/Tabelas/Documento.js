@@ -26,6 +26,9 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
     },
     DocumentoHashDoPDFOriginal: {
         type: Sequelize.TEXT,
+    },
+    DocumentoResponsavel: {
+        type: Sequelize.STRING
     }
   });
 
