@@ -17,12 +17,13 @@ module.exports = async (Requisicao, Resposta) => {
         const { ArquivoId } = await Arquivo.create(RegistroArquivo)
 
         const RegistroDoDocumento = {
-            DocumentoTitulo:  Requisicao.body.DocumentoTitulo,
+            DocumentoTitulo: Requisicao.body.DocumentoTitulo,
             DocumentoNome: Requisicao.body.DocumentoNome,
             DocumentoToken,
             DocumentoHashDoPDFOriginal: HashDoPDFOriginal,
             ArquivoOriginalId: ArquivoId,
-            DocumentoStatusAssinatura: "Em Processo"
+            DocumentoStatusAssinatura: "Em Processo",
+            DocumentoResponsavel: Requisicao.body.DocumentoResponsavel
         }
         const { DocumentoId } = await Documento.create(RegistroDoDocumento)
 
