@@ -22,7 +22,7 @@ module.exports = async (Requisicao, Resposta) => {
             DocumentoToken,
             DocumentoHashDoPDFOriginal: HashDoPDFOriginal,
             ArquivoOriginalId: ArquivoId,
-            DocumentoStatusAssinatura: "Pendente"
+            DocumentoStatusAssinatura: "Em Andamento"
         }
         const { DocumentoId } = await Documento.create(RegistroDoDocumento)
 

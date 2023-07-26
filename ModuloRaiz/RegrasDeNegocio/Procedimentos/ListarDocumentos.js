@@ -5,16 +5,44 @@ module.exports = async (Requisicao, Resposta) => {
     
     try {
 
-        let Filtros = {}
+        const { FiltroDeStatus, FiltroDeProcura } = Requisicao.body;
 
-        if (Requisicao.body.FiltroDeStatus != null || Requisicao.body.FiltroDeStatus != '') {
-            Filtros.DocumentoStatusAssinatura = Requisicao.body.FiltroDeStatus
+        var where = {};
+        if(FiltroDeStatus != null){
+            where = {
+                [Op.and] : [
+                    {
+                        DocumentoStatusAssinatura:{
+                            [Op.eq] : FiltroDeStatus
+                        } 
+                    },
+                    {
+                        [Op.or]: [
+                            {
+                                DocumentoTitulo: {
+                                    [Op.iLike] : FiltroDeProcura + "%"
+                                }
+                            },
+                        ],
+                    }
+                ]
+                
+                
+            };
+        }else{
+            where = {
+                [Op.or]: [
+                    {
+                        DocumentoTitulo: {
+                            [Op.iLike] : FiltroDeProcura + "%"
+                        }
+                    },
+                ] 
+            };
         }
 
-        console.log(Filtros)
-
         let Documentos = await Documento.findAndCountAll({
-            where: { [Op.and]: Filtros },
+            where: where,
             offset: Requisicao.body.QtdPularRegistrosPular,
             limit: Requisicao.body.limiteRegistros,
             attributes: ["DocumentoId","DocumentoNome","DocumentoStatusAssinatura","DocumentoToken","createdAt"]
@@ -32,23 +60,12 @@ module.exports = async (Requisicao, Resposta) => {
 
         }
 
+        Documentos.TotalDeDocumentos = await Documento.count()
+        Documentos.DocumentosAssinados = await Documento.count({ where: { DocumentoStatusAssinatura: 'Assinado' } })
+        Documentos.DocumentosEmProcesso = await Documento.count({ where: { DocumentoStatusAssinatura: 'Em Processo' } })
+
+        console.log(Documentos)
         Resposta.json(Documentos)
-
-        // let Documentos = await Documento.findAll({ attributes:["DocumentoId","DocumentoNome","DocumentoStatusAssinatura","createdAt"]})
-        // let Signatarios = []
-        
-        // for await (let Documento of Documentos){
-            
-        //     Signatarios = await Signatario.findAll({ 
-        //         where: { DocumentoId: Documento.dataValues.DocumentoId },
-        //         attributes: ["SignatarioNome", "SignatarioStatusAssinatura", "SignatarioId"]
-        //     })
-            
-        //     Documentos[Documentos.indexOf(Documento)].dataValues.Signatarios = Signatarios;
-
-        // }
-
-        // Resposta.json(Documentos)
 
     } catch (Erro) {
         console.log(Erro)
