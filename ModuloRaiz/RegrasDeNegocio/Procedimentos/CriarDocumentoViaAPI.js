@@ -7,8 +7,10 @@ module.exports = async (Requisicao, Resposta) => {
     
     try {
 
-        let ArquivoBase64 = Requisicao.body.DocumentoBase64
         let DocumentoToken = crypto.randomUUID()
+        let SignatarioToken = crypto.randomUUID()
+
+        let ArquivoBase64 = Requisicao.body.DocumentoBase64
         let CaminhoDoPDF = "./Arquivos/Temporario/"+DocumentoToken+"_Original.pdf"
         await CriarArquivoPDFApartirDoBase64(CaminhoDoPDF, ArquivoBase64)
         const HashDoPDFOriginal = await RecuperarHashDeArquivoApartirDeBase64(CaminhoDoPDF)
@@ -30,9 +32,10 @@ module.exports = async (Requisicao, Resposta) => {
         const ColecaoDeSignatarios = Requisicao.body.Signatarios.map((RegistroDoSignatario) => {
             return {
                 ...RegistroDoSignatario,
-                SignatarioToken: crypto.randomUUID(),
+                SignatarioToken,
                 DocumentoId: DocumentoId,
-                SignatarioStatusAssinatura: "Pendente"
+                SignatarioStatusAssinatura: "Pendente",
+                SignatarioLinkAssinatura: process.env.ORIGIN+'/verificar/'+SignatarioToken
             }
         })
 

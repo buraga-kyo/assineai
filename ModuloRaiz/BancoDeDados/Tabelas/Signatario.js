@@ -47,6 +47,9 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
         },
         SignatarioStatusAssinatura: {
             type: Sequelize.STRING
+        },
+        SignatarioLinkAssinatura:  {
+            type: Sequelize.TEXT
         }
     });
 
