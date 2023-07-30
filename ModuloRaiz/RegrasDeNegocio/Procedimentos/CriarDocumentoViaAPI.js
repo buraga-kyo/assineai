@@ -8,7 +8,6 @@ module.exports = async (Requisicao, Resposta) => {
     try {
 
         let DocumentoToken = crypto.randomUUID()
-        let SignatarioToken = crypto.randomUUID()
 
         let ArquivoBase64 = Requisicao.body.DocumentoBase64
         let CaminhoDoPDF = "./Arquivos/Temporario/"+DocumentoToken+"_Original.pdf"
@@ -30,6 +29,8 @@ module.exports = async (Requisicao, Resposta) => {
         const { DocumentoId } = await Documento.create(RegistroDoDocumento)
 
         const ColecaoDeSignatarios = Requisicao.body.Signatarios.map((RegistroDoSignatario) => {
+            let SignatarioToken = crypto.randomUUID()
+            
             return {
                 ...RegistroDoSignatario,
                 SignatarioToken,

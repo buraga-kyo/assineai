@@ -2,15 +2,18 @@ const rotas = require("express").Router()
 const CriarDocumentoViaAPI = require("./CriarDocumentoViaAPI")
 const AdicionarDocumentoExtraViaAPI = require("./AdicionarDocumentoExtraViaAPI")
 const AssinarDocumentoViaAPI = require("./AssinarDocumentoViaAPI")
-const ListarDocumentos = require("./ListarDocumentos")
-const ListarDocumento = require("./ListarDocumento")
+const ListarTodosDocumentos = require("./ListarTodosDocumentos")
+const ListarDetalheDoDocumento = require("./ListarDetalheDoDocumento")
+const ListarDocumentosAguardandoAssinatura = require("./ListarDocumentosAguardandoAssinatura")
 
 rotas.post("/CriarDocumentoViaAPI", CriarDocumentoViaAPI)
 rotas.post("/AdicionarDocumentoExtraViaAPI/:DocumentoToken", AdicionarDocumentoExtraViaAPI)
 rotas.post("/AssinarDocumentoViaAPI", AssinarDocumentoViaAPI)
 
-rotas.post("/ListarDocumentos", ListarDocumentos)
-rotas.get("/ListarDocumento/:token", ListarDocumento)
+rotas.post("/ListarTodosDocumentos", ListarTodosDocumentos)
+rotas.get("/ListarDetalheDoDocumento/:DocumentoToken", ListarDetalheDoDocumento)
+
+rotas.get("/ListarDocumentosAguardandoAssinatura/:SignatarioToken", ListarDocumentosAguardandoAssinatura)
 
 const teste = require("./LidadorDeAssinaturaViaAPI_Backup")
 rotas.post("/teste", teste)

@@ -5,7 +5,7 @@ module.exports = async (Requisicao, Resposta) => {
     try {
 
         let Documentos = await Documento.findAll({
-            where: { DocumentoToken: Requisicao.params.token },
+            where: { DocumentoToken: Requisicao.params.DocumentoToken },
             attributes: ["DocumentoId","DocumentoNome","DocumentoStatusAssinatura","DocumentoToken","DocumentoResponsavel","createdAt"]
         })
         let Signatarios = []
