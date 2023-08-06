@@ -30,7 +30,6 @@ module.exports = async (Requisicao, Resposta) => {
             ...MapRegistroDocumentoExtra
         ]
 
-        console.log(Registro)
         Resposta.json(Registro)
 
     } catch (Erro) {

@@ -17,7 +17,7 @@ module.exports = async (DocumentoId, SignatarioId) =>  {
     
     var Pagina = PDF.addPage()
 
-    await ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, RegistrosDoDocumento.DocumentoTitulo, RegistrosDoDocumento.DocumentoNome, RegistrosDoDocumento.DocumentoToken, RegistrosDoDocumento.DocumentoHashDoPDFOriginal)
+    await ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, RegistrosDoDocumento.DocumentoNome, RegistrosDoDocumento.DocumentoNome, RegistrosDoDocumento.DocumentoToken, RegistrosDoDocumento.DocumentoHashDoPDFOriginal)
     const { PaginaAtual, PosicaoY } = await ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoId, RegistrosDoDocumento.DocumentoToken)
     await ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaBold, RegistrosDoDocumento.DocumentoToken)
 

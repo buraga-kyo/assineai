@@ -4,9 +4,7 @@ const ConstruirPaginaComDadosDeAssinatura = require("../Ferramentas/ManipulacaoD
 const CriarArquivoPDFApartirDoBase64 = require("../Ferramentas/ManipulacaoDePDF/CriarArquivoPDFApartirDoBase64")
 const AssinarPDFcomCertificadoDigital = require("../Ferramentas/LidadorDeAssinatura/CertificadoDigital")
 const AssinarPDFcomCriptografiaAssimetrica = require("../Ferramentas/LidadorDeAssinatura/CriptografiaAssimetrica")
-
 const fs = require("fs");
-
 
 module.exports = async (Requisicao, Resposta) => {
     const { dataValues: RegistrosDoSignatario } = await Signatario.findOne({ where: { SignatarioToken: Requisicao.body.SignatarioToken } })
@@ -16,7 +14,7 @@ module.exports = async (Requisicao, Resposta) => {
     
     RegistrosDoSignatario.SignatarioDispositivo = Requisicao.headers['user-agent']
     RegistrosDoSignatario.SignatarioDataAssinatura = DataAtualFormatada()
-    RegistrosDoSignatario.SignatarioStatusAssinatura = "assinado"
+    RegistrosDoSignatario.SignatarioStatusAssinatura = "Assinado"
     Signatario.update(RegistrosDoSignatario, { where: { SignatarioId: RegistrosDoSignatario.SignatarioId } })    
     Documento.update({ DocumentoStatusAssinatura: "Em Processo" }, { where: { DocumentoId: RegistrosDoSignatario.DocumentoId } })
 
