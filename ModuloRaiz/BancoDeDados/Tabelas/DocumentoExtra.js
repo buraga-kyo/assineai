@@ -20,7 +20,10 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
       },
       DocumentoExtraStatusAssinatura: {
         type: Sequelize.STRING,
-      }
+      },
+      DocumentoExtraHashDoPDFOriginal: {
+        type: Sequelize.TEXT,
+      },
     });
   
     return DocumentoExtra;

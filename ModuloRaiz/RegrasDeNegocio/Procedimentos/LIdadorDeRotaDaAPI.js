@@ -7,17 +7,21 @@ const ListarDetalheDoDocumento = require("./ListarDetalheDoDocumento")
 const ListarDocumentosAguardandoAssinatura = require("./ListarDocumentosAguardandoAssinatura")
 const RecuperarArquivoOriginalEmBase64 = require("./RecuperarArquivoOriginalEmBase64")
 const RecuperarArquivoAssinadoEmBase64 = require("./RecuperarArquivoAssinadoEmBase64")
+const RecuperarArquivoPrincipalOriginalEmBase64 = require("./RecuperarArquivoPrincipalOriginalEmBase64")
+const RecuperarArquivoPrincipalAssinadoEmBase64 = require("./RecuperarArquivoPrincipalAssinadoEmBase64")
 
 rotas.post("/CriarDocumentoViaAPI", CriarDocumentoViaAPI)
-rotas.post("/AdicionarDocumentoExtraViaAPI/:DocumentoToken", AdicionarDocumentoExtraViaAPI)
 rotas.post("/AssinarDocumentoViaAPI", AssinarDocumentoViaAPI)
-
 rotas.post("/ListarTodosDocumentos", ListarTodosDocumentos)
+
+rotas.post("/AdicionarDocumentoExtraViaAPI/:DocumentoToken", AdicionarDocumentoExtraViaAPI)
 
 rotas.get("/ListarDetalheDoDocumento/:DocumentoToken", ListarDetalheDoDocumento)
 rotas.get("/ListarDocumentosAguardandoAssinatura/:SignatarioToken", ListarDocumentosAguardandoAssinatura)
 rotas.get("/RecuperarArquivoOriginalEmBase64/:DocumentoExtraId", RecuperarArquivoOriginalEmBase64)
 rotas.get("/RecuperarArquivoAssinadoEmBase64/:DocumentoExtraId", RecuperarArquivoAssinadoEmBase64)
+rotas.get("/RecuperarArquivoPrincipalOriginalEmBase64/:DocumentoId", RecuperarArquivoPrincipalOriginalEmBase64)
+rotas.get("/RecuperarArquivoPrincipalAssinadoEmBase64/:DocumentoId", RecuperarArquivoPrincipalAssinadoEmBase64)
 
 const teste = require("./LidadorDeAssinaturaViaAPI_Backup")
 rotas.post("/teste", teste)

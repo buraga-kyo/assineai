@@ -1,12 +1,12 @@
-const { Documento, Signatario, Arquivo } = require("../../../BancoDeDados/Conector").Tabelas;
-const { PDFDocument, StandardFonts, rgb, PDFName, PDFString } = require("pdf-lib");
-const GeradorDeQRCode = require("../FuncoesGenericas/GeradorDeQRCode");
+const { Documento, Signatario, Arquivo, DocumentoExtra } = require("../../../BancoDeDados/Conector").Tabelas
+const { PDFDocument, StandardFonts, rgb, PDFName, PDFString } = require("pdf-lib")
+const GeradorDeQRCode = require("../FuncoesGenericas/GeradorDeQRCode")
 const DataAtualFormatada = require("../FuncoesGenericas/DataAtualFormatada")
-const fs = require("fs");
+const fs = require("fs")
 
-module.exports = async (DocumentoId, SignatarioId) =>  {
+module.exports = async (DocumentoExtraId, SignatarioId) =>  {
 
-    const { dataValues: RegistrosDoDocumento } = await Documento.findByPk(DocumentoId)
+    const { dataValues: RegistrosDoDocumento } = await DocumentoExtra.findByPk(DocumentoExtraId)
     const { dataValues: RegistrosDoArquivo } = await Arquivo.findByPk(RegistrosDoDocumento.ArquivoOriginalId)
     
     const BufferDoBase64 = Buffer.from(RegistrosDoArquivo.ArquivoBase64, 'base64')
@@ -17,9 +17,16 @@ module.exports = async (DocumentoId, SignatarioId) =>  {
     
     var Pagina = PDF.addPage()
 
-    await ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, RegistrosDoDocumento.DocumentoNome, RegistrosDoDocumento.DocumentoNome, RegistrosDoDocumento.DocumentoToken, RegistrosDoDocumento.DocumentoHashDoPDFOriginal)
-    const { PaginaAtual, PosicaoY } = await ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoId, RegistrosDoDocumento.DocumentoToken)
-    await ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaBold, RegistrosDoDocumento.DocumentoToken)
+    await ConstruirCabecalho(
+        PDF, Pagina, Helvetica, HelveticaBold, RegistrosDoDocumento.DocumentoExtraNome, 
+        RegistrosDoDocumento.DocumentoExtraNome, RegistrosDoDocumento.DocumentoExtraToken, RegistrosDoDocumento.DocumentoExtraHashDoPDFOriginal
+    )
+    
+    const { PaginaAtual, PosicaoY } = await ConstruirCorpo(
+        PDF, Pagina, Helvetica, HelveticaBold, RegistrosDoDocumento.DocumentoId, RegistrosDoDocumento.DocumentoExtraToken
+    )
+    
+    await ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaBold, RegistrosDoDocumento.DocumentoExtraToken)
 
     const BytesDoPDF = await PDF.save()
     const DocumentoBase64Atualizado = Buffer.from(BytesDoPDF).toString('base64')
