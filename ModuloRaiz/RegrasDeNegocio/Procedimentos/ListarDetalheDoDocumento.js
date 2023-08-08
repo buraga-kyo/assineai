@@ -25,7 +25,7 @@ module.exports = async (Requisicao, Resposta) => {
 
         RegistrosDosSignatarios = await Signatario.findAll({ 
             where: { DocumentoId },
-            attributes: ["SignatarioNome", "SignatarioStatusAssinatura", "SignatarioId", "SignatarioLinkAssinatura"]
+            attributes: ["SignatarioNome", "SignatarioStatusAssinatura", "SignatarioId", "SignatarioLinkAssinatura", "SignatarioMensagemSobreVisualizacaoDoLinkDeAssinatura"]
         })
 
         TotalDeSignatarios = await Signatario.count({ 

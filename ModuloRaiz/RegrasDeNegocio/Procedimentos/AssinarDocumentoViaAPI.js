@@ -36,10 +36,30 @@ module.exports = async (Requisicao, Resposta) => {
 
             const { ArquivoId } = await Arquivo.create({ ArquivoBase64: Base64PDFComCertificado })
 
+            const TotalDeSignatarios = await Signatario.count({ 
+                where: { DocumentoId: RegistrosDoSignatario.DocumentoId } 
+            })
+    
+            const TotalDeAssinaturas = await Signatario.count({ 
+                where: { SignatarioStatusAssinatura: 'Assinado', DocumentoId: RegistrosDoSignatario.DocumentoId } 
+            })
+
+            const Data = new Date();
+    
+            let Mensagem = 'Assinou em '+Data.toLocaleString('pt-BR');        
+
+            //new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')
+            
+            Signatario.update({ 
+                SignatarioMensagemSobreVisualizacaoDoLinkDeAssinatura: Mensagem,
+                SignatarioStatusAssinatura: 'Assinado',
+             }, { where: { SignatarioToken: Requisicao.body.SignatarioToken } })
+
             Documento.update({
                 DocumentoChaveAssinatura: DadosCriptografiaAssimetrica.Assinatura,
                 DocumentoChavePublica: DadosCriptografiaAssimetrica.ChavePublica,
                 ArquivoAssinadoId: ArquivoId,
+                DocumentoStatusAssinatura: (TotalDeSignatarios == TotalDeAssinaturas ? 'Assinado' : 'Em Processo')
             }, {
                 where: {
                     DocumentoId: RegistrosDoDocumento.DocumentoId
@@ -88,3 +108,4 @@ module.exports = async (Requisicao, Resposta) => {
 
     Resposta.sendStatus(200)
 }
+
