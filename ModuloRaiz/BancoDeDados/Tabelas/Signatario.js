@@ -30,7 +30,7 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
         SignatarioQuantidadeDeAcessosNoLinkDeAssinatura: {
             type: Sequelize.INTEGER
         },
-        SignatarioUltimaVisualizacaoNoLinkDeAssinatura: {
+        SignatarioMensagemSobreVisualizacaoDoLinkDeAssinatura: {
             type: Sequelize.STRING
         },
         SignatarioIp: {
