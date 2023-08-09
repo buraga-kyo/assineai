@@ -23,7 +23,7 @@ module.exports = async (Requisicao, Resposta) => {
 
         let RegistroDocumentoExtra = await DocumentoExtra.findAll({
             where: { DocumentoId: RegistroSignatario.DocumentoId },
-            attributes: ["DocumentoId", "DocumentoExtraNome"]
+            attributes: ["DocumentoExtraId", "DocumentoId", "DocumentoExtraNome"]
         }) 
         
         if (RegistroSignatario.SignatarioStatusAssinatura != "Assinado") {
@@ -40,17 +40,21 @@ module.exports = async (Requisicao, Resposta) => {
             )
         }
 
-        const MapRegistroDocumentoExtra = RegistroDocumentoExtra.map(({dataValues}) => {
-            return {
-                ...dataValues
-            }
-        })
+        // const MapRegistroDocumentoExtra = RegistroDocumentoExtra.map(({dataValues}) => {
+        //     return {
+        //         ...dataValues
+        //     }
+        // })
 
         let Registro = {}
-        Registro.DocumentoExtra = [
-            RegistroDocumento.dataValues,
-            ...MapRegistroDocumentoExtra
-        ]
+        Registro.DocumentoPrincipal = RegistroDocumento
+        Registro.DocumentoExtra = RegistroDocumentoExtra
+
+        // let Registro = {}
+        // Registro.DocumentoExtra = [
+        //     RegistroDocumento.dataValues,
+        //     ...MapRegistroDocumentoExtra
+        // ]
 
         Resposta.json(Registro)
 
