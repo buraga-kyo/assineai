@@ -6,19 +6,12 @@ module.exports = async (Requisicao, Resposta) => {
 
         let RegistroSignatario = await Signatario.findOne({
             where: { SignatarioToken: Requisicao.params.SignatarioToken },
-            attributes: ["DocumentoId", "SignatarioQuantidadeDeAcessosNoLinkDeAssinatura", "SignatarioStatusAssinatura"]
+            attributes: ["DocumentoId", "SignatarioQuantidadeDeAcessosNoLinkDeAssinatura", "SignatarioStatusAssinatura", "SignatarioMensagemSobreVisualizacaoDoLinkDeAssinatura"]
         })
-
-        let SignatarioQuantidadeDeAcessosNoLinkDeAssinatura = RegistroSignatario.SignatarioQuantidadeDeAcessosNoLinkDeAssinatura
-
-        Signatario.update(
-            { SignatarioQuantidadeDeAcessosNoLinkDeAssinatura: SignatarioQuantidadeDeAcessosNoLinkDeAssinatura +=1 },
-            { where: { SignatarioToken: Requisicao.params.SignatarioToken } }
-        )
 
         let RegistroDocumento = await Documento.findOne({
             where: { DocumentoId: RegistroSignatario.DocumentoId },
-            attributes: ["DocumentoId", "DocumentoNome"]
+            attributes: ["DocumentoId", "DocumentoNome", "DocumentoStatusAssinatura", "createdAt"]
         })      
 
         let RegistroDocumentoExtra = await DocumentoExtra.findAll({
@@ -27,6 +20,13 @@ module.exports = async (Requisicao, Resposta) => {
         }) 
         
         if (RegistroSignatario.SignatarioStatusAssinatura != "Assinado") {
+            let SignatarioQuantidadeDeAcessosNoLinkDeAssinatura = RegistroSignatario.SignatarioQuantidadeDeAcessosNoLinkDeAssinatura
+
+            Signatario.update(
+                { SignatarioQuantidadeDeAcessosNoLinkDeAssinatura: SignatarioQuantidadeDeAcessosNoLinkDeAssinatura +=1 },
+                { where: { SignatarioToken: Requisicao.params.SignatarioToken } }
+            )
+
             let Mensagem = ''
             if (SignatarioQuantidadeDeAcessosNoLinkDeAssinatura == 1) {
                 Mensagem = 'Acessou '+SignatarioQuantidadeDeAcessosNoLinkDeAssinatura+' vez o link de assinatura'
@@ -40,22 +40,12 @@ module.exports = async (Requisicao, Resposta) => {
             )
         }
 
-        // const MapRegistroDocumentoExtra = RegistroDocumentoExtra.map(({dataValues}) => {
-        //     return {
-        //         ...dataValues
-        //     }
-        // })
-
         let Registro = {}
         Registro.DocumentoPrincipal = RegistroDocumento
         Registro.DocumentoExtra = RegistroDocumentoExtra
+        Registro.RegistroSignatario = RegistroSignatario
 
-        // let Registro = {}
-        // Registro.DocumentoExtra = [
-        //     RegistroDocumento.dataValues,
-        //     ...MapRegistroDocumentoExtra
-        // ]
-
+        console.log(Registro.DocumentoPrincipal)
         Resposta.json(Registro)
 
     } catch (Erro) {
