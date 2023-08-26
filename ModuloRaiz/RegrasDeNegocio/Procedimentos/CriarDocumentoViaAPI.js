@@ -36,7 +36,7 @@ module.exports = async (Requisicao, Resposta) => {
                 SignatarioToken,
                 DocumentoId: DocumentoId,
                 SignatarioStatusAssinatura: "Pendente",
-                SignatarioLinkAssinatura: process.env.ORIGIN+'/verificar/'+SignatarioToken,
+                SignatarioLinkAssinatura: process.env.ORIGIN+'/Paineis/DocumentoAguardandoAssinatura/'+SignatarioToken,
                 SignatarioMensagemSobreVisualizacaoDoLinkDeAssinatura: 'Não abriu o link de assinatura'
             }
         })
