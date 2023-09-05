@@ -24,7 +24,8 @@ module.exports = async (Requisicao, Resposta) => {
             DocumentoHashDoPDFOriginal: HashDoPDFOriginal,
             ArquivoOriginalId: ArquivoId,
             DocumentoStatusAssinatura: "Em Processo",
-            DocumentoResponsavel: Requisicao.body.DocumentoResponsavel
+            DocumentoResponsavel: Requisicao.body.DocumentoResponsavel,
+            DocumentoDataDeGeracao: new Date()
         }
         const { DocumentoId } = await Documento.create(RegistroDoDocumento)
 
