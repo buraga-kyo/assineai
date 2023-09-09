@@ -14,39 +14,6 @@ module.exports = async (Requisicao, Resposta) => {
         if (FiltroDeProcura) where.DocumentoNome = { [Op.iLike]: "%"+FiltroDeProcura+"%" }
         if (FiltroDeData?.includes(" to ")) where.createdAt = { [Op.between]: [FiltroDeData.split(" to ")[0], FiltroDeData.split(" to ")[1]] }
 
-        // if(FiltroDeStatus != null){
-        //     where = {
-        //         [Op.and] : [
-        //             {
-        //                 DocumentoStatusAssinatura:{
-        //                     [Op.eq] : FiltroDeStatus
-        //                 } 
-        //             },
-        //             {
-        //                 [Op.or]: [
-        //                     {
-        //                         DocumentoNome: {
-        //                             [Op.iLike] : FiltroDeProcura + "%"
-        //                         }
-        //                     },
-        //                 ],
-        //             }
-        //         ]
-
-
-        //     };
-        // }else{
-        //     where = {
-        //         [Op.or]: [
-        //             {
-        //                 DocumentoNome: {
-        //                     [Op.iLike] : FiltroDeProcura + "%"
-        //                 }
-        //             },
-        //         ] 
-        //     };
-        // }
-
         let Documentos = await Documento.findAndCountAll({
             where: where,
             offset: Requisicao.body.QtdPularRegistrosPular,
@@ -80,3 +47,38 @@ module.exports = async (Requisicao, Resposta) => {
 
 
 }
+
+
+
+        // if(FiltroDeStatus != null){
+        //     where = {
+        //         [Op.and] : [
+        //             {
+        //                 DocumentoStatusAssinatura:{
+        //                     [Op.eq] : FiltroDeStatus
+        //                 } 
+        //             },
+        //             {
+        //                 [Op.or]: [
+        //                     {
+        //                         DocumentoNome: {
+        //                             [Op.iLike] : FiltroDeProcura + "%"
+        //                         }
+        //                     },
+        //                 ],
+        //             }
+        //         ]
+
+
+        //     };
+        // }else{
+        //     where = {
+        //         [Op.or]: [
+        //             {
+        //                 DocumentoNome: {
+        //                     [Op.iLike] : FiltroDeProcura + "%"
+        //                 }
+        //             },
+        //         ] 
+        //     };
+        // }
