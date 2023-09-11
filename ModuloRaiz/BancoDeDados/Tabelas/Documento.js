@@ -7,7 +7,7 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
             primaryKey: true
         },
         DocumentoDataDeGeracao: {
-            type: Sequelize.DATEONLY
+            type: Sequelize.DATE
         },
         DocumentoTitulo: {
             type: Sequelize.STRING,
