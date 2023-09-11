@@ -75,8 +75,8 @@ BancoDeDados.Tabelas.Signatario.belongsTo(BancoDeDados.Tabelas.Documento, {
 
 // um documento para muitos signatarios
 BancoDeDados.Tabelas.Documento.hasMany(BancoDeDados.Tabelas.Signatario, {
-    foreignKey: 'DocumentoId'
-});
+    foreignKey: 'DocumentoId', as: 'Signatarios'
+}); 
 
 // BancoDeDados.Tabelas.DocumentoExtra.belongsTo(BancoDeDados.Tabelas.Documento, {
 //     constraint: true,
