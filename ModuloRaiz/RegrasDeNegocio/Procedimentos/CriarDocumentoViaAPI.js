@@ -31,10 +31,12 @@ module.exports = async (Requisicao, Resposta) => {
 
         const ColecaoDeSignatarios = Requisicao.body.Signatarios.map((RegistroDoSignatario) => {
             let SignatarioToken = crypto.randomUUID()
+            const SignatarioTokenEnviadoEmail = Math.floor(100000 + Math.random() * 900000).toString().substring(0, 6)
             
             return {
                 ...RegistroDoSignatario,
                 SignatarioToken,
+                SignatarioTokenEnviadoEmail,
                 DocumentoId: DocumentoId,
                 SignatarioStatusAssinatura: "Pendente",
                 SignatarioLinkAssinatura: process.env.ORIGIN+'/Paineis/DocumentoAguardandoAssinatura/'+SignatarioToken,
