@@ -76,57 +76,6 @@ BancoDeDados.Tabelas.Signatario.belongsTo(BancoDeDados.Tabelas.Documento, {
 // um documento para muitos signatarios
 BancoDeDados.Tabelas.Documento.hasMany(BancoDeDados.Tabelas.Signatario, {
     foreignKey: 'DocumentoId', as: 'Signatarios'
-}); 
-
-// BancoDeDados.Tabelas.DocumentoExtra.belongsTo(BancoDeDados.Tabelas.Documento, {
-//     constraint: true,
-//     foreignKey: 'DocumentoId'    
-// })
-
-// BancoDeDados.Tabelas.DocumentoExtra.belongsTo(BancoDeDados.Tabelas.Arquivo, {
-//     foreignKey: 'ArquivoOriginalId',
-//     as: 'Original'  
-// })
-
-// BancoDeDados.Tabelas.DocumentoExtra.belongsTo(BancoDeDados.Tabelas.Arquivo, {
-//     foreignKey: 'ArquivoAssinadoId',
-//     as: 'Assinado'
-// })
-
-// BancoDeDados.Tabelas.Arquivo.hasMany(BancoDeDados.Tabelas.DocumentoExtra, {
-//     foreignKey: 'ArquivoOriginalId',
-//     as: 'Originals'  
-// })
-
-// BancoDeDados.Tabelas.Arquivo.hasMany(BancoDeDados.Tabelas.DocumentoExtra, {
-//     foreignKey: 'ArquivoAssinadoId',
-//     as: 'Assinados'
-// })
-
-// BancoDeDados.Tabelas.Documento.belongsTo(BancoDeDados.Tabelas.Arquivo, {
-//     constraint: true,
-//     foreignKey: 'ArquivoOriginalId'    
-// })
-
-// BancoDeDados.Tabelas.Documento.belongsTo(BancoDeDados.Tabelas.Arquivo, {
-//     constraint: true,
-//     foreignKey: 'ArquivoEmAndamentoId'    
-// })
-
-// BancoDeDados.Tabelas.Documento.belongsTo(BancoDeDados.Tabelas.Arquivo, {
-//     constraint: true,
-//     foreignKey: 'ArquivoAssinadoId'    
-// })
-
-// // Um signatario para um documento
-// BancoDeDados.Tabelas.Signatario.belongsTo(BancoDeDados.Tabelas.Documento, {
-//     constraint: true,
-//     foreignKey: 'DocumentoId'
-// })
-
-// // um documento para muitos signatarios
-// BancoDeDados.Tabelas.Documento.hasMany(BancoDeDados.Tabelas.Signatario, {
-//     foreignKey: 'DocumentoId'
-// });
+})
 
 module.exports = BancoDeDados;

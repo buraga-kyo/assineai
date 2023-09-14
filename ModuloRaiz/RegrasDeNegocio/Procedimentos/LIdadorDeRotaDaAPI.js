@@ -13,7 +13,6 @@ const RecuperarArquivoPrincipalAssinadoEmBase64 = require("./RecuperarArquivoPri
 rotas.post("/CriarDocumentoViaAPI", CriarDocumentoViaAPI)
 rotas.post("/AssinarDocumentoViaAPI", AssinarDocumentoViaAPI)
 rotas.post("/ListarTodosDocumentos", ListarTodosDocumentos)
-
 rotas.post("/AdicionarDocumentoExtraViaAPI/:DocumentoToken", AdicionarDocumentoExtraViaAPI)
 
 rotas.get("/ListarDetalheDoDocumento/:DocumentoToken", ListarDetalheDoDocumento)
@@ -22,8 +21,5 @@ rotas.get("/RecuperarArquivoOriginalEmBase64/:DocumentoExtraId", RecuperarArquiv
 rotas.get("/RecuperarArquivoAssinadoEmBase64/:DocumentoExtraId", RecuperarArquivoAssinadoEmBase64)
 rotas.get("/RecuperarArquivoPrincipalOriginalEmBase64/:DocumentoId", RecuperarArquivoPrincipalOriginalEmBase64)
 rotas.get("/RecuperarArquivoPrincipalAssinadoEmBase64/:DocumentoId", RecuperarArquivoPrincipalAssinadoEmBase64)
-
-const teste = require("./LidadorDeAssinaturaViaAPI_Backup")
-rotas.post("/teste", teste)
 
 module.exports = rotas
