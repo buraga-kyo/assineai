@@ -39,7 +39,7 @@ BancoDeDados.Tabelas = {
 
 BancoDeDados.Tabelas.DocumentoExtra.belongsTo(BancoDeDados.Tabelas.Documento, {
     constraint: true,
-    foreignKey: 'DocumentoId'    
+    foreignKey: 'DocumentoId', as: "DocumentosExtras"    
 })
 
 BancoDeDados.Tabelas.DocumentoExtra.belongsTo(BancoDeDados.Tabelas.Arquivo, {

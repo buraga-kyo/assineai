@@ -4,24 +4,23 @@ module.exports = async (Requisicao, Resposta) => {
 
     try {
 
-        let RegistrosDoDocumento = await Signatario.findAll({
+        let RegistrosDoDocumento = await Signatario.findOne({
             where: { SignatarioToken: Requisicao.params.SignatarioToken },
-            include: [{model: Documento, as: 'Documentos', attributes: ['DocumentoId', 'DocumentoNome']}],
+            attributes: ['SignatarioId'],
+            include: [
+                {
+                    model: Documento, 
+                    as: 'Documentos', 
+                    attributes: ['DocumentoId', 'DocumentoNome']
+                }
+            ]
         })
 
-        //console.log(RegistrosDoDocumento.dataValues.Documentos)
+        let RegistrosDocumentosExtras = await DocumentoExtra.findAll({
+            where: { DocumentoId: RegistrosDoDocumento.dataValues.Documentos.dataValues.DocumentoId }
+        })
 
-        // let DocumentoId = RegistrosDoDocumento.dataValues.DocumentoId
-
-        // let RegistrosDosDocumentosExtras = await DocumentoExtra.findAll({ 
-        //     where: { DocumentoId },
-        //     attributes: [
-        //         "DocumentoExtraId","DocumentoExtraNome"
-        //     ]            
-        // })
-
-        // console.log(RegistrosDoDocumento)
-        // console.log(RegistrosDosDocumentosExtras)
+        RegistrosDoDocumento.dataValues.DocumentoExtra = RegistrosDocumentosExtras
 
         Resposta.json(RegistrosDoDocumento)
 
