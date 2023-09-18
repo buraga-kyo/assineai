@@ -70,7 +70,7 @@ BancoDeDados.Tabelas.Documento.belongsTo(BancoDeDados.Tabelas.Arquivo, {
 // Um signatario para um documento
 BancoDeDados.Tabelas.Signatario.belongsTo(BancoDeDados.Tabelas.Documento, {
     constraint: true,
-    foreignKey: 'DocumentoId'
+    foreignKey: 'DocumentoId', as: 'Documentos'
 })
 
 // um documento para muitos signatarios
