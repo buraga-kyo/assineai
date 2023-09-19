@@ -106,6 +106,6 @@ module.exports = async (Requisicao, Resposta) => {
         }   
     }
 
-    Resposta.sendStatus(200)
+    Resposta.json('DocumentoAssinadoComSucesso')
 }
 
