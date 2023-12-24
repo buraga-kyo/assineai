@@ -1,10 +1,11 @@
-const { Documento, Signatario, Arquivo } = require("../../BancoDeDados/Conector").Tabelas;
+const { Documento, Signatario, DocumentoExtra } = require("../../BancoDeDados/Conector").Tabelas;
 const Op = require("sequelize").Op;
 const { InstanciaConfiguradaDoSequelize } = require("../../BancoDeDados/Conector")
 
 module.exports = async (Requisicao, Resposta) => {
 
     try {
+
 
         const { FiltroDeStatus, FiltroDeProcura, FiltroDeData, Sort } = Requisicao.body;
         const Filtro = {};
@@ -76,8 +77,11 @@ module.exports = async (Requisicao, Resposta) => {
             where: Filtro,
             offset: Requisicao.body.QtdPularRegistrosPular,
             limit: Requisicao.body.limiteRegistros,
-            attributes: ["DocumentoId", "DocumentoNome", "DocumentoStatusAssinatura", "DocumentoToken", "DocumentoDataDeGeracao"],
-            include: [{model: Signatario, as: 'Signatarios', attributes: ['SignatarioNome']}],
+            attributes: [ "DocumentoId", "DocumentoNome", "DocumentoStatusAssinatura", "DocumentoToken", "DocumentoDataDeGeracao"],
+            include: [
+              {model: Signatario, as: 'Signatarios', attributes: ['SignatarioNome']},
+              {model: DocumentoExtra, as: 'DocumentosExtras', attributes: ['DocumentoExtraId']}
+            ],
             order: Order
         })
 

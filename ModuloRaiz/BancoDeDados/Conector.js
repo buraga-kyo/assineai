@@ -78,4 +78,9 @@ BancoDeDados.Tabelas.Documento.hasMany(BancoDeDados.Tabelas.Signatario, {
     foreignKey: 'DocumentoId', as: 'Signatarios'
 })
 
+// um documento para muitos signatarios
+BancoDeDados.Tabelas.Documento.hasMany(BancoDeDados.Tabelas.DocumentoExtra, {
+  foreignKey: 'DocumentoId', as: 'DocumentosExtras'
+})
+
 module.exports = BancoDeDados;
