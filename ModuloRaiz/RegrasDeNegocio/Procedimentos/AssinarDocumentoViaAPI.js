@@ -91,7 +91,9 @@ module.exports = async (Requisicao, Resposta) => {
                 const DadosCriptografiaAssimetrica = AssinarPDFcomCriptografiaAssimetrica(Base64PDFComCertificado)
     
                 const { ArquivoId } = await Arquivo.create({ ArquivoBase64: Base64PDFComCertificado })
-    
+                
+                console.log(ArquivoId)
+
                 DocumentoExtra.update({
                     DocumentoExtraChaveAssinatura: DadosCriptografiaAssimetrica.Assinatura,
                     DocumentoExtraChavePublica: DadosCriptografiaAssimetrica.ChavePublica,
