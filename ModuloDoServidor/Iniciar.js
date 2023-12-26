@@ -2,7 +2,7 @@ require('dotenv').config()
 
 require("../ModuloRaiz/BancoDeDados/Conector")
     .InstanciaConfiguradaDoSequelize
-    .sync({ force: true })
+    .sync({ force: false })
     .catch(erro => console.log(erro))
 
 const express = require("express")
