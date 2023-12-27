@@ -71,25 +71,26 @@ module.exports = async ({params: { DocumentoId } }, Resposta) => {
         await AdicionarDocumentoExtraOriginal()
     }
 
-    // if (DocumentosExtrasAssinados) {
+    if (DocumentosExtrasAssinados) {
 
-    //     const AdicionarDocumentoExtraAssinado = async () => {
+        const AdicionarDocumentoExtraAssinado = async () => {
 
-    //         for (const {dataValues: { ArquivoAssinadoId }} of DocumentosExtrasAssinados) {
+            for (const {dataValues: { ArquivoAssinadoId }} of DocumentosExtrasAssinados) {
 
-    //             console.log(ArquivoAssinadoId)
+                console.log(ArquivoAssinadoId)
                 
-    //             let { ArquivoBase64: ArquivoExtraAssinado } = await Arquivo.findOne({
-    //                 where: { 'ArquivoId': ArquivoAssinadoId },
-    //                 attributes: [ "ArquivoBase64" ]        
-    //             })
+                let { ArquivoBase64: ArquivoExtraAssinado } = await Arquivo.findOne({
+                    where: { 'ArquivoId': ArquivoAssinadoId },
+                    attributes: [ "ArquivoBase64" ]        
+                })
 
-    //             ArquivosBase64.ArquivosExtrasAssinados.push(ArquivoExtraAssinado)
-    //         }
+                ArquivosBase64.ArquivosExtrasAssinados.push(ArquivoExtraAssinado)
+            }
 
-    //     };
+        };
 
-    //     await AdicionarDocumentoExtraAssinado()      
+        await AdicionarDocumentoExtraAssinado()  
+    }    
 
     Resposta.json(ArquivosBase64)
 }
