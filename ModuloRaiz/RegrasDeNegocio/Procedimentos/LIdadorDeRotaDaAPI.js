@@ -14,7 +14,9 @@ const EnviarEmailDeConfirmacaoDeDadosComToken = require("./EnviarEmailDeConfirma
 const RecuperarTokenQueVaiSerEnviadoNoEmailDoSignatario = require("./RecuperarTokenQueVaiSerEnviadoNoEmailDoSignatario")
 const VerificarAutenticidadeDoTokenInseridoPeloSignatario = require("./VerificarAutenticidadeDoTokenInseridoPeloSignatario")
 const RecuperarTodosDocumentosEmBase64 = require("./RecuperarTodosDocumentosEmBase64")
+const GCA_AssinarDocumentoViaAPI = require("./GCA_AssinarDocumentoViaAPI")
 
+rotas.post("/GCA_AssinarDocumentoViaAPI", GCA_AssinarDocumentoViaAPI)
 rotas.post("/CriarDocumentoViaAPI", CriarDocumentoViaAPI)
 rotas.post("/AssinarDocumentoViaAPI", AssinarDocumentoViaAPI)
 rotas.post("/ListarTodosDocumentos", ListarTodosDocumentos)
