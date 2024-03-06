@@ -1,15 +1,9 @@
-const { Signatario, Documento, Arquivo, DocumentoExtra } = require("../../BancoDeDados/Conector").Tabelas
-const DataAtualFormatada = require("../Ferramentas/FuncoesGenericas/DataAtualFormatada")
 const GCA_ConstruirPaginaComDadosDeAssinatura = require("../Ferramentas/ManipulacaoDePDF/GCA_ConstruirPaginaComDadosDeAssinatura")
-const CriarArquivoPDFApartirDoBase64 = require("../Ferramentas/ManipulacaoDePDF/CriarArquivoPDFApartirDoBase64")
-const AssinarPDFcomCertificadoDigital = require("../Ferramentas/LidadorDeAssinatura/CertificadoDigital")
-const AssinarPDFcomCriptografiaAssimetrica = require("../Ferramentas/LidadorDeAssinatura/CriptografiaAssimetrica")
-const ConstruirPaginaDocumentoExtraComDadosDeAssinaturaProducao = require("../Ferramentas/ManipulacaoDePDF/ConstruirPaginaDocumentoExtraComDadosDeAssinaturaProducao")
-const fs = require("fs");
 
 module.exports = async ({ body: { Documentos, Signatarios } }, Resposta) => {
 
     var DocumentoComDadosDeAssinatura = {}
+    var ColecaoDeDocumentos = []
 
     for (let i = 0; i < Documentos.length; i++) {
 
@@ -17,10 +11,13 @@ module.exports = async ({ body: { Documentos, Signatarios } }, Resposta) => {
 
         DocumentoComDadosDeAssinatura.DocumentoId = Documentos[i].DocumentoId
         DocumentoComDadosDeAssinatura.DocumentoBase64Atualizado = DocumentoBase64Atualizado
+        ColecaoDeDocumentos.push(DocumentoComDadosDeAssinatura)
 
     }
 
-    Resposta.json(DocumentoBase64Atualizado)
+    Resposta.json(ColecaoDeDocumentos)
+
+}
 
     // const { dataValues: RegistrosDoSignatario } = await Signatario.findOne({ where: { SignatarioToken: Requisicao.body.SignatarioToken } })
     // const { dataValues: RegistrosDoDocumento } = await Documento.findOne({ where: { DocumentoId: RegistrosDoSignatario.DocumentoId } })
@@ -121,7 +118,4 @@ module.exports = async ({ body: { Documentos, Signatarios } }, Resposta) => {
     //         }
     //     }   
     // }
-
-    
-}
 
