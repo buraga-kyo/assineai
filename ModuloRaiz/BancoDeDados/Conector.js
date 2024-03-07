@@ -42,7 +42,8 @@ BancoDeDados.Tabelas = {
 
     Assinatura: Assinatura(InstanciaConfiguradaDoSequelize, Sequelize),
     Documentos: Documentos(InstanciaConfiguradaDoSequelize, Sequelize),
-    Signatarios: Signatarios(InstanciaConfiguradaDoSequelize, Sequelize)
+    Signatarios: Signatarios(InstanciaConfiguradaDoSequelize, Sequelize),
+    InstanciaConfiguradaDoSequelize
 };
 
 // Associações
