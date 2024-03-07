@@ -1,10 +1,10 @@
 module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
-    const Documentos = InstanciaConfiguradaDoSequelize.define("Documentos", {
-        DocumentoId: { // Definindo explicitamente a chave primária
+    const Documentos = InstanciaConfiguradaDoSequelize.define("Documentos", {      
+        DocumentoId: {
             type: Sequelize.INTEGER,
             primaryKey: true,
-            autoIncrement: true // Definindo como autoincrementável
-        },        
+            autoIncrement: true
+        },         
         DocumentoTitulo: {
             type: Sequelize.STRING,
         },

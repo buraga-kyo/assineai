@@ -1,10 +1,10 @@
 module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
-    const Signatarios = InstanciaConfiguradaDoSequelize.define("Signatarios", {  
-        SignatarioId: { // Definindo explicitamente a chave primária
+    const Signatarios = InstanciaConfiguradaDoSequelize.define("Signatarios", {         
+        SignatarioId: {
             type: Sequelize.INTEGER,
             primaryKey: true,
-            autoIncrement: true // Definindo como autoincrementável
-        },            
+            autoIncrement: true
+        },           
         SignatarioNome: {
             type: Sequelize.STRING,
         },        

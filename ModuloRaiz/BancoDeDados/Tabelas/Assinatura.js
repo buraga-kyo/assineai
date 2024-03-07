@@ -1,9 +1,11 @@
 module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
     
     const Assinatura = InstanciaConfiguradaDoSequelize.define("Assinatura", {
-        AssinaturaData: {
-            type: Sequelize.DATE
-        },
+        AssinaturaId: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },        
         AssinaturaResponsavel: {
             type: Sequelize.STRING,
         },
@@ -16,4 +18,4 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
     });
 
     return Assinatura;
-};
+}; 
