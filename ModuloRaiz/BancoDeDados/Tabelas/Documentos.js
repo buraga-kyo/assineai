@@ -23,8 +23,11 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
         DocumentoToken: {
             type: Sequelize.TEXT,
         },
-        DocumentoChavePublica: {
+        DocumentoCriptografiaChavePublica: {
             type: Sequelize.TEXT,
+        },
+        DocumentoCriptografiaAssinatura: {
+            type: Sequelize.TEXT
         },
         DocumentoHashDoPDFOriginal: {
             type: Sequelize.TEXT,
