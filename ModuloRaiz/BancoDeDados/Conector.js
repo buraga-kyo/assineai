@@ -47,10 +47,10 @@ BancoDeDados.Tabelas = {
 };
 
 // Associações
-BancoDeDados.Tabelas.Assinatura.hasMany(BancoDeDados.Tabelas.Documentos);
-BancoDeDados.Tabelas.Documentos.belongsTo(BancoDeDados.Tabelas.Assinatura);
-BancoDeDados.Tabelas.Assinatura.hasMany(BancoDeDados.Tabelas.Signatarios);
-BancoDeDados.Tabelas.Signatarios.belongsTo(BancoDeDados.Tabelas.Assinatura);
+BancoDeDados.Tabelas.Assinatura.hasMany(BancoDeDados.Tabelas.Documentos, { foreignKey: 'AssinaturaId' });
+BancoDeDados.Tabelas.Documentos.belongsTo(BancoDeDados.Tabelas.Assinatura, { foreignKey: 'AssinaturaId' });
+BancoDeDados.Tabelas.Assinatura.hasMany(BancoDeDados.Tabelas.Signatarios, { foreignKey: 'AssinaturaId' });
+BancoDeDados.Tabelas.Signatarios.belongsTo(BancoDeDados.Tabelas.Assinatura, { foreignKey: 'AssinaturaId' });
 
 // BancoDeDados.Tabelas.Assinatura.belongsToMany(BancoDeDados.Tabelas.Signatarios, { through: 'AssinaturaSignatarios' });
 // BancoDeDados.Tabelas.Signatarios.belongsToMany(BancoDeDados.Tabelas.Assinatura, { through: 'AssinaturaSignatarios' });

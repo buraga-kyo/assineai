@@ -11,7 +11,7 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
         SignatarioEmail: {
             type: Sequelize.STRING,
         },
-        SignatarioTokenEnviadoEmail: {
+        SignatarioTokenEmail: {
             type: Sequelize.STRING
         },
         SignatarioTokenLinkAssinatura: {
