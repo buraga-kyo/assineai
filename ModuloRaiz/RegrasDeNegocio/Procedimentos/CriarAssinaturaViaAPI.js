@@ -2,7 +2,7 @@ const { Assinatura, Documentos, Signatarios, InstanciaConfiguradaDoSequelize } =
 const crypto = require("crypto")
 
 const CalcularHash = require("../Ferramentas/FuncoesGenericas/CalcularHash")
-const CriptografiaAssimetrica = require("../Ferramentas/LidadorDeAssinatura/CriptografiaAssimetrica")
+const CriptografiaAssimetrica = require("../Ferramentas/LidarComAssinatura/CriptografiaAssimetrica")
 
 module.exports = async ({ body }, Resposta) => {
 

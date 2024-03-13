@@ -38,7 +38,7 @@ module.exports = async ({ body: { Documentos, Signatarios } }, Resposta) => {
     // const ArquivoPDFCriadoComSucesso = await CriarArquivoPDFApartirDoBase64(CaminhoDoArquivo, DocumentoBase64Atualizado)
 
     // if (ArquivoPDFCriadoComSucesso) {
-    //     const PDFAssinadoComSucesso = await AssinarPDFcomCertificadoDigital(NomeDoArquivo)
+        // const PDFAssinadoComSucesso = await AssinarPDFcomCertificadoDigital(NomeDoArquivo)
 
     //     if (PDFAssinadoComSucesso) {
     //         const BufferDoPDFcomCertificado =  fs.readFileSync("./Arquivos/Temporario/"+RegistrosDoDocumento.DocumentoId+"_signed.pdf")

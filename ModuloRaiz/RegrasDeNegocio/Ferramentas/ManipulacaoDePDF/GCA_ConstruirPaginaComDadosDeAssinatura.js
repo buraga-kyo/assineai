@@ -196,27 +196,8 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
             color: rgb(0.14,0.14,0.14)
         })
 
-        if (Signatario.SignatarioStatusAssinatura == "Pendente") {
+        if (Signatario.SignatarioStatusAssinatura == "Assinado") {
             
-            PaginaAtual.drawImage(AssinaturaPendentePNG, {
-                x: 25,
-                y: PosicaoY-7,
-                width: 15,
-                height: 15,
-            })
-
-            PaginaAtual.drawText('Assinatura pendente', {
-                x: 47,
-                y: PosicaoY-10,
-                size: 7,
-                font: Helvetica,
-                color: rgb(0.46,0.46,0.46)
-            })        
-    
-            PosicaoY = PosicaoY-50
-
-        } else {
-
             PaginaAtual.drawImage(AssinadoPNG, {
                 x: 25,
                 y: PosicaoY-7,
@@ -292,7 +273,27 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
                 color: rgb(0.46,0.46,0.46)
             })  
 
+            PosicaoY = PosicaoY-50            
+
+        } else {
+
+            PaginaAtual.drawImage(AssinaturaPendentePNG, {
+                x: 25,
+                y: PosicaoY-7,
+                width: 15,
+                height: 15,
+            })
+
+            PaginaAtual.drawText('Assinatura pendente', {
+                x: 47,
+                y: PosicaoY-10,
+                size: 7,
+                font: Helvetica,
+                color: rgb(0.46,0.46,0.46)
+            })        
+    
             PosicaoY = PosicaoY-50
+
         }
 
     }
