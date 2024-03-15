@@ -1,12 +1,31 @@
 const GCA_ConstruirPaginaComDadosDeAssinatura = require("../Ferramentas/ManipulacaoDePDF/GCA_ConstruirPaginaComDadosDeAssinatura")
-const crypto = require("crypto")
+const DataAtualFormatada = require("../Ferramentas/FuncoesGenericas/DataAtualFormatada")
 const CalcularHash = require("../Ferramentas/FuncoesGenericas/CalcularHash")
 const CriptografiaAssimetrica = require("../Ferramentas/LidarComAssinatura/CriptografiaAssimetrica")
+const crypto = require("crypto")
 
-module.exports = async ({ body: { Documentos, Signatarios } }, Resposta) => {
+module.exports = async ({ connection, headers, socket, body: { Documentos, Signatarios } }, Resposta) => {
+
+    console.log(Signatarios)
 
     var DocumentoComDadosDeAssinatura = {}
     var ColecaoDeDocumentos = []
+
+    for (let i = 0; i < Signatarios.length; i++) {
+
+        if (Signatarios[i].SignatarioQualificacao === 'Cliente') {
+
+            Signatarios[i].SignatarioIp = connection.remoteAddress 
+            || socket.remoteAddress 
+            || connection.socket.remoteAddress
+
+            Signatarios[i].SignatarioDispositivo = headers['user-agent']
+
+        }
+
+        Signatarios[i].SignatarioDataAssinatura = DataAtualFormatada()
+        Signatarios[i].SignatarioToken = crypto.randomUUID()
+    }
 
     for (let i = 0; i < Documentos.length; i++) {
 
@@ -22,7 +41,7 @@ module.exports = async ({ body: { Documentos, Signatarios } }, Resposta) => {
         DocumentoComDadosDeAssinatura.DocumentoChavePublica = ChavePublica
         DocumentoComDadosDeAssinatura.DocumentoAssinaturaChavePrivada = Assinatura
         DocumentoComDadosDeAssinatura.DocumentoBase64Atualizado = DocumentoBase64Atualizado
-        ColecaoDeDocumentos.push(DocumentoComDadosDeAssinatura)
+        ColecaoDeDocumentos.push(DocumentoComDadosDeAssinatura) 
 
     }
 

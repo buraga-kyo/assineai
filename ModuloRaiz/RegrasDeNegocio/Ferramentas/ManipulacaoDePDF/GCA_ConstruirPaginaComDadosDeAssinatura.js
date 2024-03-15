@@ -205,7 +205,7 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
                 height: 16,
             })
 
-            PaginaAtual.drawText('Documento assinado', {
+            PaginaAtual.drawText('Documento assinado como '+Signatario.SignatarioQualificacao, {
                 x: 47,
                 y: PosicaoY-10,
                 size: 7,
