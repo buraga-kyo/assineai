@@ -1,50 +1,56 @@
-const GCA_ConstruirPaginaComDadosDeAssinatura = require("../Ferramentas/ManipulacaoDePDF/GCA_ConstruirPaginaComDadosDeAssinatura")
-const DataAtualFormatada = require("../Ferramentas/FuncoesGenericas/DataAtualFormatada")
 const CalcularHash = require("../Ferramentas/FuncoesGenericas/CalcularHash")
-const CriptografiaAssimetrica = require("../Ferramentas/LidarComAssinatura/CriptografiaAssimetrica")
 const crypto = require("crypto")
 
-module.exports = async ({ connection, headers, socket, body: { Documentos, Signatarios } }, Resposta) => {
+module.exports = async (Requisicao, Resposta) => {
 
-    console.log(Signatarios)
+    var DadosDaAssinatura = {}
+    
+    DadosDaAssinatura.Hash = CalcularHash(Requisicao.body.DocumentoBase64)
+    DadosDaAssinatura.Token = crypto.randomUUID()
 
-    var DocumentoComDadosDeAssinatura = {}
-    var ColecaoDeDocumentos = []
-
-    for (let i = 0; i < Signatarios.length; i++) {
-
-        if (Signatarios[i].SignatarioQualificacao === 'Cliente') {
-
-            Signatarios[i].SignatarioIp = connection.remoteAddress 
-            || socket.remoteAddress 
-            || connection.socket.remoteAddress
-
-            Signatarios[i].SignatarioDispositivo = headers['user-agent']
-
-        }
-
-        Signatarios[i].SignatarioDataAssinatura = DataAtualFormatada()
-        Signatarios[i].SignatarioToken = crypto.randomUUID()
-    }
-
-    for (let i = 0; i < Documentos.length; i++) {
-
-        Documentos[i].DocumentoHASH = CalcularHash(Documentos[i].DocumentoBase64)
-        Documentos[i].DocumentoToken = crypto.randomUUID()
-
-        let DocumentoBase64Atualizado = await GCA_ConstruirPaginaComDadosDeAssinatura(Documentos[i], Signatarios)
-        let { ChavePublica, Assinatura } = CriptografiaAssimetrica(Documentos[i].DocumentoBase64)
-
-        DocumentoComDadosDeAssinatura.DocumentoId = Documentos[i].DocumentoId
-        DocumentoComDadosDeAssinatura.DocumentoHASH = Documentos[i].DocumentoHASH
-        DocumentoComDadosDeAssinatura.DocumentoToken = Documentos[i].DocumentoToken
-        DocumentoComDadosDeAssinatura.DocumentoChavePublica = ChavePublica
-        DocumentoComDadosDeAssinatura.DocumentoAssinaturaChavePrivada = Assinatura
-        DocumentoComDadosDeAssinatura.DocumentoBase64Atualizado = DocumentoBase64Atualizado
-        ColecaoDeDocumentos.push(DocumentoComDadosDeAssinatura) 
-
-    }
-
-    Resposta.json(ColecaoDeDocumentos)
+    Resposta.json(DadosDaAssinatura)
 
 }
+
+/*************
+var DocumentoComDadosDeAssinatura = {}
+var ColecaoDeDocumentos = []
+
+for (let i = 0; i < Signatarios.length; i++) {
+
+    if (Signatarios[i].SignatarioQualificacao === 'Cliente') {
+
+        Signatarios[i].SignatarioIp = connection.remoteAddress 
+        || socket.remoteAddress 
+        || connection.socket.remoteAddress
+
+        Signatarios[i].SignatarioDispositivo = headers['user-agent']
+
+    }
+
+    Signatarios[i].SignatarioDataAssinatura = DataAtualFormatada()
+    Signatarios[i].SignatarioToken = crypto.randomUUID()
+}
+
+for (let i = 0; i < Documentos.length; i++) {
+
+    Documentos[i].DocumentoHASH = CalcularHash(Documentos[i].DocumentoBase64)
+    Documentos[i].DocumentoToken = crypto.randomUUID()
+
+    let DocumentoBase64Atualizado = await GCA_ConstruirPaginaComDadosDeAssinatura(Documentos[i], Signatarios)
+
+    let { ChavePublica, Assinatura } = CriptografiaAssimetrica(DocumentoBase64Atualizado)
+
+    DocumentoComDadosDeAssinatura.DocumentoId = Documentos[i].DocumentoId
+    DocumentoComDadosDeAssinatura.DocumentoHASH = Documentos[i].DocumentoHASH
+    DocumentoComDadosDeAssinatura.DocumentoToken = Documentos[i].DocumentoToken
+    DocumentoComDadosDeAssinatura.DocumentoChavePublica = ChavePublica
+    DocumentoComDadosDeAssinatura.DocumentoAssinaturaChavePrivada = Assinatura
+    DocumentoComDadosDeAssinatura.DocumentoEmpresaSituacaoAssinatura = "Assinou em "+DataAtualFormatada()
+    DocumentoComDadosDeAssinatura.DocumentoEmpresaIp = Signatarios[0].SignatarioIp
+    DocumentoComDadosDeAssinatura.DocumentoBase64Atualizado = DocumentoBase64Atualizado
+    DocumentoComDadosDeAssinatura.DocumentoTokenEnviadoEmail = Math.floor(100000 + Math.random() * 900000).toString().substring(0, 6)
+    ColecaoDeDocumentos.push(DocumentoComDadosDeAssinatura) 
+
+}
+************/
