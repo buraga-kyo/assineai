@@ -15,19 +15,14 @@ const RecuperarTokenQueVaiSerEnviadoNoEmailDoSignatario = require("./RecuperarTo
 const VerificarAutenticidadeDoTokenInseridoPeloSignatario = require("./VerificarAutenticidadeDoTokenInseridoPeloSignatario")
 const RecuperarTodosDocumentosEmBase64 = require("./RecuperarTodosDocumentosEmBase64")
 const CriarAssinaturaViaAPI = require("./CriarAssinaturaViaAPI")
-
 const GCR_CriarAssinaturaViaAPI = require("./GCR_CriarAssinaturaViaAPI")
 const GCR_AssinarDocumentoViaAPI = require("./GCR_AssinarDocumentoViaAPI")
-
 const GCA_AssinarDocumentoViaAPI = require("./GCA_AssinarDocumentoViaAPI")
+
 rotas.post("/GCA_AssinarDocumentoViaAPI", GCA_AssinarDocumentoViaAPI)
+rotas.post("/GCR_AssinarDocumentoViaAPI", GCR_AssinarDocumentoViaAPI)
 
-rotas.post("/CriarAssinaturaViaAPI", GCR_CriarAssinaturaViaAPI)
-rotas.post("/AssinarDocumentoViaAPI", GCR_AssinarDocumentoViaAPI)
-
-//rotas.post("/CriarAssinaturaViaAPI", CriarAssinaturaViaAPI)
 rotas.post("/CriarDocumentoViaAPI", CriarDocumentoViaAPI)
-// rotas.post("/AssinarDocumentoViaAPI", AssinarDocumentoViaAPI)
 rotas.post("/ListarTodosDocumentos", ListarTodosDocumentos)
 rotas.post("/EnviarEmailDeConfirmacaoDeDadosComToken", EnviarEmailDeConfirmacaoDeDadosComToken)
 rotas.post("/VerificarAutenticidadeDoTokenInseridoPeloSignatario",VerificarAutenticidadeDoTokenInseridoPeloSignatario)
@@ -42,5 +37,9 @@ rotas.get("/RecuperarArquivoOriginalEmBase64/:DocumentoExtraId", RecuperarArquiv
 rotas.get("/RecuperarArquivoAssinadoEmBase64/:DocumentoExtraId", RecuperarArquivoAssinadoEmBase64)
 rotas.get("/RecuperarArquivoPrincipalOriginalEmBase64/:DocumentoId", RecuperarArquivoPrincipalOriginalEmBase64)
 rotas.get("/RecuperarArquivoPrincipalAssinadoEmBase64/:DocumentoId", RecuperarArquivoPrincipalAssinadoEmBase64)
+
+//rotas.post("/CriarAssinaturaViaAPI", GCR_CriarAssinaturaViaAPI)
+//rotas.post("/CriarAssinaturaViaAPI", CriarAssinaturaViaAPI)
+//rotas.post("/AssinarDocumentoViaAPI", AssinarDocumentoViaAPI)
 
 module.exports = rotas

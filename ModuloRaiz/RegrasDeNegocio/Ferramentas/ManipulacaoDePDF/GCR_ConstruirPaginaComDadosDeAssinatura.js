@@ -20,7 +20,8 @@ module.exports = async (DadosDeAssinatura) =>  {
         HelveticaBold,
         DadosDeAssinatura.DocumentoTitulo,
         DadosDeAssinatura.DocumentoToken, 
-        DadosDeAssinatura.DocumentoHASH
+        DadosDeAssinatura.DocumentoHASH,
+        DadosDeAssinatura.DocumentoLinkAssinatura
     )
 
     const { PaginaAtual, PosicaoY } = await ConstruirCorpo(
@@ -46,7 +47,7 @@ module.exports = async (DadosDeAssinatura) =>  {
     return DocumentoBase64Atualizado
 }
 
-async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoTitulo, DocumentoToken, HashDocumentoOriginal) {
+async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoTitulo, DocumentoToken, HashDocumentoOriginal, DocumentoLinkAssinatura) {
 
     const BordaDoTopo = Pagina.getHeight() - 40
     const BordaDaEsquerda = 26
@@ -122,7 +123,7 @@ async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, Documen
         color: rgb(0.46,0.46,0.46)
     })
 
-    const LinkVerificadorDeAutenticidade = process.env.ORIGIN+'/verificar/autenticidade?doc='+DocumentoToken
+    const LinkVerificadorDeAutenticidade = DocumentoLinkAssinatura
 
     const QRCodeBuffer = await GeradorDeQRCode(DocumentoToken, LinkVerificadorDeAutenticidade)
 
@@ -242,13 +243,43 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DadosDeAssi
 
     PosicaoY = PosicaoY-10
 
-    PaginaAtual.drawText('Email: '+DadosDeAssinatura.SignatarioEmail, {
-        x: 47,
-        y: PosicaoY-10,
-        size: 7,
-        font: Helvetica,
-        color: rgb(0.46,0.46,0.46)
-    })  
+    if (DadosDeAssinatura.SignatarioFormaAutenticacao === 'email') {
+        PaginaAtual.drawText('Email: '+DadosDeAssinatura.SignatarioEmail+' (autenticado com código enviado exclusivamente a este e-mail)', {
+            x: 47,
+            y: PosicaoY-10,
+            size: 7,
+            font: Helvetica,
+            color: rgb(0.46,0.46,0.46)
+        })
+
+        PosicaoY = PosicaoY-10
+
+        PaginaAtual.drawText('Celular: '+DadosDeAssinatura.SignatarioCelular, {
+            x: 47,
+            y: PosicaoY-10,
+            size: 7,
+            font: Helvetica,
+            color: rgb(0.46,0.46,0.46)
+        })         
+    } else {
+        PaginaAtual.drawText('Email: '+DadosDeAssinatura.SignatarioEmail, {
+            x: 47,
+            y: PosicaoY-10,
+            size: 7,
+            font: Helvetica,
+            color: rgb(0.46,0.46,0.46)
+        })
+
+        PosicaoY = PosicaoY-10
+
+        PaginaAtual.drawText('Celular: '+DadosDeAssinatura.SignatarioCelular+' (autenticado com código enviado exclusivamente a este WhatsApp)', {
+            x: 47,
+            y: PosicaoY-10,
+            size: 7,
+            font: Helvetica,
+            color: rgb(0.46,0.46,0.46)
+        }) 
+    }
 
     PosicaoY = PosicaoY-40
 
@@ -345,7 +376,7 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DadosDeAssi
             height: 16,
         })
 
-        PaginaAtual.drawText('Documento assinado como empresa', {
+        PaginaAtual.drawText('Documento assinado como testemunha', {
             x: 47,
             y: PosicaoY-10,
             size: 7,
@@ -423,7 +454,7 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DadosDeAssi
             height: 16,
         })
 
-        PaginaAtual.drawText('Documento assinado como empresa', {
+        PaginaAtual.drawText('Documento assinado como testemunha', {
             x: 47,
             y: PosicaoY-10,
             size: 7,
@@ -524,7 +555,7 @@ async function ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaB
         color: rgb(0.46,0.46,0.46)
     })
 
-    PaginaAtual.drawText('Integridade do documento certificada digitalmente pelo Assina Aí (ICP Brasil):', {
+    PaginaAtual.drawText('Integridade do documento certificada digitalmente pela Dwith (ICP Brasil):', {
         x: 70,
         y: PosicaoY,
         size: 9,
@@ -540,7 +571,7 @@ async function ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaB
         color: rgb(0.46,0.46,0.46)
     })
 
-    PaginaAtual.drawText('De acordo com os termos de uso do Assina Aí, disponivel em www.assinaai.com.br', {
+    PaginaAtual.drawText('De acordo com os termos de uso do Dwith, disponivel em www.dwith.com.br', {
         x: 70,
         y: PosicaoY-25,
         size: 9,
@@ -553,7 +584,7 @@ async function ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaB
     for (const PaginaAtual of QuantidadeDePaginas) {
         const Pagina = PDF.getPage(PaginaAtual)
 
-        Pagina.drawText('assina aí '+DocumentoToken,  {
+        Pagina.drawText('Dwith '+DocumentoToken,  {
             x: 26,
             y: 5,
             size: 6,
