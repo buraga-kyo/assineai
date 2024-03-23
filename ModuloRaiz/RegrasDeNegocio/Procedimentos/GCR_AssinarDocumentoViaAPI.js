@@ -6,32 +6,49 @@ const fs = require("fs")
 
 module.exports = async (Requisicao, Resposta) => {
 
-    const DadosDeAssinatura = Requisicao.body
-    DadosDeAssinatura.SignatarioIp = Requisicao.connection.remoteAddress || Requisicao.socket.remoteAddress || Requisicao.connection.socket.remoteAddress
-    DadosDeAssinatura.SignatarioDispositivo = Requisicao.headers['user-agent']
+    try {
 
-    const DocumentoBase64Atualizado = await GCR_ConstruirPaginaComDadosDeAssinatura(DadosDeAssinatura)
+        //throw new Error('Falha ao buscar dados da API')
 
-    const NomeDoArquivo = DadosDeAssinatura.DocumentoTitulo+".pdf"
-    const CaminhoDoArquivo = "./Arquivos/Temporario/"+NomeDoArquivo
-    const ArquivoPDFCriadoComSucesso = await CriarArquivoPDFApartirDoBase64(CaminhoDoArquivo, DocumentoBase64Atualizado)
+        const DadosDeAssinatura = Requisicao.body
+        DadosDeAssinatura.SignatarioIp = Requisicao.connection.remoteAddress || Requisicao.socket.remoteAddress || Requisicao.connection.socket.remoteAddress
+        DadosDeAssinatura.SignatarioDispositivo = Requisicao.headers['user-agent']
+    
+        const DocumentoBase64Atualizado = await GCR_ConstruirPaginaComDadosDeAssinatura(DadosDeAssinatura)
+    
+        const NomeDoArquivo = DadosDeAssinatura.DocumentoTitulo+".pdf"
+        const CaminhoDoArquivo = "./Arquivos/Temporario/"+NomeDoArquivo
+        const ArquivoPDFCriadoComSucesso = await CriarArquivoPDFApartirDoBase64(CaminhoDoArquivo, DocumentoBase64Atualizado)
+    
+        if (ArquivoPDFCriadoComSucesso) {
+    
+            const PDFAssinadoComSucesso = await AssinarPDFcomCertificadoDigital(NomeDoArquivo)
+    
+            if (PDFAssinadoComSucesso) {
+                const BufferDoPDFcomCertificado =  fs.readFileSync("./Arquivos/Temporario/"+DadosDeAssinatura.DocumentoTitulo+"_signed.pdf")
+                var Base64PDFComCertificado = BufferDoPDFcomCertificado.toString('base64')
+                var DadosCriptografiaAssimetrica = AssinarPDFcomCriptografiaAssimetrica(Base64PDFComCertificado)
+            }  
+    
+        }
+    
+        const DadosDoPDFAssinado = {}
+        DadosDoPDFAssinado.ChavePublica = DadosCriptografiaAssimetrica.ChavePublica
+        DadosDoPDFAssinado.Assinatura = DadosCriptografiaAssimetrica.Assinatura
+        DadosDoPDFAssinado.Base64 = Base64PDFComCertificado
+    
+        Resposta.json(DadosDoPDFAssinado)
 
-    if (ArquivoPDFCriadoComSucesso) {
+    } catch (error) {
+        
+        console.error('--------------------------------------------------------')
+        console.error('Requisicao: ',Requisicao.body)
+        console.error('***********************************************************************************')
+        console.error('Erro: ',error)
+        console.error('--------------------------------------------------------')
 
-        const PDFAssinadoComSucesso = await AssinarPDFcomCertificadoDigital(NomeDoArquivo)
-
-        if (PDFAssinadoComSucesso) {
-            const BufferDoPDFcomCertificado =  fs.readFileSync("./Arquivos/Temporario/"+DadosDeAssinatura.DocumentoTitulo+"_signed.pdf")
-            var Base64PDFComCertificado = BufferDoPDFcomCertificado.toString('base64')
-            var DadosCriptografiaAssimetrica = AssinarPDFcomCriptografiaAssimetrica(Base64PDFComCertificado)
-        }  
+        Resposta.status(500).json(error)
 
     }
 
-    DadosDoPDFAssinado = {}
-    DadosDoPDFAssinado.ChavePublica = DadosCriptografiaAssimetrica.ChavePublica
-    DadosDoPDFAssinado.Assinatura = DadosCriptografiaAssimetrica.Assinatura
-    DadosDoPDFAssinado.Base64 = Base64PDFComCertificado
-
-    Resposta.json(DadosDoPDFAssinado)
 }
