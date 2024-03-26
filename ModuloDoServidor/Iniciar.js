@@ -18,6 +18,6 @@ Servidor.use(cors())
 Servidor.use(express.json({limit: '50mb'}))
 Servidor.use(express.urlencoded({ extended: false}))
 Servidor.use(LidarComRotasDaAPI)
-Servidor.listen(process.env.PORT || 3000)
+Servidor.listen(process.env.PORT || 4004)
 
 

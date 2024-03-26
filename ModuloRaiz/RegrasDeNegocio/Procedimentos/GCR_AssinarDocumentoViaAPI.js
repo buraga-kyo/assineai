@@ -11,11 +11,7 @@ module.exports = async (Requisicao, Resposta) => {
         //throw new Error('Falha ao buscar dados da API')
 
         const DadosDeAssinatura = Requisicao.body
-        DadosDeAssinatura.SignatarioIp = Requisicao.connection.remoteAddress || Requisicao.socket.remoteAddress || Requisicao.connection.socket.remoteAddress
-        DadosDeAssinatura.SignatarioDispositivo = Requisicao.headers['user-agent']
-    
         const DocumentoBase64Atualizado = await GCR_ConstruirPaginaComDadosDeAssinatura(DadosDeAssinatura)
-    
         const NomeDoArquivo = DadosDeAssinatura.DocumentoTitulo+".pdf"
         const CaminhoDoArquivo = "./Arquivos/Temporario/"+NomeDoArquivo
         const ArquivoPDFCriadoComSucesso = await CriarArquivoPDFApartirDoBase64(CaminhoDoArquivo, DocumentoBase64Atualizado)

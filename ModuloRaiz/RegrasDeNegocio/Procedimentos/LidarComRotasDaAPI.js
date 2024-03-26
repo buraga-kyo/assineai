@@ -22,6 +22,9 @@ const GCA_AssinarDocumentoViaAPI = require("./GCA_AssinarDocumentoViaAPI")
 rotas.post("/GCA_AssinarDocumentoViaAPI", GCA_AssinarDocumentoViaAPI)
 rotas.post("/GCR_AssinarDocumentoViaAPI", GCR_AssinarDocumentoViaAPI)
 
+rotas.post("/CriarAssinaturaViaAPI", CriarAssinaturaViaAPI)
+rotas.post("/AssinarDocumentoViaAPI", AssinarDocumentoViaAPI)
+
 rotas.post("/CriarDocumentoViaAPI", CriarDocumentoViaAPI)
 rotas.post("/ListarTodosDocumentos", ListarTodosDocumentos)
 rotas.post("/EnviarEmailDeConfirmacaoDeDadosComToken", EnviarEmailDeConfirmacaoDeDadosComToken)
@@ -39,7 +42,5 @@ rotas.get("/RecuperarArquivoPrincipalOriginalEmBase64/:DocumentoId", RecuperarAr
 rotas.get("/RecuperarArquivoPrincipalAssinadoEmBase64/:DocumentoId", RecuperarArquivoPrincipalAssinadoEmBase64)
 
 //rotas.post("/CriarAssinaturaViaAPI", GCR_CriarAssinaturaViaAPI)
-//rotas.post("/CriarAssinaturaViaAPI", CriarAssinaturaViaAPI)
-//rotas.post("/AssinarDocumentoViaAPI", AssinarDocumentoViaAPI)
 
 module.exports = rotas
