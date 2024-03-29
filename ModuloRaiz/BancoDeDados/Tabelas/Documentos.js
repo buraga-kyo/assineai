@@ -1,5 +1,5 @@
 module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
-    const Documentos = InstanciaConfiguradaDoSequelize.define("Documentos", {      
+    const AssinaturaDocumentos = InstanciaConfiguradaDoSequelize.define("AssinaturaDocumentos", {      
         DocumentoId: {
             type: Sequelize.INTEGER,
             primaryKey: true,
@@ -34,5 +34,5 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
         }
     });
 
-    return Documentos;
+    return AssinaturaDocumentos;
 };
