@@ -7,8 +7,8 @@ const Arquivo = require("./Tabelas/Arquivo");
 const DocumentoExtra = require("./Tabelas/DocumentoExtra");
 
 const Assinatura = require("./Tabelas/Assinatura");
-const Documentos = require("./Tabelas/Documentos");
-const Signatarios = require("./Tabelas/Signatarios");
+const AssinaturaDocumentos = require("./Tabelas/Documentos");
+const AssinaturaSignatarios = require("./Tabelas/Signatarios");
 
 const BancoDeDados = {};
 
@@ -40,17 +40,17 @@ BancoDeDados.Tabelas = {
     Usuario: Usuario(InstanciaConfiguradaDoSequelize, Sequelize),
     DocumentoExtra: DocumentoExtra(InstanciaConfiguradaDoSequelize, Sequelize),
 
-    //Assinatura: Assinatura(InstanciaConfiguradaDoSequelize, Sequelize),
-    //Documentos: Documentos(InstanciaConfiguradaDoSequelize, Sequelize),
-    //Signatarios: Signatarios(InstanciaConfiguradaDoSequelize, Sequelize),
+    Assinatura: Assinatura(InstanciaConfiguradaDoSequelize, Sequelize),
+    AssinaturaDocumentos: AssinaturaDocumentos(InstanciaConfiguradaDoSequelize, Sequelize),
+    AssinaturaSignatarios: AssinaturaSignatarios(InstanciaConfiguradaDoSequelize, Sequelize),
     InstanciaConfiguradaDoSequelize
 };
 
 // Associações
-// BancoDeDados.Tabelas.Assinatura.hasMany(BancoDeDados.Tabelas.Documentos, { foreignKey: 'AssinaturaId' });
-// BancoDeDados.Tabelas.Documentos.belongsTo(BancoDeDados.Tabelas.Assinatura, { foreignKey: 'AssinaturaId' });
-// BancoDeDados.Tabelas.Assinatura.hasMany(BancoDeDados.Tabelas.Signatarios, { foreignKey: 'AssinaturaId' });
-// BancoDeDados.Tabelas.Signatarios.belongsTo(BancoDeDados.Tabelas.Assinatura, { foreignKey: 'AssinaturaId' });
+BancoDeDados.Tabelas.Assinatura.hasMany(BancoDeDados.Tabelas.AssinaturaDocumentos, { foreignKey: 'AssinaturaId' });
+BancoDeDados.Tabelas.Documentos.belongsTo(BancoDeDados.Tabelas.Assinatura, { foreignKey: 'AssinaturaId' });
+BancoDeDados.Tabelas.Assinatura.hasMany(BancoDeDados.Tabelas.AssinaturaSignatarios, { foreignKey: 'AssinaturaId' });
+BancoDeDados.Tabelas.Signatarios.belongsTo(BancoDeDados.Tabelas.Assinatura, { foreignKey: 'AssinaturaId' });
 
 // BancoDeDados.Tabelas.Assinatura.belongsToMany(BancoDeDados.Tabelas.Signatarios, { through: 'AssinaturaSignatarios' });
 // BancoDeDados.Tabelas.Signatarios.belongsToMany(BancoDeDados.Tabelas.Assinatura, { through: 'AssinaturaSignatarios' });

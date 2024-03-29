@@ -1,5 +1,5 @@
 module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
-    const Signatarios = InstanciaConfiguradaDoSequelize.define("Signatarios", {         
+    const AssinaturaSignatarios = InstanciaConfiguradaDoSequelize.define("AssinaturaSignatarios", {         
         SignatarioId: {
             type: Sequelize.INTEGER,
             primaryKey: true,
@@ -43,5 +43,5 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
         }
     });
 
-    return Signatarios;
+    return AssinaturaSignatarios;
 }
