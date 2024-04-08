@@ -21,7 +21,8 @@ module.exports = async (DadosDeAssinatura) =>  {
         DadosDeAssinatura.DocumentoTitulo,
         DadosDeAssinatura.DocumentoToken, 
         DadosDeAssinatura.DocumentoHASH,
-        DadosDeAssinatura.DocumentoLinkAssinatura
+        DadosDeAssinatura.DocumentoLinkAssinatura,
+        DadosDeAssinatura.AssinaturaDataCriacao
     )
 
     const { PaginaAtual, PosicaoY } = await ConstruirCorpo(
@@ -47,7 +48,16 @@ module.exports = async (DadosDeAssinatura) =>  {
     return DocumentoBase64Atualizado
 }
 
-async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoTitulo, DocumentoToken, HashDocumentoOriginal, DocumentoLinkAssinatura) {
+async function ConstruirCabecalho(
+    PDF,
+    Pagina, 
+    Helvetica, 
+    HelveticaBold, 
+    DocumentoTitulo, 
+    DocumentoToken, 
+    HashDocumentoOriginal, 
+    DocumentoLinkAssinatura,
+    AssinaturaDataCriacao) {
 
     const BordaDoTopo = Pagina.getHeight() - 40
     const BordaDaEsquerda = 26
@@ -60,8 +70,8 @@ async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, Documen
         color: rgb(0.14,0.14,0.14)
     })
 
-    Pagina.drawText(`Gerado: ${DataAtualFormatada()}`, {
-        x: 465,
+    Pagina.drawText(`Gerado: ${AssinaturaDataCriacao}`, {
+        x: 470,
         y: 810,
         size: 7,
         font: Helvetica,
@@ -174,7 +184,7 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DadosDeAssi
     let PosicaoY = 650
     var PaginaAtual = Pagina
 
-    const BufferAssinaturaAssinada = fs.readFileSync('./Arquivos/Permanente/assinado.png')
+    const BufferAssinaturaAssinada = fs.readFileSync(process.env.BaseDir+'/Arquivos/Permanente/assinado.png')
     const AssinadoPNG = await PDF.embedPng(BufferAssinaturaAssinada)   
     
     // Dados do Cliente
@@ -527,7 +537,7 @@ async function ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaB
         PosicaoY = 800
     }
 
-    const ICPBuffer = fs.readFileSync('./Arquivos/Permanente/ICP.png');
+    const ICPBuffer = fs.readFileSync(process.env.BaseDir+'/Arquivos/Permanente/ICP.png');
 
     const ICPPNG = await PDF.embedPng(ICPBuffer)
 

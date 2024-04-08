@@ -3,10 +3,22 @@
 const cmd = require('node-cmd');
 
 module.exports = (NomeDoArquivo) => {
-   
-    return new Promise((resolve, reject) => {
+	
+	console.log(process.env)
+	
+	console.log(NomeDoArquivo)
+    
+	return new Promise((resolve, reject) => {
 
-        cmd.run('cd ./Arquivos/Permanente & java -jar JSignPdf.jar -d ../Temporario -kst PKCS12 -ksf cert.pfx -ksp '+process.env.SENHA_DO_CERTIFICADO+' -pr DISALLOW_PRINTING ../Temporario/'+NomeDoArquivo, (err, data, stderr) => {
+        const comando = 'cd '+process.env.BaseDir+'\\Arquivos\\Permanente & java -jar JSignPdf.jar -d '+process.env.BaseDir+'\\Arquivos\\Temporario -kst PKCS12 -ksf cert.pfx -ksp '+process.env.SENHA_DO_CERTIFICADO+' -pr DISALLOW_PRINTING '+process.env.BaseDir+'\\Arquivos\\Temporario\\'+NomeDoArquivo
+        console.log(comando)
+
+        cmd.run(comando, (err, data, stderr) => {
+
+            console.log(err)
+            console.log(data)
+            console.log(stderr)
+
             if (err == null) {
                 resolve(true);
             } else {
