@@ -13,7 +13,7 @@ module.exports = async (Requisicao, Resposta) => {
         const DadosDeAssinatura = Requisicao.body
         const DocumentoBase64Atualizado = await GCR_ConstruirPaginaComDadosDeAssinatura(DadosDeAssinatura)
         const NomeDoArquivo = DadosDeAssinatura.DocumentoTitulo+".pdf"
-        const CaminhoDoArquivo = "./Arquivos/Temporario/"+NomeDoArquivo
+        const CaminhoDoArquivo = process.env.BaseDir+"/Arquivos/Temporario/"+NomeDoArquivo
         const ArquivoPDFCriadoComSucesso = await CriarArquivoPDFApartirDoBase64(CaminhoDoArquivo, DocumentoBase64Atualizado)
     
         if (ArquivoPDFCriadoComSucesso) {
@@ -21,7 +21,7 @@ module.exports = async (Requisicao, Resposta) => {
             const PDFAssinadoComSucesso = await AssinarPDFcomCertificadoDigital(NomeDoArquivo)
     
             if (PDFAssinadoComSucesso) {
-                const BufferDoPDFcomCertificado =  fs.readFileSync("./Arquivos/Temporario/"+DadosDeAssinatura.DocumentoTitulo+"_signed.pdf")
+                const BufferDoPDFcomCertificado =  fs.readFileSync(process.env.BaseDir+"/Arquivos/Temporario/"+DadosDeAssinatura.DocumentoTitulo+"_signed.pdf")
                 var Base64PDFComCertificado = BufferDoPDFcomCertificado.toString('base64')
                 var DadosCriptografiaAssimetrica = AssinarPDFcomCriptografiaAssimetrica(Base64PDFComCertificado)
             }  
