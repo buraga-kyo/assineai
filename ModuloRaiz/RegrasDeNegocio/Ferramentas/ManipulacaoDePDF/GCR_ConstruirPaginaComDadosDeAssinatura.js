@@ -5,6 +5,9 @@ const fs = require("fs");
 
 module.exports = async (DadosDeAssinatura) =>  {
 
+	console.log('Iniciando construção de pagina com dados de assinatura')
+	console.log('Associado: '+DadosDeAssinatura.SignatarioNome)
+	
     const BufferDoBase64 = Buffer.from(DadosDeAssinatura.DocumentoBase64, 'base64')
     const PDF = await PDFDocument.load(BufferDoBase64)
 
@@ -45,6 +48,8 @@ module.exports = async (DadosDeAssinatura) =>  {
     const BytesDoPDF = await PDF.save()
     const DocumentoBase64Atualizado = Buffer.from(BytesDoPDF).toString('base64')
     
+	console.log('pagina criada com sucesso')
+	
     return DocumentoBase64Atualizado
 }
 
