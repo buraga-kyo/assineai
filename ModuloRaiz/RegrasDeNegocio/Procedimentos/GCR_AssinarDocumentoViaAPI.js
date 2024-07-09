@@ -8,15 +8,15 @@ module.exports = async (Requisicao, Resposta) => {
 
     try {
 
-        //throw new Error('Falha ao buscar dados da API')
-
+		console.log('Iniciando processamento da requisição')
+		
         const DadosDeAssinatura = Requisicao.body
         const DocumentoBase64Atualizado = await GCR_ConstruirPaginaComDadosDeAssinatura(DadosDeAssinatura)
         const NomeDoArquivo = DadosDeAssinatura.DocumentoTitulo+".pdf"
         const CaminhoDoArquivo = process.env.BaseDir+"/Arquivos/Temporario/"+NomeDoArquivo
         const ArquivoPDFCriadoComSucesso = await CriarArquivoPDFApartirDoBase64(CaminhoDoArquivo, DocumentoBase64Atualizado)
-    
-        if (ArquivoPDFCriadoComSucesso) {
+
+		if (ArquivoPDFCriadoComSucesso) {
     
             const PDFAssinadoComSucesso = await AssinarPDFcomCertificadoDigital(NomeDoArquivo)
     
@@ -24,9 +24,15 @@ module.exports = async (Requisicao, Resposta) => {
                 const BufferDoPDFcomCertificado =  fs.readFileSync(process.env.BaseDir+"/Arquivos/Temporario/"+DadosDeAssinatura.DocumentoTitulo+"_signed.pdf")
                 var Base64PDFComCertificado = BufferDoPDFcomCertificado.toString('base64')
                 var DadosCriptografiaAssimetrica = AssinarPDFcomCriptografiaAssimetrica(Base64PDFComCertificado)
-            }  
+            } else {
+				console.log('Ocorreu um erro na assinatura do pdf com certificado')
+				throw new Error('Ocorreu um erro na assinatura do pdf com certificado')
+			}
     
-        }
+        } else {
+			console.log('Ocorreu um erro na criação do arquivo fisico')
+			throw new Error('Ocorreu um erro na criação do arquivo fisico')
+		}
     
         const DadosDoPDFAssinado = {}
         DadosDoPDFAssinado.ChavePublica = DadosCriptografiaAssimetrica.ChavePublica
