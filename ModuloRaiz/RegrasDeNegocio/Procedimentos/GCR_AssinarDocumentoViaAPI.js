@@ -26,12 +26,12 @@ module.exports = async (Requisicao, Resposta) => {
                 var DadosCriptografiaAssimetrica = AssinarPDFcomCriptografiaAssimetrica(Base64PDFComCertificado)
             } else {
 				console.log('Ocorreu um erro na assinatura do pdf com certificado')
-				throw new Error('Ocorreu um erro na assinatura do pdf com certificado')
+                return Resposta.status(500)
 			}
     
         } else {
 			console.log('Ocorreu um erro na criação do arquivo fisico')
-			throw new Error('Ocorreu um erro na criação do arquivo fisico')
+            return Resposta.status(500)
 		}
     
         const DadosDoPDFAssinado = {}

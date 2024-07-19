@@ -15,7 +15,6 @@ const RecuperarTokenQueVaiSerEnviadoNoEmailDoSignatario = require("./RecuperarTo
 const VerificarAutenticidadeDoTokenInseridoPeloSignatario = require("./VerificarAutenticidadeDoTokenInseridoPeloSignatario")
 const RecuperarTodosDocumentosEmBase64 = require("./RecuperarTodosDocumentosEmBase64")
 const CriarAssinaturaViaAPI = require("./CriarAssinaturaViaAPI")
-const GCR_CriarAssinaturaViaAPI = require("./GCR_CriarAssinaturaViaAPI")
 const GCR_AssinarDocumentoViaAPI = require("./GCR_AssinarDocumentoViaAPI")
 const GCA_AssinarDocumentoViaAPI = require("./GCA_AssinarDocumentoViaAPI")
 

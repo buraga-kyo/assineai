@@ -2,21 +2,19 @@ const GCA_ConstruirPaginaComDadosDeAssinatura = require("../Ferramentas/Manipula
 
 module.exports = async ({ body: { Documentos, Signatarios } }, Resposta) => {
 
-    var DocumentoComDadosDeAssinatura = {}
-    var ColecaoDeDocumentos = []
+    const ColecaoDeDocumentos = []
 
-    for (let i = 0; i < Documentos.length; i++) {
-
-        var DocumentoBase64Atualizado = await GCA_ConstruirPaginaComDadosDeAssinatura(Documentos[i], Signatarios)
-
-        DocumentoComDadosDeAssinatura.DocumentoId = Documentos[i].DocumentoId
-        DocumentoComDadosDeAssinatura.DocumentoBase64Atualizado = DocumentoBase64Atualizado
-        ColecaoDeDocumentos.push(DocumentoComDadosDeAssinatura)
-
+    for await (const documento of Documentos){
+        ColecaoDeDocumentos.push({
+            DocumentoToken: documento.DocumentoToken,
+            DocumentoBase64Atualizado: await GCA_ConstruirPaginaComDadosDeAssinatura(documento, Signatarios),
+        })
     }
 
-    Resposta.json(ColecaoDeDocumentos)
+    console.log("ColecaoDeDocumentos",ColecaoDeDocumentos);
 
+    Resposta.json(ColecaoDeDocumentos)
+  
 }
 
     // const { dataValues: RegistrosDoSignatario } = await Signatario.findOne({ where: { SignatarioToken: Requisicao.body.SignatarioToken } })
