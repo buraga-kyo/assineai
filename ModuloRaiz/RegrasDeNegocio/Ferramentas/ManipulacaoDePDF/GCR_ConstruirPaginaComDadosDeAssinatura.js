@@ -1,6 +1,5 @@
 const { PDFDocument, StandardFonts, rgb, PDFName, PDFString } = require("pdf-lib");
 const GeradorDeQRCode = require("../FuncoesGenericas/GeradorDeQRCode");
-const DataAtualFormatada = require("../FuncoesGenericas/DataAtualFormatada")
 const fs = require("fs");
 
 module.exports = async (DadosDeAssinatura) =>  {

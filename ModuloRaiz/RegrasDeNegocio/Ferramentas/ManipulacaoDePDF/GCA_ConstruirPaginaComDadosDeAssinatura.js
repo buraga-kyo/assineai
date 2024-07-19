@@ -1,6 +1,5 @@
 const { PDFDocument, StandardFonts, rgb, PDFName, PDFString } = require("pdf-lib");
 const GeradorDeQRCode = require("../FuncoesGenericas/GeradorDeQRCode");
-const DataAtualFormatada = require("../FuncoesGenericas/DataAtualFormatada")
 const fs = require("fs");
 
 module.exports = async (Documento, Signatarios) =>  {
@@ -20,7 +19,9 @@ module.exports = async (Documento, Signatarios) =>  {
         HelveticaBold,
         Documento.DocumentoTitulo,
         Documento.DocumentoToken, 
-        Documento.DocumentoHASH
+        Documento.DocumentoHASH,
+        Documento.DocumentoLinkAssinatura,
+        Documento.AssinaturaDataCriacao
     )
 
     const { PaginaAtual, PosicaoY } = await ConstruirCorpo(
@@ -46,7 +47,16 @@ module.exports = async (Documento, Signatarios) =>  {
     return DocumentoBase64Atualizado
 }
 
-async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, DocumentoTitulo, DocumentoToken, HashDocumentoOriginal) {
+async function ConstruirCabecalho(
+    PDF,
+    Pagina, 
+    Helvetica, 
+    HelveticaBold, 
+    DocumentoTitulo, 
+    DocumentoToken, 
+    HashDocumentoOriginal, 
+    DocumentoLinkAssinatura,
+    AssinaturaDataCriacao) {
 
     const BordaDoTopo = Pagina.getHeight() - 40
     const BordaDaEsquerda = 26
@@ -59,8 +69,8 @@ async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, Documen
         color: rgb(0.14,0.14,0.14)
     })
 
-    Pagina.drawText(`Gerado: ${DataAtualFormatada()}`, {
-        x: 465,
+    Pagina.drawText(`Gerado: ${AssinaturaDataCriacao}`, {
+        x: 470,
         y: 810,
         size: 7,
         font: Helvetica,
@@ -122,7 +132,7 @@ async function ConstruirCabecalho(PDF, Pagina, Helvetica, HelveticaBold, Documen
         color: rgb(0.46,0.46,0.46)
     })
 
-    const LinkVerificadorDeAutenticidade = process.env.ORIGIN+'/verificar/autenticidade?doc='+DocumentoToken
+    const LinkVerificadorDeAutenticidade = DocumentoLinkAssinatura
 
     const QRCodeBuffer = await GeradorDeQRCode(DocumentoToken, LinkVerificadorDeAutenticidade)
 
@@ -245,7 +255,7 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
 
             PosicaoY = PosicaoY-10
 
-            PaginaAtual.drawText('Data e Hora: '+Signatario.SignatarioDataAssinatura, {
+            PaginaAtual.drawText(Signatario.SignatarioDataAssinatura, {
                 x: 47,
                 y: PosicaoY-10,
                 size: 7,
@@ -255,23 +265,43 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
 
             PosicaoY = PosicaoY-10
 
-            PaginaAtual.drawText('Email: '+Signatario.SignatarioEmail, {
-                x: 47,
-                y: PosicaoY-10,
-                size: 7,
-                font: Helvetica,
-                color: rgb(0.46,0.46,0.46)
-            })  
-
-            PosicaoY = PosicaoY-10
-
-            PaginaAtual.drawText('Token: '+Signatario.SignatarioToken, {
-                x: 47,
-                y: PosicaoY-10,
-                size: 7,
-                font: Helvetica,
-                color: rgb(0.46,0.46,0.46)
-            })  
+            if (Signatario.SignatarioFormaAutenticacao === 'Email') {
+                PaginaAtual.drawText('Email: '+Signatario.SignatarioEmail+' (autenticado com código enviado exclusivamente a este e-mail)', {
+                    x: 47,
+                    y: PosicaoY-10,
+                    size: 7,
+                    font: Helvetica,
+                    color: rgb(0.46,0.46,0.46)
+                })
+        
+                PosicaoY = PosicaoY-10
+        
+                PaginaAtual.drawText('Celular: '+Signatario.SignatarioCelular, {
+                    x: 47,
+                    y: PosicaoY-10,
+                    size: 7,
+                    font: Helvetica,
+                    color: rgb(0.46,0.46,0.46)
+                })         
+            } else {
+                PaginaAtual.drawText('Email: '+Signatario.SignatarioEmail, {
+                    x: 47,
+                    y: PosicaoY-10,
+                    size: 7,
+                    font: Helvetica,
+                    color: rgb(0.46,0.46,0.46)
+                })
+        
+                PosicaoY = PosicaoY-10
+        
+                PaginaAtual.drawText('Celular: '+Signatario.SignatarioCelular+' (autenticado com código enviado exclusivamente a este WhatsApp)', {
+                    x: 47,
+                    y: PosicaoY-10,
+                    size: 7,
+                    font: Helvetica,
+                    color: rgb(0.46,0.46,0.46)
+                }) 
+            }
 
             PosicaoY = PosicaoY-50            
 
@@ -367,7 +397,7 @@ async function ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaB
     for (const PaginaAtual of QuantidadeDePaginas) {
         const Pagina = PDF.getPage(PaginaAtual)
 
-        Pagina.drawText('assina aí '+DocumentoToken,  {
+        Pagina.drawText('Dwith '+DocumentoToken,  {
             x: 26,
             y: 5,
             size: 6,
