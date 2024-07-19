@@ -3,8 +3,18 @@ const GCA_ConstruirPaginaComDadosDeAssinatura = require("../Ferramentas/Manipula
 module.exports = async ({ body: { Documentos, Signatarios } }, Resposta) => {
 
     const ColecaoDeDocumentos = []
+    var DocumentoBase64Atualizado = ""
+    var NomeDoArquivo = ""
+    var CaminhoDoArquivo = ""
+    var ArquivoPDFCriadoComSucesso = false
 
-    for await (const documento of Documentos){
+    for await (const documento of Documentos) {
+
+        // DocumentoBase64Atualizado = await GCA_ConstruirPaginaComDadosDeAssinatura(documento, Signatarios)
+        // NomeDoArquivo = documento.DocumentoTitulo+".pdf"
+        // CaminhoDoArquivo = process.env.BaseDir+"/Arquivos/Temporario/"+NomeDoArquivo
+        // ArquivoPDFCriadoComSucesso = await CriarArquivoPDFApartirDoBase64(CaminhoDoArquivo, DocumentoBase64Atualizado)
+
         ColecaoDeDocumentos.push({
             DocumentoToken: documento.DocumentoToken,
             DocumentoBase64Atualizado: await GCA_ConstruirPaginaComDadosDeAssinatura(documento, Signatarios),
