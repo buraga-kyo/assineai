@@ -8,8 +8,6 @@ module.exports = async (Requisicao, Resposta) => {
 
     try {
 
-		console.log('Iniciando processamento da requisição')
-		
         const DadosDeAssinatura = Requisicao.body
         const DocumentoBase64Atualizado = await GCR_ConstruirPaginaComDadosDeAssinatura(DadosDeAssinatura)
         const NomeDoArquivo = DadosDeAssinatura.DocumentoTitulo+".pdf"
@@ -26,12 +24,12 @@ module.exports = async (Requisicao, Resposta) => {
                 var DadosCriptografiaAssimetrica = AssinarPDFcomCriptografiaAssimetrica(Base64PDFComCertificado)
             } else {
 				console.log('Ocorreu um erro na assinatura do pdf com certificado')
-                return Resposta.status(500)
+                return Resposta.status(500).json('Ocorreu um erro na assinatura do pdf com certificado')
 			}
     
         } else {
 			console.log('Ocorreu um erro na criação do arquivo fisico')
-            return Resposta.status(500)
+            return Resposta.status(500).json('Ocorreu um erro na criação do arquivo fisico')
 		}
     
         const DadosDoPDFAssinado = {}
