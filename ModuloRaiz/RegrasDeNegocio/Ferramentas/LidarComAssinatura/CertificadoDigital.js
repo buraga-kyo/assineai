@@ -8,6 +8,8 @@ module.exports = (NomeDoArquivo) => {
 
         cmd.run(comando, (err, data, stderr) => {
 
+            //resolve(false);
+
             if (err == null) {
 				console.log('certificado adicionado com sucesso')
                 resolve(true);

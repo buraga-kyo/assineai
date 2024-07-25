@@ -61,7 +61,7 @@ async function ConstruirCabecalho(
     const BordaDoTopo = Pagina.getHeight() - 40
     const BordaDaEsquerda = 26
     
-    Pagina.drawText(DocumentoTitulo, {
+    Pagina.drawText('Relatório de Assinaturas', {
         x: BordaDaEsquerda,
         y: BordaDoTopo,
         size: 20,
@@ -368,7 +368,7 @@ async function ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaB
         color: rgb(0.46,0.46,0.46)
     })
 
-    PaginaAtual.drawText('Integridade do documento certificada digitalmente pelo Assina Aí (ICP Brasil):', {
+    PaginaAtual.drawText('Integridade do documento certificada digitalmente pela Dwith (ICP Brasil):', {
         x: 70,
         y: PosicaoY,
         size: 9,
@@ -384,7 +384,7 @@ async function ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaB
         color: rgb(0.46,0.46,0.46)
     })
 
-    PaginaAtual.drawText('De acordo com os termos de uso do Assina Aí, disponivel em www.assinaai.com.br', {
+    PaginaAtual.drawText('De acordo com os termos de uso do Dwith, disponivel em www.dwith.com.br', {
         x: 70,
         y: PosicaoY-25,
         size: 9,
