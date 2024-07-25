@@ -187,10 +187,10 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
 
         let Signatario = Signatarios[i]
 
-        const BufferAssinaturaPendente = fs.readFileSync('./Arquivos/Permanente/pendente.png')
+        const BufferAssinaturaPendente = fs.readFileSync(process.env.BaseDir+'/Arquivos/Permanente/pendente.png')
         const AssinaturaPendentePNG = await PDF.embedPng(BufferAssinaturaPendente)
 
-        const BufferAssinaturaAssinada = fs.readFileSync('./Arquivos/Permanente/assinado.png')
+        const BufferAssinaturaAssinada = fs.readFileSync(process.env.BaseDir+'/Arquivos/Permanente/assinado.png')
         const AssinadoPNG = await PDF.embedPng(BufferAssinaturaAssinada)
 
         if (PosicaoY == 0) {
@@ -340,7 +340,7 @@ async function ConstruirRodaPe(PDF, PaginaAtual, PosicaoY, Helvetica, HelveticaB
         PosicaoY = 800
     }
 
-    const ICPBuffer = fs.readFileSync('./Arquivos/Permanente/ICP.png');
+    const ICPBuffer = fs.readFileSync(process.env.BaseDir+'/Arquivos/Permanente/ICP.png');
 
     const ICPPNG = await PDF.embedPng(ICPBuffer)
 
