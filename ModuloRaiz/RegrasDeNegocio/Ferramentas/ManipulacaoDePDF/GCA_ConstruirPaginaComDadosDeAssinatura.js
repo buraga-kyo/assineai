@@ -1,6 +1,7 @@
-const { PDFDocument, StandardFonts, rgb, PDFName, PDFString } = require("pdf-lib");
+const { PDFDocument, StandardFonts, rgb, PDFName, PDFString, degrees } = require("pdf-lib");
 const GeradorDeQRCode = require("../FuncoesGenericas/GeradorDeQRCode");
 const fs = require("fs");
+const NewPDFDocument = require('pdfkit');
 
 module.exports = async (Documento, Signatarios) =>  {
     
@@ -10,7 +11,13 @@ module.exports = async (Documento, Signatarios) =>  {
     const HelveticaBold = await PDF.embedFont(StandardFonts.HelveticaBold)
     const Helvetica = await PDF.embedFont(StandardFonts.Helvetica)
     
-    var Pagina = PDF.addPage()
+    // Obtém a primeira página do PDF existente
+    const existingPage = PDF.getPage(0);
+
+    // Obtém as dimensões da página existente
+    const { width, height } = existingPage.getSize();
+
+    var Pagina = PDF.addPage([width, 840])
 
     await ConstruirCabecalho(
         PDF, 
@@ -41,9 +48,73 @@ module.exports = async (Documento, Signatarios) =>  {
         Documento.DocumentoToken
     )
 
+    // ------------- Adicionar pagina de selfie no documento
+    let pdfKitDoc = new NewPDFDocument();
+    let buffers = [];
+
+    pdfKitDoc.on('data', buffers.push.bind(buffers))
+    pdfKitDoc.font('Helvetica-Bold').fontSize(20).text('Selfies dos Assinantes Verificados.', 27, 27)
+    pdfKitDoc.strokeColor('#c7c7c7');
+    pdfKitDoc.moveTo(27, 55).lineTo(570, 55).stroke()
+
+    const pdfKitBufferPromise = new Promise((resolve, reject) => {
+        pdfKitDoc.on('end', () => {
+            resolve(Buffer.concat(buffers));
+        });
+    });
+
+    let posicao = 0
+    let paginaFoto = null
+
+    for (let i = 0; i < Signatarios.length; i++) {  
+
+        if (Signatarios[i].SignatarioSelfieBase64 != '') {
+
+            pdfKitDoc.lineWidth(0.1)
+            pdfKitDoc.moveTo(27, 100+posicao).lineTo(570, 100+posicao).stroke()
+            pdfKitDoc.moveTo(27, 100+posicao).lineTo(27, 280+posicao).stroke()
+            pdfKitDoc.moveTo(285, 100+posicao).lineTo(285, 280+posicao).stroke()
+            pdfKitDoc.moveTo(570, 100+posicao).lineTo(570, 280+posicao).stroke()
+            pdfKitDoc.moveTo(27, 280+posicao).lineTo(570, 280+posicao).stroke()
+
+            pdfKitDoc.font('Helvetica').fontSize(10).text('Foto do rosto de '+Signatarios[i].SignatarioNome, 300, 120+posicao)
+            pdfKitDoc.font('Helvetica').fontSize(10).text(Signatarios[i].SignatarioDataAssinatura, 300, 140+posicao)
+            pdfKitDoc.font('Helvetica').fontSize(10).text('Token: '+Signatarios[i].SignatarioLinkToken, 300, 160+posicao)
+
+            pdfKitDoc.image(Buffer.from(Signatarios[i].SignatarioSelfieBase64, 'base64'), 100, 115+posicao, { height: 150 })
+
+            // Define a opacidade da marca d'água
+            pdfKitDoc.opacity(0.3);
+
+            // Define a fonte, tamanho e cor do texto da marca d'água
+            pdfKitDoc.font('Helvetica-Bold').fontSize(30)
+            pdfKitDoc.text('CONFIDENCIAL', 40, 170+posicao);
+            pdfKitDoc.opacity(1);
+
+            posicao = posicao + 200
+
+            if (posicao == 600) {
+                posicao = 0
+            }
+        }
+
+    }
+    // ------------- Fim
+
+    pdfKitDoc.end()     
+
+    // Espera até que o pdf-kit finalize o documento
+    const pdfKitBuffer = await pdfKitBufferPromise;
+
+    // Carrega a nova página criada com pdf-kit
+    const newPagePdfDoc = await PDFDocument.load(pdfKitBuffer);
+    [paginaFoto] = await PDF.copyPages(newPagePdfDoc, [0]);
+
+    // Adiciona a nova página ao PDF existente
+    PDF.addPage(paginaFoto);
+
     const BytesDoPDF = await PDF.save()
     const DocumentoBase64Atualizado = Buffer.from(BytesDoPDF).toString('base64')
-    
     return DocumentoBase64Atualizado
 }
 
@@ -163,6 +234,16 @@ async function ConstruirCabecalho(
 
 }
 
+
+/**
+ * @async
+ * @function ConstruirCorpo
+ * @param {<import('pdf-lib').PDFDocument>} PDF 
+ * @param {<import('pdf-lib').PDFPage>} Pagina  
+ * @param {<import('pdf-lib').PDFFont>} Helvetica  
+ * @param {<import('pdf-lib').PDFFont>} HelveticaBold  
+ * @param {object} Signatarios  
+*/
 async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios) {
 
     Pagina.drawText('Assinaturas', {
@@ -303,7 +384,7 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
                 }) 
             }
 
-            PosicaoY = PosicaoY-50            
+            PosicaoY = PosicaoY-50
 
         } else {
 
