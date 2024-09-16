@@ -4,7 +4,7 @@ const AssinarPDFcomCertificadoDigital = require("../Ferramentas/LidarComAssinatu
 const AssinarPDFcomCriptografiaAssimetrica = require("../Ferramentas/LidarComAssinatura/CriptografiaAssimetrica")
 const fs = require("fs")
 
-module.exports = async ({ body: { Documentos, Signatarios } }, Resposta) => {
+module.exports = async ({ body: { Documentos, Signatarios, GravarSelfie } }, Resposta) => {
 
     try {     
 
@@ -17,7 +17,7 @@ module.exports = async ({ body: { Documentos, Signatarios } }, Resposta) => {
         for await (const documento of Documentos) {
 
             NomeDoArquivo = documento.DocumentoToken+".pdf"
-            DocumentoBase64Atualizado = await GCA_ConstruirPaginaComDadosDeAssinatura(documento, Signatarios)
+            DocumentoBase64Atualizado = await GCA_ConstruirPaginaComDadosDeAssinatura(documento, Signatarios, GravarSelfie)
             CaminhoDoArquivo = process.env.BaseDir+"/Arquivos/Temporario/"+NomeDoArquivo
             ArquivoPDFCriadoComSucesso = await CriarArquivoPDFApartirDoBase64(CaminhoDoArquivo, DocumentoBase64Atualizado)
 

@@ -3,8 +3,9 @@ const GeradorDeQRCode = require("../FuncoesGenericas/GeradorDeQRCode");
 const fs = require("fs");
 const NewPDFDocument = require('pdfkit');
 
-module.exports = async (Documento, Signatarios) =>  {
+module.exports = async (Documento, Signatarios, GravarSelfie) =>  {
     
+    console.log(GravarSelfie)
     const BufferDoBase64 = Buffer.from(Documento.DocumentoBase64, 'base64')
     const PDF = await PDFDocument.load(BufferDoBase64)
 
@@ -48,71 +49,73 @@ module.exports = async (Documento, Signatarios) =>  {
         Documento.DocumentoToken
     )
 
-    // ------------- Adicionar pagina de selfie no documento
-    let pdfKitDoc = new NewPDFDocument();
-    let buffers = [];
+    if (GravarSelfie) {
+        // ------------- Adicionar pagina de selfie no documento
+        let pdfKitDoc = new NewPDFDocument();
+        let buffers = [];
 
-    pdfKitDoc.on('data', buffers.push.bind(buffers))
-    pdfKitDoc.font('Helvetica-Bold').fontSize(20).text('Selfies dos Assinantes Verificados.', 27, 27)
-    pdfKitDoc.strokeColor('#c7c7c7');
-    pdfKitDoc.moveTo(27, 55).lineTo(570, 55).stroke()
+        pdfKitDoc.on('data', buffers.push.bind(buffers))
+        pdfKitDoc.font('Helvetica-Bold').fontSize(20).text('Selfies dos Assinantes Verificados.', 27, 27)
+        pdfKitDoc.strokeColor('#c7c7c7');
+        pdfKitDoc.moveTo(27, 55).lineTo(570, 55).stroke()
 
-    const pdfKitBufferPromise = new Promise((resolve, reject) => {
-        pdfKitDoc.on('end', () => {
-            resolve(Buffer.concat(buffers));
+        const pdfKitBufferPromise = new Promise((resolve, reject) => {
+            pdfKitDoc.on('end', () => {
+                resolve(Buffer.concat(buffers));
+            });
         });
-    });
 
-    let posicao = 0
-    let paginaFoto = null
+        let posicao = 0
+        let paginaFoto = null
 
-    for (let i = 0; i < Signatarios.length; i++) {  
+        for (let i = 0; i < Signatarios.length; i++) {  
 
-        if (Signatarios[i].SignatarioSelfieBase64 != '') {
+            if (Signatarios[i].SignatarioSelfieBase64 != '') {
 
-            pdfKitDoc.lineWidth(0.1)
-            pdfKitDoc.moveTo(27, 100+posicao).lineTo(570, 100+posicao).stroke()
-            pdfKitDoc.moveTo(27, 100+posicao).lineTo(27, 280+posicao).stroke()
-            pdfKitDoc.moveTo(285, 100+posicao).lineTo(285, 280+posicao).stroke()
-            pdfKitDoc.moveTo(570, 100+posicao).lineTo(570, 280+posicao).stroke()
-            pdfKitDoc.moveTo(27, 280+posicao).lineTo(570, 280+posicao).stroke()
+                pdfKitDoc.lineWidth(0.1)
+                pdfKitDoc.moveTo(27, 100+posicao).lineTo(570, 100+posicao).stroke()
+                pdfKitDoc.moveTo(27, 100+posicao).lineTo(27, 280+posicao).stroke()
+                pdfKitDoc.moveTo(285, 100+posicao).lineTo(285, 280+posicao).stroke()
+                pdfKitDoc.moveTo(570, 100+posicao).lineTo(570, 280+posicao).stroke()
+                pdfKitDoc.moveTo(27, 280+posicao).lineTo(570, 280+posicao).stroke()
 
-            pdfKitDoc.font('Helvetica').fontSize(10).text('Foto do rosto de '+Signatarios[i].SignatarioNome, 300, 120+posicao)
-            pdfKitDoc.font('Helvetica').fontSize(10).text(Signatarios[i].SignatarioDataAssinatura, 300, 140+posicao)
-            pdfKitDoc.font('Helvetica').fontSize(10).text('Token: '+Signatarios[i].SignatarioLinkToken, 300, 160+posicao)
+                pdfKitDoc.font('Helvetica').fontSize(10).text('Foto do rosto de '+Signatarios[i].SignatarioNome, 300, 120+posicao)
+                pdfKitDoc.font('Helvetica').fontSize(10).text(Signatarios[i].SignatarioDataAssinatura, 300, 140+posicao)
+                pdfKitDoc.font('Helvetica').fontSize(10).text('Token: '+Signatarios[i].SignatarioLinkToken, 300, 160+posicao)
 
-            pdfKitDoc.image(Buffer.from(Signatarios[i].SignatarioSelfieBase64, 'base64'), 100, 115+posicao, { height: 150 })
+                pdfKitDoc.image(Buffer.from(Signatarios[i].SignatarioSelfieBase64, 'base64'), 100, 115+posicao, { height: 150 })
 
-            // Define a opacidade da marca d'água
-            pdfKitDoc.opacity(0.3);
+                // Define a opacidade da marca d'água
+                pdfKitDoc.opacity(0.3);
 
-            // Define a fonte, tamanho e cor do texto da marca d'água
-            pdfKitDoc.font('Helvetica-Bold').fontSize(30)
-            pdfKitDoc.text('CONFIDENCIAL', 40, 170+posicao);
-            pdfKitDoc.opacity(1);
+                // Define a fonte, tamanho e cor do texto da marca d'água
+                pdfKitDoc.font('Helvetica-Bold').fontSize(30)
+                pdfKitDoc.text('CONFIDENCIAL', 40, 170+posicao);
+                pdfKitDoc.opacity(1);
 
-            posicao = posicao + 200
+                posicao = posicao + 200
 
-            if (posicao == 600) {
-                posicao = 0
+                if (posicao == 600) {
+                    posicao = 0
+                }
             }
+
         }
+        // ------------- Fim
 
+        pdfKitDoc.end()     
+
+        // Espera até que o pdf-kit finalize o documento
+        const pdfKitBuffer = await pdfKitBufferPromise;
+
+        // Carrega a nova página criada com pdf-kit
+        const newPagePdfDoc = await PDFDocument.load(pdfKitBuffer);
+        [paginaFoto] = await PDF.copyPages(newPagePdfDoc, [0]);
+
+        // Adiciona a nova página ao PDF existente
+        PDF.addPage(paginaFoto);
     }
-    // ------------- Fim
-
-    pdfKitDoc.end()     
-
-    // Espera até que o pdf-kit finalize o documento
-    const pdfKitBuffer = await pdfKitBufferPromise;
-
-    // Carrega a nova página criada com pdf-kit
-    const newPagePdfDoc = await PDFDocument.load(pdfKitBuffer);
-    [paginaFoto] = await PDF.copyPages(newPagePdfDoc, [0]);
-
-    // Adiciona a nova página ao PDF existente
-    PDF.addPage(paginaFoto);
-
+    
     const BytesDoPDF = await PDF.save()
     const DocumentoBase64Atualizado = Buffer.from(BytesDoPDF).toString('base64')
     return DocumentoBase64Atualizado
