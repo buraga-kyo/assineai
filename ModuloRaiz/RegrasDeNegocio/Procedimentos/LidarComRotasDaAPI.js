@@ -18,6 +18,11 @@ const CriarAssinaturaViaAPI = require("./CriarAssinaturaViaAPI")
 const GCR_AssinarDocumentoViaAPI = require("./GCR_AssinarDocumentoViaAPI")
 const GCA_AssinarDocumentoViaAPI = require("./GCA_AssinarDocumentoViaAPI")
 
+rotas.post("/teste", (req, res) => {
+    console.log(req.body)
+    res.send("teste")
+})
+
 rotas.post("/GCA_AssinarDocumentoViaAPI", GCA_AssinarDocumentoViaAPI)
 rotas.post("/GCR_AssinarDocumentoViaAPI", GCR_AssinarDocumentoViaAPI)
 
