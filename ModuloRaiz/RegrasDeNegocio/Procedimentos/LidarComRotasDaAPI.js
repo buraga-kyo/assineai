@@ -18,9 +18,33 @@ const CriarAssinaturaViaAPI = require("./CriarAssinaturaViaAPI")
 const GCR_AssinarDocumentoViaAPI = require("./GCR_AssinarDocumentoViaAPI")
 const GCA_AssinarDocumentoViaAPI = require("./GCA_AssinarDocumentoViaAPI")
 
-rotas.post("/teste", (req, res) => {
-    console.log(req.body)
-    res.send("teste")
+rotas.post("/teste", async (req, res) => {
+    const { PDFDocument, StandardFonts, rgb, PDFName, PDFString, degrees } = require("pdf-lib");
+    const fs = require("fs");
+
+    const BufferDoBase64 = Buffer.from(req.body.base64, 'base64')
+    const PDF = await PDFDocument.load(BufferDoBase64)
+    const HelveticaBold = await PDF.embedFont(StandardFonts.HelveticaBold)
+    var Pagina = PDF.addPage()
+
+    Pagina.drawText('Assinaturas', {
+        x: req.body.x,
+        y: req.body.y,
+        size: 15,
+        font: HelveticaBold,
+        color: rgb(0.14,0.14,0.14)
+    })    
+
+    const BytesDoPDF = await PDF.save()
+    const DocumentoBase64Atualizado = Buffer.from(BytesDoPDF).toString('base64')
+
+    fs.writeFile('./teste222.pdf', DocumentoBase64Atualizado, 'base64', Erro => {
+        if (Erro) {
+            res.send(Erro)
+        } else {
+            res.send("ok")
+        }
+    });    
 })
 
 rotas.post("/GCA_AssinarDocumentoViaAPI", GCA_AssinarDocumentoViaAPI)
