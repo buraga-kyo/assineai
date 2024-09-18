@@ -25,11 +25,11 @@ rotas.post("/teste", async (req, res) => {
     const BufferDoBase64 = Buffer.from(req.body.base64, 'base64')
     const PDF = await PDFDocument.load(BufferDoBase64)
     const HelveticaBold = await PDF.embedFont(StandardFonts.HelveticaBold)
-    var Pagina = PDF.addPage()
+    var Pagina = PDF.getPage(req.body.page - 1)
 
     Pagina.drawText('Assinaturas', {
         x: req.body.x,
-        y: req.body.y,
+        y: Pagina.getHeight() - req.body.y,
         size: 15,
         font: HelveticaBold,
         color: rgb(0.14,0.14,0.14)
