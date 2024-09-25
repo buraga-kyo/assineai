@@ -8,14 +8,12 @@ module.exports = (NomeDoArquivo) => {
 
         cmd.run(comando, (err, data, stderr) => {
 
-            //resolve(false);
-
             if (err == null) {
 				console.log('certificado adicionado com sucesso')
                 resolve(true);
             } else {
-				console.log('Ocorreu um erro ao assinar pdf com certificado: ')
-                console.log(err);
+				console.log('CertificadoDigital.js')
+                reject(err)
             }
         })
 

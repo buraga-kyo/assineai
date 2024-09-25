@@ -2,10 +2,10 @@ const { PDFDocument, StandardFonts, rgb, PDFName, PDFString, degrees } = require
 const GeradorDeQRCode = require("../FuncoesGenericas/GeradorDeQRCode");
 const fs = require("fs");
 const NewPDFDocument = require('pdfkit');
+const sizeOf = require('image-size');
 
 module.exports = async (Documento, Signatarios, GravarSelfie) =>  {
     
-    console.log(GravarSelfie)
     const BufferDoBase64 = Buffer.from(Documento.DocumentoBase64, 'base64')
     const PDF = await PDFDocument.load(BufferDoBase64)
 
@@ -50,7 +50,6 @@ module.exports = async (Documento, Signatarios, GravarSelfie) =>  {
     )
 
     if (GravarSelfie) {
-        // ------------- Adicionar pagina de selfie no documento
         let pdfKitDoc = new NewPDFDocument();
         let buffers = [];
 
@@ -83,7 +82,16 @@ module.exports = async (Documento, Signatarios, GravarSelfie) =>  {
                 pdfKitDoc.font('Helvetica').fontSize(10).text(Signatarios[i].SignatarioDataAssinatura, 300, 140+posicao)
                 pdfKitDoc.font('Helvetica').fontSize(10).text('Token: '+Signatarios[i].SignatarioLinkToken, 300, 160+posicao)
 
-                pdfKitDoc.image(Buffer.from(Signatarios[i].SignatarioSelfieBase64, 'base64'), 100, 115+posicao, { height: 150 })
+                const imgBuffer = Buffer.from(Signatarios[i].SignatarioSelfieBase64, 'base64')
+
+                const dimensoesDaImagem = sizeOf(imgBuffer);
+
+                // se for selfie
+                if ((dimensoesDaImagem.height > dimensoesDaImagem.width) || (dimensoesDaImagem.height < dimensoesDaImagem.width && dimensoesDaImagem.orientation == 6)) {
+                    pdfKitDoc.image(imgBuffer, 100, 115+posicao, { height: 150 })
+                } else { // se for paisagem
+                    pdfKitDoc.image(imgBuffer, 60, 115+posicao, { height: 110 })
+                }
 
                 // Define a opacidade da marca d'água
                 pdfKitDoc.opacity(0.3);
@@ -101,7 +109,6 @@ module.exports = async (Documento, Signatarios, GravarSelfie) =>  {
             }
 
         }
-        // ------------- Fim
 
         pdfKitDoc.end()     
 
@@ -236,7 +243,6 @@ async function ConstruirCabecalho(
     Pagina.node.set(PDFName.of('Annots'), PDF.context.obj([ReferenciaDoLinkQRCode]));
 
 }
-
 
 /**
  * @async
