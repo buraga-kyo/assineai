@@ -6,11 +6,13 @@ module.exports = (CaminhoDoArquivo, DocumentoBase64) =>  {
 
         fs.writeFile(CaminhoDoArquivo, DocumentoBase64, 'base64', Erro => {
             if (Erro) {
-                throw Erro;
+                console.log("CriarArquivoPDFApartirDoBase64.js")
+                reject(Erro);
             } else {
                 resolve(true);
             }
         });
+
     });
 
 }

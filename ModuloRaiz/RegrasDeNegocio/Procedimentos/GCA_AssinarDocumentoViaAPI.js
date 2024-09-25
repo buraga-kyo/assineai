@@ -47,25 +47,13 @@ module.exports = async ({ body: { Documentos, Signatarios, GravarSelfie } }, Res
             })
         }
 
-        // Converter para Buffer
-        const pdfBuffer = Buffer.from(ColecaoDeDocumentos[0].DocumentoBase64Atualizado, 'base64');
-
-        // Salvar o buffer em um arquivo PDF
-        fs.writeFile('output.pdf', pdfBuffer, (err) => {
-            if (err) {
-                console.error('Erro ao salvar o arquivo:', err);
-            } else {
-                console.log('PDF salvo com sucesso!');
-            }
-        });
-
         Resposta.json(ColecaoDeDocumentos)
 
     } catch (error) {
             
         console.error('-----------------------------------------------------------------------------------')
         console.error('***********************************************************************************')
-        console.error('Erro: ',error)
+        console.error(error)
         console.error('-----------------------------------------------------------------------------------')
 
         Resposta.status(500).json(error)
