@@ -327,6 +327,18 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
                 color: rgb(0.46,0.46,0.46)
             })   
 
+            if (Signatario.SignatarioGeolocalizacao) {
+                PosicaoY = PosicaoY-10
+        
+                PaginaAtual.drawText('Localização aproximada: '+Signatario.SignatarioGeolocalizacao, {
+                    x: 47,
+                    y: PosicaoY-10,
+                    size: 7,
+                    font: Helvetica,
+                    color: rgb(0.46,0.46,0.46)
+                })  
+            }             
+
             PosicaoY = PosicaoY-10
 
             PaginaAtual.drawText('Dispositivo: '+Signatario.SignatarioDispositivo, {
