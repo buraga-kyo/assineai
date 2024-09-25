@@ -47,7 +47,7 @@ module.exports = async ({ body: { Documentos, Signatarios, GravarSelfie } }, Res
             })
         }
 
-        Resposta.json(ColecaoDeDocumentos)
+        Resposta.status(200).json(ColecaoDeDocumentos)
 
     } catch (error) {
             
