@@ -13,7 +13,13 @@ module.exports = async (DadosDeAssinatura) =>  {
     const HelveticaBold = await PDF.embedFont(StandardFonts.HelveticaBold)
     const Helvetica = await PDF.embedFont(StandardFonts.Helvetica)
     
-    var Pagina = PDF.addPage()
+    // Obtém a primeira página do PDF existente
+    const existingPage = PDF.getPage(0);
+
+    // Obtém as dimensões da página existente
+    const { width, height } = existingPage.getSize();    
+
+    var Pagina = PDF.addPage([width, 840])
 
     await ConstruirCabecalho(
         PDF, 
@@ -66,7 +72,7 @@ async function ConstruirCabecalho(
     const BordaDoTopo = Pagina.getHeight() - 40
     const BordaDaEsquerda = 26
     
-    Pagina.drawText(DocumentoTitulo, {
+    Pagina.drawText('Relatório de Assinaturas', {
         x: BordaDaEsquerda,
         y: BordaDoTopo,
         size: 20,
@@ -234,6 +240,18 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DadosDeAssi
         font: Helvetica,
         color: rgb(0.46,0.46,0.46)
     })   
+
+    if (DadosDeAssinatura.SignatarioLatLong) {
+        PosicaoY = PosicaoY-10
+
+        PaginaAtual.drawText('Localização aproximada: '+DadosDeAssinatura.SignatarioLatLong, {
+            x: 47,
+            y: PosicaoY-10,
+            size: 7,
+            font: Helvetica,
+            color: rgb(0.46,0.46,0.46)
+        })  
+    } 
 
     PosicaoY = PosicaoY-10
 
