@@ -17,6 +17,7 @@ const RecuperarTodosDocumentosEmBase64 = require("./RecuperarTodosDocumentosEmBa
 const CriarAssinaturaViaAPI = require("./CriarAssinaturaViaAPI")
 const GCR_AssinarDocumentoViaAPI = require("./GCR_AssinarDocumentoViaAPI")
 const GCA_AssinarDocumentoViaAPI = require("./GCA_AssinarDocumentoViaAPI")
+const multer = require('multer');
 
 rotas.post("/teste", async (req, res) => {
     const { PDFDocument, StandardFonts, rgb, PDFName, PDFString, degrees } = require("pdf-lib");
@@ -50,7 +51,9 @@ rotas.post("/teste", async (req, res) => {
 rotas.post("/GCA_AssinarDocumentoViaAPI", GCA_AssinarDocumentoViaAPI)
 rotas.post("/GCR_AssinarDocumentoViaAPI", GCR_AssinarDocumentoViaAPI)
 
-rotas.post("/CriarAssinaturaViaAPI", CriarAssinaturaViaAPI)
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+rotas.post("/CriarAssinaturaViaAPI", upload.any(), CriarAssinaturaViaAPI)
 rotas.post("/AssinarDocumentoViaAPI", AssinarDocumentoViaAPI)
 
 rotas.post("/CriarDocumentoViaAPI", CriarDocumentoViaAPI)

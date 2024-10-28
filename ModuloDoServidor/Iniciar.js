@@ -1,9 +1,9 @@
 require('dotenv').config({path:__dirname+'/.env'})
 
-/*require("../ModuloRaiz/BancoDeDados/Conector")
+require("../ModuloRaiz/BancoDeDados/Conector")
     .InstanciaConfiguradaDoSequelize
     .sync({ force: true })
-    .catch(erro => console.log(erro))*/
+    .catch(erro => console.log(erro))
 
 const express = require("express")
 const cors = require("cors")

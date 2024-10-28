@@ -4,46 +4,55 @@ const crypto = require("crypto")
 const CalcularHash = require("../Ferramentas/FuncoesGenericas/CalcularHash")
 const CriptografiaAssimetrica = require("../Ferramentas/LidarComAssinatura/CriptografiaAssimetrica")
 
-module.exports = async ({ body }, Resposta) => {
+module.exports = async (Requisicao, Resposta) => {
+    
+    let Transacao = await InstanciaConfiguradaDoSequelize.transaction()
 
     try {
 
-        let Transacao = await InstanciaConfiguradaDoSequelize.transaction()
-
         const { AssinaturaId } = await Assinatura.create({
-            AssinaturaResponsavel: body.AssinaturaResponsavel,
-            AssinaturaStatus: body.AssinaturaStatus,
+            AssinaturaResponsavel: "Sistema",
+            AssinaturaStatus: "Pendente",
             AssinaturaQuantidadeDocumentoAssinado: "0"
         }, { transaction: Transacao })
 
-        for (let i = 0; i < body.Documentos.length; i++) {          
+        const documentos = Requisicao.files;
+        await Promise.all(documentos.map(async (documento, index) => {
+            const documentoKey = `documento${index}`;
+            const { Documento } = JSON.parse(Requisicao.body[documentoKey]);
+            buffer = documento.buffer
 
-            let { ChavePublica, Assinatura } = CriptografiaAssimetrica(body.Documentos[0].DocumentoOriginalURLS3)
+            let { ChavePublica, Assinatura } = CriptografiaAssimetrica(buffer)
 
             await Documentos.create({
-                DocumentoTitulo: body.Documentos[i].DocumentoTitulo,
-                DocumentoOriginalURLS3: body.Documentos[i].DocumentoOriginalURLS3,
+                DocumentoTitulo: Documento.Nome,
+                DocumentoBuffer: buffer,
+                DocumentoColecaoDeDivArrastavel: Documento.ColecaoDeDivArrastavel,
                 DocumentoToken: crypto.randomUUID(),
                 DocumentoCriptografiaChavePublica: ChavePublica,
                 DocumentoCriptografiaAssinatura: Assinatura,
-                DocumentoHashDoPDFOriginal: CalcularHash(body.Documentos[i].DocumentoOriginalURLS3),
+                DocumentoHashDoPDFOriginal: CalcularHash(buffer),
                 AssinaturaId
             }, { transaction: Transacao })
-    
-        }
+        }))
 
-        for (let i = 0; i < body.Signatarios.length; i++) {
-        
+        const signatarios = JSON.parse(Requisicao.body.signatarios)
+        await Promise.all(signatarios.dadosDoSignatario.map(async (signatario) => {
             await Signatarios.create({
-                SignatarioNome: body.Signatarios[i].SignatarioNome,
-                SignatarioEmail: body.Signatarios[i].SignatarioEmail,
+                SignatarioNome: signatario.Nome,
+                SignatarioEmail: signatario.Email,
+                SignatarioWhatsApp: signatario.WhatsApp,
+                SignatarioQualificacao: signatario.Qualificacao,
+                SignatarioRG: signatario.RG,
+                SignatarioCPF: signatario.CPF,
+                SignatarioFormaDeAutenticacao: signatario.FormaDeAutenticacao,
                 SignatarioSituacaoAssinatura: "Não abriu o link",
-                SignatarioTokenLinkAssinatura: crypto.randomUUID(),
+                SignatarioTokenLinkAssinatura: signatario.GUID,
                 SignatarioTokenEmail: Math.floor(100000 + Math.random() * 900000).toString().substring(0, 6),
+                SignatarioTokenWhatsApp: Math.floor(100000 + Math.random() * 900000).toString().substring(0, 6),
                 AssinaturaId
             }, { transaction: Transacao })
-
-        }
+        }))
 
         await Transacao.commit()
         Resposta.json(AssinaturaId)
@@ -56,5 +65,4 @@ module.exports = async ({ body }, Resposta) => {
         
     }
 
-    
 }
