@@ -8,6 +8,12 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
         DocumentoTitulo: {
             type: Sequelize.STRING,
         },
+        DocumentoBuffer: {
+            type: Sequelize.BLOB
+        },
+        DocumentoColecaoDeDivArrastavel: {
+            type: Sequelize.JSON
+        },
         DocumentoOriginalURLS3: {
             type: Sequelize.TEXT,
         },

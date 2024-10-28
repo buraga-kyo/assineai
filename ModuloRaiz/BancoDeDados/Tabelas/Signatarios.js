@@ -4,16 +4,31 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
             type: Sequelize.INTEGER,
             primaryKey: true,
             autoIncrement: true
-        },           
+        },
+        SignatarioFormaDeAutenticacao: {
+            type: Sequelize.ARRAY(Sequelize.STRING)
+        },             
         SignatarioNome: {
             type: Sequelize.STRING,
         },        
         SignatarioEmail: {
             type: Sequelize.STRING,
         },
+        SignatarioRG: {
+            type: Sequelize.STRING,
+        },   
+        SignatarioCPF: {
+            type: Sequelize.STRING,
+        },                
+        SignatarioWhatsApp: {
+            type: Sequelize.STRING,
+        },
         SignatarioTokenEmail: {
             type: Sequelize.STRING
         },
+        SignatarioTokenWhatsApp: {
+            type: Sequelize.STRING
+        },        
         SignatarioTokenLinkAssinatura: {
             type: Sequelize.TEXT
         },
