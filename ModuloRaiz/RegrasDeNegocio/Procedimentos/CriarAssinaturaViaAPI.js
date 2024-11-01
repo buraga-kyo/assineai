@@ -5,21 +5,24 @@ const CalcularHash = require("../Ferramentas/FuncoesGenericas/CalcularHash")
 const CriptografiaAssimetrica = require("../Ferramentas/LidarComAssinatura/CriptografiaAssimetrica")
 
 module.exports = async (Requisicao, Resposta) => {
-    
+
     let Transacao = await InstanciaConfiguradaDoSequelize.transaction()
+
+    console.log(Requisicao.body)
 
     try {
 
+        const { assinaturaNome } = JSON.parse(Requisicao.body["assinatura"]);
         const { AssinaturaId } = await Assinatura.create({
+            AssinaturaNome: assinaturaNome,
             AssinaturaResponsavel: "Sistema",
             AssinaturaStatus: "Pendente",
             AssinaturaQuantidadeDocumentoAssinado: "0"
-        }, { transaction: Transacao })
+        }, { transaction: Transacao });
 
         const documentos = Requisicao.files;
         await Promise.all(documentos.map(async (documento, index) => {
-            const documentoKey = `documento${index}`;
-            const { Documento } = JSON.parse(Requisicao.body[documentoKey]);
+            const { Documento } = JSON.parse(Requisicao.body[`documento${index}`]);
             buffer = documento.buffer
 
             let { ChavePublica, Assinatura } = CriptografiaAssimetrica(buffer)
@@ -55,14 +58,14 @@ module.exports = async (Requisicao, Resposta) => {
         }))
 
         await Transacao.commit()
-        Resposta.json(AssinaturaId)
+        Resposta.status(200).json(AssinaturaId)
 
     } catch (Erro) {
 
         await Transacao.rollback()
         console.log(Erro)
-        Resposta.sendStatus(500)
-        
+        Resposta.status(500).json(Erro)
+
     }
 
 }

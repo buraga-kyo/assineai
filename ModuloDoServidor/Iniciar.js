@@ -1,8 +1,8 @@
-require('dotenv').config({path:__dirname+'/.env'})
+require('dotenv').config({ path: __dirname + '/.env' })
 
 require("../ModuloRaiz/BancoDeDados/Conector")
     .InstanciaConfiguradaDoSequelize
-    .sync({ force: true })
+    .sync({ force: false })
     .catch(erro => console.log(erro))
 
 const express = require("express")
@@ -18,8 +18,8 @@ const Servidor = express()
 
 Servidor.use(morgan('dev'))
 Servidor.use(cors())
-Servidor.use(express.json({limit: '50mb'}))
-Servidor.use(express.urlencoded({ extended: false}))
+Servidor.use(express.json({ limit: '50mb' }))
+Servidor.use(express.urlencoded({ extended: false }))
 Servidor.use(LidarComRotasDaAPI)
 Servidor.listen(process.env.PORT || 4004)
 
