@@ -3,6 +3,8 @@ const CriarDocumentoViaAPI = require("./CriarDocumentoViaAPI")
 const AdicionarDocumentoExtraViaAPI = require("./AdicionarDocumentoExtraViaAPI")
 const AssinarDocumentoViaAPI = require("./AssinarDocumentoViaAPI")
 const ListarTodosDocumentos = require("./ListarTodosDocumentos")
+const ListarTodasAssinaturas = require("./ListarTodasAssinaturas")
+const ListarDetalheAssinatura = require("./ListarDetalheAssinatura")
 const ListarDetalheDoDocumento = require("./ListarDetalheDoDocumento")
 const ListarDetalheDoDocumentoAPartirDoTokenDoSignatario = require("./ListarDetalheDoDocumentoAPartirDoTokenDoSignatario")
 const ListarDocumentosAguardandoAssinatura = require("./ListarDocumentosAguardandoAssinatura")
@@ -33,8 +35,8 @@ rotas.post("/teste", async (req, res) => {
         y: Pagina.getHeight() - req.body.y,
         size: 15,
         font: HelveticaBold,
-        color: rgb(0.14,0.14,0.14)
-    })    
+        color: rgb(0.14, 0.14, 0.14)
+    })
 
     const BytesDoPDF = await PDF.save()
     const DocumentoBase64Atualizado = Buffer.from(BytesDoPDF).toString('base64')
@@ -45,7 +47,7 @@ rotas.post("/teste", async (req, res) => {
         } else {
             res.send("ok")
         }
-    });    
+    });
 })
 
 rotas.post("/GCA_AssinarDocumentoViaAPI", GCA_AssinarDocumentoViaAPI)
@@ -54,12 +56,15 @@ rotas.post("/GCR_AssinarDocumentoViaAPI", GCR_AssinarDocumentoViaAPI)
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 rotas.post("/CriarAssinaturaViaAPI", upload.any(), CriarAssinaturaViaAPI)
+rotas.post("/ListarTodasAssinaturas", ListarTodasAssinaturas)
+rotas.get("/ListarDetalheAssinatura", ListarDetalheAssinatura)
+
 rotas.post("/AssinarDocumentoViaAPI", AssinarDocumentoViaAPI)
 
 rotas.post("/CriarDocumentoViaAPI", CriarDocumentoViaAPI)
 rotas.post("/ListarTodosDocumentos", ListarTodosDocumentos)
 rotas.post("/EnviarEmailDeConfirmacaoDeDadosComToken", EnviarEmailDeConfirmacaoDeDadosComToken)
-rotas.post("/VerificarAutenticidadeDoTokenInseridoPeloSignatario",VerificarAutenticidadeDoTokenInseridoPeloSignatario)
+rotas.post("/VerificarAutenticidadeDoTokenInseridoPeloSignatario", VerificarAutenticidadeDoTokenInseridoPeloSignatario)
 rotas.post("/AdicionarDocumentoExtraViaAPI/:DocumentoToken", AdicionarDocumentoExtraViaAPI)
 
 rotas.get("/RecuperarTodosDocumentosEmBase64/:DocumentoId", RecuperarTodosDocumentosEmBase64)
@@ -71,7 +76,5 @@ rotas.get("/RecuperarArquivoOriginalEmBase64/:DocumentoExtraId", RecuperarArquiv
 rotas.get("/RecuperarArquivoAssinadoEmBase64/:DocumentoExtraId", RecuperarArquivoAssinadoEmBase64)
 rotas.get("/RecuperarArquivoPrincipalOriginalEmBase64/:DocumentoId", RecuperarArquivoPrincipalOriginalEmBase64)
 rotas.get("/RecuperarArquivoPrincipalAssinadoEmBase64/:DocumentoId", RecuperarArquivoPrincipalAssinadoEmBase64)
-
-//rotas.post("/CriarAssinaturaViaAPI", GCR_CriarAssinaturaViaAPI)
 
 module.exports = rotas

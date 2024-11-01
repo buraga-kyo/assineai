@@ -5,7 +5,10 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
             type: Sequelize.INTEGER,
             primaryKey: true,
             autoIncrement: true
-        },        
+        },    
+        AssinaturaNome: {
+            type: Sequelize.STRING,
+        },            
         AssinaturaResponsavel: {
             type: Sequelize.STRING,
         },
