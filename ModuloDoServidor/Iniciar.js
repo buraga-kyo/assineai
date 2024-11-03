@@ -1,8 +1,7 @@
 require('dotenv').config({ path: __dirname + '/.env' })
-
 require("../ModuloRaiz/BancoDeDados/Conector")
     .InstanciaConfiguradaDoSequelize
-    .sync({ force: false })
+    .sync({ force: true })
     .catch(erro => console.log(erro))
 
 const express = require("express")
