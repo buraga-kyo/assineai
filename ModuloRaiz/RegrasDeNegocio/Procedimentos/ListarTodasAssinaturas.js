@@ -17,13 +17,20 @@ module.exports = async (Requisicao, Resposta) => {
       AssinaturaSignatarios,
       AssinaturaStatus,
       ItemsPorPagina,
-      offset
+      offset,
+      order
     } = Requisicao.body;
 
     const Filtro = {};
     const FiltroDocumentos = {};
     const FiltroSignatarios = {};
+    let Order = [];
 
+    if (order) {
+      Order = [["AssinaturaId", order.toUpperCase()]];
+    } else {
+      Order = [["AssinaturaId", "DESC"]];
+    }
     if (AssinaturaId) Filtro.AssinaturaId = AssinaturaId
     if (AssinaturaResponsavel) Filtro.AssinaturaResponsavel = { [Op.iLike]: "%" + AssinaturaResponsavel + "%" }
     if (AssinaturaNome) Filtro.AssinaturaNome = { [Op.iLike]: "%" + AssinaturaNome + "%" }
@@ -82,6 +89,7 @@ module.exports = async (Requisicao, Resposta) => {
       where: Filtro,
       limit: ItemsPorPagina,
       offset,
+      order: Order,
       include: [
         { model: Signatarios, attributes: ['SignatarioNome'], where: FiltroSignatarios },
         { model: Documentos, attributes: ['DocumentoTitulo'], where: FiltroDocumentos }

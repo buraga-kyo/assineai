@@ -8,7 +8,19 @@ module.exports = async (Requisicao, Resposta) => {
     RegistrosDaAssinatura = await Assinatura.findOne({
       where: { AssinaturaId: Requisicao.query.AssinaturaId },
       include: [
-        { model: Signatarios, attributes: ['SignatarioNome', 'SignatarioEmail', 'SignatarioRG', 'SignatarioCPF', 'SignatarioWhatsApp', 'SignatarioSituacaoAssinatura', 'SignatarioTokenLinkAssinatura'] },
+        {
+          model: Signatarios,
+          attributes: [
+            'SignatarioNome',
+            'SignatarioEmail',
+            'SignatarioRG',
+            'SignatarioCPF',
+            'SignatarioWhatsApp',
+            'SignatarioSituacaoAssinatura',
+            'SignatarioTokenLinkAssinatura',
+            'SignatarioAssinou',
+          ]
+        },
         { model: Documentos, attributes: ['DocumentoTitulo'] }
       ],
     })

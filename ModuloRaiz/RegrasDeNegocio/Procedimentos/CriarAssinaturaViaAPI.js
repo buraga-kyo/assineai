@@ -43,6 +43,7 @@ module.exports = async (Requisicao, Resposta) => {
         await Promise.all(signatarios.dadosDoSignatario.map(async (signatario) => {
             await Signatarios.create({
                 SignatarioNome: signatario.Nome,
+                SignatarioAssinou: false,
                 SignatarioEmail: signatario.Email,
                 SignatarioWhatsApp: signatario.WhatsApp,
                 SignatarioQualificacao: signatario.Qualificacao,
