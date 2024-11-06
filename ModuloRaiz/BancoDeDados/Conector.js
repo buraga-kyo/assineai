@@ -4,6 +4,7 @@ const Sequelize = require("sequelize");
 const Assinatura = require("./Tabelas/Assinatura");
 const Documentos = require("./Tabelas/Documentos");
 const Signatarios = require("./Tabelas/Signatarios");
+const SignatarioHistorico = require("./Tabelas/SignatarioHistorico");
 
 const BancoDeDados = {};
 
@@ -29,10 +30,11 @@ BancoDeDados.Sequelize = Sequelize;
 BancoDeDados.InstanciaConfiguradaDoSequelize = InstanciaConfiguradaDoSequelize;
 
 BancoDeDados.Tabelas = {
-    Assinatura: Assinatura(InstanciaConfiguradaDoSequelize, Sequelize),
-    Documentos: Documentos(InstanciaConfiguradaDoSequelize, Sequelize),
-    Signatarios: Signatarios(InstanciaConfiguradaDoSequelize, Sequelize),
-    InstanciaConfiguradaDoSequelize
+  Assinatura: Assinatura(InstanciaConfiguradaDoSequelize, Sequelize),
+  Documentos: Documentos(InstanciaConfiguradaDoSequelize, Sequelize),
+  Signatarios: Signatarios(InstanciaConfiguradaDoSequelize, Sequelize),
+  SignatarioHistorico: SignatarioHistorico(InstanciaConfiguradaDoSequelize, Sequelize),
+  InstanciaConfiguradaDoSequelize
 };
 
 // Associações
@@ -40,5 +42,9 @@ BancoDeDados.Tabelas.Assinatura.hasMany(BancoDeDados.Tabelas.Documentos, { forei
 BancoDeDados.Tabelas.Documentos.belongsTo(BancoDeDados.Tabelas.Assinatura, { foreignKey: 'AssinaturaId' });
 BancoDeDados.Tabelas.Assinatura.hasMany(BancoDeDados.Tabelas.Signatarios, { foreignKey: 'AssinaturaId' });
 BancoDeDados.Tabelas.Signatarios.belongsTo(BancoDeDados.Tabelas.Assinatura, { foreignKey: 'AssinaturaId' });
+
+BancoDeDados.Tabelas.Signatarios.hasMany(BancoDeDados.Tabelas.SignatarioHistorico, { foreignKey: 'SignatarioId', as: "historicos" });
+BancoDeDados.Tabelas.SignatarioHistorico.belongsTo(BancoDeDados.Tabelas.Signatarios, { foreignKey: 'SignatarioId' });
+
 
 module.exports = BancoDeDados;

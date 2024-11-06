@@ -1,9 +1,8 @@
-const { Assinatura, Signatarios, Documentos } = require("../../BancoDeDados/Conector").Tabelas;
+const { Assinatura, Signatarios, Documentos, SignatarioHistorico } = require("../../BancoDeDados/Conector").Tabelas;
 
 module.exports = async (Requisicao, Resposta) => {
 
   try {
-    console.log(Requisicao.query)
 
     RegistrosDaAssinatura = await Assinatura.findOne({
       where: { AssinaturaId: Requisicao.query.AssinaturaId },
@@ -11,6 +10,7 @@ module.exports = async (Requisicao, Resposta) => {
         {
           model: Signatarios,
           attributes: [
+            'SignatarioId',
             'SignatarioNome',
             'SignatarioEmail',
             'SignatarioRG',
@@ -19,13 +19,17 @@ module.exports = async (Requisicao, Resposta) => {
             'SignatarioSituacaoAssinatura',
             'SignatarioTokenLinkAssinatura',
             'SignatarioAssinou',
+          ],
+          include: [
+            {
+              model: SignatarioHistorico,
+              as: "historicos"
+            }
           ]
         },
         { model: Documentos, attributes: ['DocumentoTitulo'] }
       ],
     })
-
-    console.log(RegistrosDaAssinatura)
 
     Resposta.json(RegistrosDaAssinatura)
 
