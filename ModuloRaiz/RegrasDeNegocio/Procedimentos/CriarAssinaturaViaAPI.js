@@ -1,4 +1,4 @@
-const { Assinatura, Documentos, Signatarios, InstanciaConfiguradaDoSequelize } = require("../../BancoDeDados/Conector").Tabelas
+const { Assinatura, Documentos, Signatarios, SignatarioHistorico, InstanciaConfiguradaDoSequelize } = require("../../BancoDeDados/Conector").Tabelas
 const crypto = require("crypto")
 
 const CalcularHash = require("../Ferramentas/FuncoesGenericas/CalcularHash")
@@ -41,7 +41,7 @@ module.exports = async (Requisicao, Resposta) => {
 
         const signatarios = JSON.parse(Requisicao.body.signatarios)
         await Promise.all(signatarios.dadosDoSignatario.map(async (signatario) => {
-            await Signatarios.create({
+            const { SignatarioId } = await Signatarios.create({
                 SignatarioNome: signatario.Nome,
                 SignatarioAssinou: false,
                 SignatarioEmail: signatario.Email,
@@ -55,6 +55,14 @@ module.exports = async (Requisicao, Resposta) => {
                 SignatarioTokenEmail: Math.floor(100000 + Math.random() * 900000).toString().substring(0, 6),
                 SignatarioTokenWhatsApp: Math.floor(100000 + Math.random() * 900000).toString().substring(0, 6),
                 AssinaturaId
+            }, { transaction: Transacao })
+
+            await SignatarioHistorico.create({
+                SignatarioHistoricoStatus: "naoabriulink",
+                SignatarioHistoricoIp: "192.168.0.1",
+                SignatarioHistoricoDispositivo: "localhost",
+                SignatarioHistoricoAcao: "naoabriulink",
+                SignatarioId
             }, { transaction: Transacao })
         }))
 
