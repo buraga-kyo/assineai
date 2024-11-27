@@ -6,6 +6,7 @@ const ListarTodosDocumentos = require("./ListarTodosDocumentos")
 const ListarTodasAssinaturas = require("./ListarTodasAssinaturas")
 const ListarDetalheAssinatura = require("./ListarDetalheAssinatura")
 const ListarDetalheDoDocumento = require("./ListarDetalheDoDocumento")
+const ListarDetalhesDoSignatario = require("./ListarDetalhesDoSignatario")
 const ListarDetalheDoDocumentoAPartirDoTokenDoSignatario = require("./ListarDetalheDoDocumentoAPartirDoTokenDoSignatario")
 const ListarDocumentosAguardandoAssinatura = require("./ListarDocumentosAguardandoAssinatura")
 const RecuperarArquivoOriginalEmBase64 = require("./RecuperarArquivoOriginalEmBase64")
@@ -58,6 +59,7 @@ const upload = multer({ storage });
 rotas.post("/CriarAssinaturaViaAPI", upload.any(), CriarAssinaturaViaAPI)
 rotas.post("/ListarTodasAssinaturas", ListarTodasAssinaturas)
 rotas.get("/ListarDetalheAssinatura", ListarDetalheAssinatura)
+rotas.get("/ListarDetalhesDoSignatario", ListarDetalhesDoSignatario)
 
 rotas.post("/AssinarDocumentoViaAPI", AssinarDocumentoViaAPI)
 
