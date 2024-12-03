@@ -6,7 +6,7 @@ module.exports = async (Requisicao, Resposta) => {
 
   try {
 
-    console.log(Requisicao.body)
+    console.log("Chegou")
 
     const {
       AssinaturaId,
