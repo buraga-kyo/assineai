@@ -18,7 +18,9 @@ module.exports = async (Requisicao, Resposta) => {
       }
     });
 
-    Resposta.json({ signatario, documentos })
+    console.log(documentos)
+
+    Resposta.json({ Signatario: signatario, Documentos: documentos })
 
   } catch (Erro) {
     console.log(Erro)
