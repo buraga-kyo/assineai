@@ -6,8 +6,6 @@ module.exports = async (Requisicao, Resposta) => {
 
   try {
 
-    console.log("Chegou")
-
     const {
       AssinaturaId,
       createdAt,
