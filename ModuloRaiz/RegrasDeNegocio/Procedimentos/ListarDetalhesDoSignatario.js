@@ -6,19 +6,24 @@ module.exports = async (Requisicao, Resposta) => {
 
   try {
 
-    const signatario = await Signatarios.findOne({
+    const assinaturaId = await Signatarios.findOne({
       where: {
         SignatarioTokenLinkAssinatura: Requisicao.query.SignatarioToken
+      },
+      attributes: ["AssinaturaId"]
+    });
+
+    const signatario = await Signatarios.findAll({
+      where: {
+        AssinaturaId: assinaturaId.dataValues.AssinaturaId
       }
     });
 
     const documentos = await Documentos.findAll({
       where: {
-        AssinaturaId: signatario.dataValues.AssinaturaId
+        AssinaturaId: assinaturaId.dataValues.AssinaturaId
       }
     });
-
-    console.log(documentos)
 
     Resposta.json({ Signatario: signatario, Documentos: documentos })
 
