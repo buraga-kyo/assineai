@@ -1,19 +1,19 @@
 const cmd = require('node-cmd');
 const { spawn } = require('child_process');
+const fs = require('fs');
+const forge = require('node-forge');
+const { PDFDocument, rgb } = require('pdf-lib');
 
 module.exports = (NomeDoArquivo) => {
 
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
 
         const { exec } = require('child_process');
 
         const command = 'cd '+process.env.BaseDir+'\\Arquivos\\Permanente & java -jar JSignPdf.jar -d ' + process.env.BaseDir + '\\Arquivos\\Temporario -kst PKCS12 -ksf cert.pfx -ksp ' + process.env.SENHA_DO_CERTIFICADO + ' -pr DISALLOW_PRINTING ' + process.env.BaseDir + '\\Arquivos\\Temporario\\' + NomeDoArquivo;
+        console.log(command);
 
-        const options = {
-            windowsHide: true,
-        };
-
-        exec(command, options, (error, stdout, stderr) => {
+        exec(command, { windowsHide: true }, (error, stdout, stderr) => {
             if (error) {
                 console.error(`Error: ${error}`);
                 reject(error);
@@ -24,6 +24,72 @@ module.exports = (NomeDoArquivo) => {
             console.log(`stdout: ${stdout}`);
             resolve(true);
         });
+
+        /** const pfxBuffer = fs.readFileSync(process.env.BaseDir+'\\Arquivos\\Permanente\\cert.pfx');
+        const p12Asn1 = forge.asn1.fromDer(pfxBuffer.toString('binary'));
+        const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, 'dwith2024');
+      
+        const keyObj = p12.getBags({ bagType: forge.pki.oids.pkcs8ShroudedKeyBag })[forge.pki.oids.pkcs8ShroudedKeyBag][0];
+        const certObj = p12.getBags({ bagType: forge.pki.oids.certBag })[forge.pki.oids.certBag][0];
+      
+        const privateKeyPem = forge.pki.privateKeyToPem(keyObj.key);
+        const certificate = forge.pki.certificateToPem(certObj.cert);
+      
+        console.log(privateKeyPem);
+        console.log(certificate);
+
+        const pdfBuffer = fs.readFileSync(process.env.BaseDir+'\\Arquivos\\Temporario\\'+NomeDoArquivo);
+        const pdfDoc = await PDFDocument.load(pdfBuffer);
+      
+        // Criar uma assinatura fictícia (espaço reservado)
+        const signaturePlaceholder = Buffer.alloc(8192); // Espaço reservado para a assinatura
+      
+        // Adicionar uma assinatura simples ao PDF
+        const pages = pdfDoc.getPages();
+        const firstPage = pages[0];
+        firstPage.drawText('Assinado digitalmente', {
+          x: 50,
+          y: 50,
+          size: 12,
+          color: rgb(0, 0, 0), // preto
+        });
+      
+        // Salvar o PDF com o espaço reservado
+        const pdfWithPlaceholder = await pdfDoc.save();
+
+        // Criar assinatura
+        const privateKey = forge.pki.privateKeyFromPem(privateKeyPem);
+        const md = forge.md.sha256.create();
+        md.update(pdfWithPlaceholder, 'binary');
+        const signature = privateKey.sign(md);
+        const signatureBuffer = Buffer.from(signature, 'binary');        
+
+        console.log(signatureBuffer);
+
+        signatureBuffer.copy(signaturePlaceholder);
+
+        // Escrever o PDF final no disco
+        fs.writeFileSync(process.env.BaseDir+'\\Arquivos\\Temporario\\signed.pdf', Buffer.concat([pdfWithPlaceholder, signaturePlaceholder]));
+        console.log(`PDF assinado salvo em: ${process.env.BaseDir+'\\Arquivos\\Temporario\\signed.pdf'}`);   */     
+
+        /**** // Read the PDF and certificate files
+        const pdfBuffer = readFileSync(process.env.BaseDir+'\\Arquivos\\Temporario\\'+NomeDoArquivo);
+        const certificateBuffer = readFileSync(process.env.BaseDir+'\\Arquivos\\Permanente\\cert.pfx');
+
+        // Create a new signer instance
+        const signer = new NodeSignPDF();
+
+        // Sign the PDF
+        const signedPdf = await signer.sign(pdfBuffer, certificateBuffer, {
+            passphrase: password,
+        });
+
+        // Save the signed PDF
+        const outputPath = `signed_${NomeDoArquivo}`;
+        console.log(`Saving signed PDF to ${outputPath}`);
+        writeFileSync(outputPath, signedPdf);
+
+        resolve(true); **/
 
         /*const diretorioOndeComandoSeraExecutado = process.env.BaseDir+'\\Arquivos\\Permanente';
 
