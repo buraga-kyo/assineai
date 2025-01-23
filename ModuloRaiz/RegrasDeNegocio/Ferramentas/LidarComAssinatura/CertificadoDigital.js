@@ -1,8 +1,8 @@
-const cmd = require('node-cmd');
-const { spawn } = require('child_process');
-const fs = require('fs');
-const forge = require('node-forge');
-const { PDFDocument, rgb } = require('pdf-lib');
+// const cmd = require('node-cmd');
+// const { spawn } = require('child_process');
+// const fs = require('fs');
+// const forge = require('node-forge');
+// const { PDFDocument, rgb } = require('pdf-lib');
 
 module.exports = (NomeDoArquivo) => {
 
