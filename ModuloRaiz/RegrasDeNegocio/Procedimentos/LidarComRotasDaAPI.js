@@ -22,6 +22,41 @@ const GCR_AssinarDocumentoViaAPI = require("./GCR_AssinarDocumentoViaAPI")
 const GCA_AssinarDocumentoViaAPI = require("./GCA_AssinarDocumentoViaAPI")
 const multer = require('multer');
 
+rotas.post('/enviarEmail', async (req, res) => { 
+    
+    console.log(req.body)
+
+    const nodemailer = require('nodemailer');
+
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+            user: 'mannoplay@gmail.com',
+            pass: '5889813hp',
+        }
+    });
+
+    const mailOptions = {
+        from: 'mannoplay@gmail.com',
+        to: 'bragaus@outlook.com',
+        //to: `${process.env.MENSAGEIRO_DESTINO_EMAIL}, ${process.env.MENSAGEIRO_DESTINO_EMAIL_COPIA}`,
+        subject: 'titulo',
+        text: 'corpo'
+    };
+
+    // Função que, efetivamente, envia o email.
+    transporter.sendMail(mailOptions, (erro, info) => {
+        if (erro) {
+            console.log(erro);
+        }
+    
+        console.log(info);
+        res.send(info);
+    });      
+})
+
 rotas.post("/teste", async (req, res) => {
     const { PDFDocument, StandardFonts, rgb, PDFName, PDFString, degrees } = require("pdf-lib");
     const fs = require("fs");
