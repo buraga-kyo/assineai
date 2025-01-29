@@ -6,7 +6,13 @@ module.exports = async (Requisicao, Resposta) => {
 
   try {
 
-    const assinaturaId = await Signatarios.findOne({
+    const signatario = await Signatarios.findOne({
+      where: {
+        SignatarioTokenLinkAssinatura: Requisicao.query.SignatarioToken
+      }
+    });
+
+    /*const assinaturaId = await Signatarios.findOne({
       where: {
         SignatarioTokenLinkAssinatura: Requisicao.query.SignatarioToken
       },
@@ -17,11 +23,11 @@ module.exports = async (Requisicao, Resposta) => {
       where: {
         AssinaturaId: assinaturaId.dataValues.AssinaturaId
       }
-    });
+    });*/
 
     const documentos = await Documentos.findAll({
       where: {
-        AssinaturaId: assinaturaId.dataValues.AssinaturaId
+        AssinaturaId: signatario.dataValues.AssinaturaId
       }
     });
 
