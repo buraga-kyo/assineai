@@ -29,13 +29,21 @@ rotas.post('/enviarEmail', async (req, res) => {
     const nodemailer = require('nodemailer');
 
     const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
+        service: 'gmail',
         auth: {
-            user: 'mannoplay@gmail.com',
-            pass: '5889813hp',
-        }
+          type: 'OAuth2',
+          user: 'mannoplay@gmail.com', // Seu e-mail do Gmail
+          clientId: '310311605738-q236bgra8o2nrsaro9jfhirnts91f6t2.apps.googleusercontent.com',
+          clientSecret: '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',
+          refreshToken: '1//04AEGcKz80q1HCgYIARAAGAQSNwF-L9Ir4thZsS3NY03I99dANZh3tYv5Avar9r5bP3gLtw8zJkLetIGJJTLkA64WXsS7gqIG4BY',
+        },        
+        // host: 'smtp.gmail.com',
+        // port: 587,
+        // secure: false,
+        // auth: {
+        //     user: 'mannoplay@gmail.com',
+        //     pass: '5889813hp',
+        // }
     });
 
     const mailOptions = {
