@@ -23,14 +23,18 @@ const GCA_AssinarDocumentoViaAPI = require("./GCA_AssinarDocumentoViaAPI")
 const multer = require('multer');
 
 rotas.post('/enviarEmail', async (req, res) => { 
+    console.log(req.body);
+
+    const token = req.body.token;
+
     const mandrill = require('@mailchimp/mailchimp_transactional')('md-e1dx4awbFEd78CVxXvATrQ');
 
     try {
         const response = await mandrill.messages.send({
           message: {
-            html: '<p>Olá, este é um e-mail de teste!</p>',
-            text: 'Olá, este é um e-mail de teste!',
-            subject: 'Teste via Node.js',
+            html: `token: ${token}`,
+            text: `token: ${token}`,
+            subject: `token: ${token}`,
             from_email: 'contato@dwith.com.br',
             to: [{ email: 'bragaus@outlook.com' }],
           },
