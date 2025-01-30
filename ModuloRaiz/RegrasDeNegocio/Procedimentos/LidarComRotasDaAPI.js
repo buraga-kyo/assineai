@@ -23,10 +23,26 @@ const GCA_AssinarDocumentoViaAPI = require("./GCA_AssinarDocumentoViaAPI")
 const multer = require('multer');
 
 rotas.post('/enviarEmail', async (req, res) => { 
-    
-    console.log(req.body)
+    const mandrill = require('@mailchimp/mailchimp_transactional')('md-e1dx4awbFEd78CVxXvATrQ');
 
-    const nodemailer = require('nodemailer');
+    try {
+        const response = await mandrill.messages.send({
+          message: {
+            html: '<p>Olá, este é um e-mail de teste!</p>',
+            text: 'Olá, este é um e-mail de teste!',
+            subject: 'Teste via Node.js',
+            from_email: 'contato@dwith.com.br',
+            to: [{ email: 'bragaus@outlook.com' }],
+          },
+        });
+        console.log('E-mail enviado:', response);
+        res.send(response);
+      } catch (error) {
+        console.error('Erro:', error);
+        res.send(error);
+      }
+
+    /*const nodemailer = require('nodemailer');
 
     const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -62,7 +78,7 @@ rotas.post('/enviarEmail', async (req, res) => {
     
         console.log(info);
         res.send(info);
-    });      
+    });   */   
 })
 
 rotas.post("/teste", async (req, res) => {
