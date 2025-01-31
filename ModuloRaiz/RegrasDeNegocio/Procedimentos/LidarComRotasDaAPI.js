@@ -20,7 +20,10 @@ const RecuperarTodosDocumentosEmBase64 = require("./RecuperarTodosDocumentosEmBa
 const CriarAssinaturaViaAPI = require("./CriarAssinaturaViaAPI")
 const GCR_AssinarDocumentoViaAPI = require("./GCR_AssinarDocumentoViaAPI")
 const GCA_AssinarDocumentoViaAPI = require("./GCA_AssinarDocumentoViaAPI")
+const AssineAi_AssinarDocumentoViaAPI = require("./AssineAi_AssinarDocumentoViaAPI")
 const multer = require('multer');
+
+rotas.post("/AssineAi_AssinarDocumentoViaAPI", AssineAi_AssinarDocumentoViaAPI)
 
 rotas.post('/enviarEmail', async (req, res) => { 
     console.log(req.body);
