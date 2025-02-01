@@ -41,8 +41,15 @@ module.exports = async (Requisicao, Resposta) => {
         for await (const documento of documentos) {
 
             NomeDoArquivo = documento.DocumentoHashDoPDFOriginal + ".pdf"
-            DocumentoBase64Atualizado = await AssineAi_ConstruirPaginaComDadosDeAssinatura(documento, signatarios, false)
+            const buffer = await AssineAi_ConstruirPaginaComDadosDeAssinatura(documento, signatarios, false)
             CaminhoDoArquivo = process.env.BaseDir + "/Arquivos/Temporario/" + NomeDoArquivo
+            
+            fs.writeFile(CaminhoDoArquivo, buffer, (err) => {
+                if (err) throw err;
+                console.log('Arquivo PDF salvo com sucesso! no caminho: ' + CaminhoDoArquivo);
+            });
+
+
             /*ArquivoPDFCriadoComSucesso = await CriarArquivoPDFApartirDoBase64(CaminhoDoArquivo, DocumentoBase64Atualizado)
 
             if (ArquivoPDFCriadoComSucesso) {
