@@ -1,31 +1,22 @@
 module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
-    const AssinaturaDocumentos = InstanciaConfiguradaDoSequelize.define("AssinaturaDocumentos", {      
+    const AssinaturaDocumentos = InstanciaConfiguradaDoSequelize.define("AssinaturaDocumentos", {
         DocumentoId: {
             type: Sequelize.INTEGER,
             primaryKey: true,
             autoIncrement: true
-        },         
+        },
         DocumentoTitulo: {
             type: Sequelize.STRING,
         },
         DocumentoBuffer: {
             type: Sequelize.BLOB
         },
+        DocumentoAssinadoBuffer: {
+            type: Sequelize.BLOB
+        },
         DocumentoColecaoDeDivArrastavel: {
             type: Sequelize.JSON
         },
-        DocumentoOriginalURLS3: {
-            type: Sequelize.TEXT,
-        },
-        DocumentoEmAndamentoURLS3: {
-            type: Sequelize.TEXT,
-        },
-        DocumentoAssinadoURLS3: {
-            type: Sequelize.TEXT,
-        },
-        DocumentoChaveS3: {
-            type: Sequelize.TEXT,
-        },                     
         DocumentoToken: {
             type: Sequelize.TEXT,
         },
@@ -36,6 +27,9 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
             type: Sequelize.TEXT
         },
         DocumentoHashDoPDFOriginal: {
+            type: Sequelize.TEXT,
+        },
+        DocumentoLinkAutenticacao: {
             type: Sequelize.TEXT,
         }
     });
