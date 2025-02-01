@@ -58,6 +58,9 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
         },
         SignatarioDispositivo: {
             type: Sequelize.TEXT,
+        },
+        SignatarioGeolocalizacao: {
+            type: DataTypes.GEOGRAPHY('POINT'),
         }
     });
 
