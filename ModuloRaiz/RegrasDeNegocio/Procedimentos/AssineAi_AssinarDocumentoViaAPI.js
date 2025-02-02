@@ -40,7 +40,7 @@ module.exports = async (Requisicao, Resposta) => {
 
         for await (const documento of documentos) {
 
-            NomeDoArquivo = documento.DocumentoHashDoPDFOriginal + ".pdf"
+            NomeDoArquivo = documento.DocumentoToken + ".pdf"
             const buffer = await AssineAi_ConstruirPaginaComDadosDeAssinatura(documento, signatarios, false)
             CaminhoDoArquivo = process.env.BaseDir + "/Arquivos/Temporario/" + NomeDoArquivo
             
