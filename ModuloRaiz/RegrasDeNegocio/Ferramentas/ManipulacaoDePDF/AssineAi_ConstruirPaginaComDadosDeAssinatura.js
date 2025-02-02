@@ -19,6 +19,23 @@ module.exports = async (Documento, Signatarios, GravarSelfie) =>  {
 
     var Pagina = PDF.addPage([width, 840])
 
+    const dataUTC = new Date(Documento.createdAt);
+
+    // Opções para formatação no fuso horário do Brasil (Horário de Brasília)
+    const opcoesFormatacao = {
+      timeZone: 'America/Sao_Paulo',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false // Formato 24h
+    };
+    
+    // Formata a data e hora
+    const dataFormatada = dataUTC.toLocaleString('pt-BR', opcoesFormatacao);
+
     await ConstruirCabecalho(
         PDF, 
         Pagina, 
@@ -28,7 +45,7 @@ module.exports = async (Documento, Signatarios, GravarSelfie) =>  {
         Documento.DocumentoToken, 
         Documento.DocumentoHashDoPDFOriginal,
         Documento.DocumentoLinkAutenticacao,
-        Documento.createdAt
+        dataFormatada
     )
 
     const { PaginaAtual, PosicaoY } = await ConstruirCorpo(
