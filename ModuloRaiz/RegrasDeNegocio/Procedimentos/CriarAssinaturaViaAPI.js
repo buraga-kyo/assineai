@@ -6,9 +6,7 @@ const CriptografiaAssimetrica = require("../Ferramentas/LidarComAssinatura/Cript
 
 module.exports = async (Requisicao, Resposta) => {
 
-    let Transacao = await InstanciaConfiguradaDoSequelize.transaction()
-
-    console.log(Requisicao.body)
+    let Transacao = await InstanciaConfiguradaDoSequelize.transaction();
 
     try {
 
@@ -27,14 +25,17 @@ module.exports = async (Requisicao, Resposta) => {
 
             let { ChavePublica, Assinatura } = CriptografiaAssimetrica(buffer)
 
+            const token = crypto.randomUUID();
+
             await Documentos.create({
                 DocumentoTitulo: Documento.Nome,
                 DocumentoBuffer: buffer,
                 DocumentoColecaoDeDivArrastavel: Documento.ColecaoDeDivArrastavel,
-                DocumentoToken: crypto.randomUUID(),
+                DocumentoToken: token,
                 DocumentoCriptografiaChavePublica: ChavePublica,
                 DocumentoCriptografiaAssinatura: Assinatura,
                 DocumentoHashDoPDFOriginal: CalcularHash(buffer),
+                DocumentoLinkAutenticacao: process.env.URLBASE+'web-panels/autenticidade-documento/'+token,
                 AssinaturaId
             }, { transaction: Transacao })
         }))
