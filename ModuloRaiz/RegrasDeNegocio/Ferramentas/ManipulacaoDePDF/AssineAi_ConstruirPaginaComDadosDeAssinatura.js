@@ -27,7 +27,7 @@ module.exports = async (Documento, Signatarios, GravarSelfie) =>  {
         Documento.DocumentoTitulo,
         Documento.DocumentoToken, 
         Documento.DocumentoHashDoPDFOriginal,
-        'a',
+        Documento.DocumentoLinkAutenticacao,
         Documento.createdAt
     )
 
