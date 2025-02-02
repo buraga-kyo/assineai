@@ -9,6 +9,12 @@ const { raw } = require("body-parser");
 module.exports = async (Requisicao, Resposta) => {
 
     try {
+        Signatarios.update({ 
+            SignatarioGeolocalizacao: {
+                type: 'Point',
+                coordinates: [Requisicao.body.userLocation.longitude, Requisicao.body.userLocation.latitude]
+            }
+         }, { where: { SignatarioTokenLinkAssinatura: Requisicao.body.SignatarioToken } })        
 
         const signatario = await Signatarios.findOne({
             raw: true,
