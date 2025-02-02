@@ -9,20 +9,32 @@ const { raw } = require("body-parser");
 module.exports = async (Requisicao, Resposta) => {
 
     try {
-        Signatarios.update({ 
-            SignatarioGeolocalizacao: {
-                type: 'Point',
-                coordinates: [Requisicao.body.userLocation.longitude, Requisicao.body.userLocation.latitude]
-            }
-         }, { where: { SignatarioTokenLinkAssinatura: Requisicao.body.SignatarioToken } })        
 
         const signatario = await Signatarios.findOne({
             raw: true,
             where: {
                 SignatarioTokenLinkAssinatura: Requisicao.body.SignatarioToken
             },
-            attributes: ["AssinaturaId"]
+            attributes: ["AssinaturaId", "SignatarioTokenEmail", "SignatarioTokenWhatsApp"]
         });
+
+        let autenticadoVia = "";
+        if (Requisicao.body.otp == signatario.SignatarioTokenEmail) {
+            autenticadoVia = "email";
+        } else {
+            autenticadoVia = "whatsapp";
+        }
+
+        await Signatarios.update({ 
+            SignatarioGeolocalizacao: {
+                type: 'Point',
+                coordinates: [Requisicao.body.userLocation.longitude, Requisicao.body.userLocation.latitude]
+            },
+            SignatarioAssinou: true,
+            SignatarioIp: Requisicao.connection.remoteAddress || Requisicao.socket.remoteAddress || Requisicao.connection.socket.remoteAddress,
+            SignatarioDispositivo: Requisicao.headers['user-agent'],
+            SignatarioAutenticadoVia: autenticadoVia           
+         }, { where: { SignatarioTokenLinkAssinatura: Requisicao.body.SignatarioToken } })
 
         const signatarios = await Signatarios.findAll({
             raw: true,

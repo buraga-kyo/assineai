@@ -350,7 +350,7 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
             if (Signatario.SignatarioGeolocalizacao) {
                 PosicaoY = PosicaoY-10
         
-                PaginaAtual.drawText('Localização aproximada: Signatario.SignatarioGeolocalizacao', {
+                PaginaAtual.drawText('Localização aproximada: '+ Signatario.SignatarioGeolocalizacao.coordinates, {
                     x: 47,
                     y: PosicaoY-10,
                     size: 7,
@@ -371,7 +371,24 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
 
             PosicaoY = PosicaoY-10
 
-            PaginaAtual.drawText(Signatario.updatedAt, {
+            const dataUTC = new Date(Signatario.updatedAt);
+
+            // Opções para formatação no fuso horário do Brasil (Horário de Brasília)
+            const opcoesFormatacao = {
+              timeZone: 'America/Sao_Paulo',
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: false // Formato 24h
+            };
+            
+            // Formata a data e hora
+            const dataFormatada = dataUTC.toLocaleString('pt-BR', opcoesFormatacao);
+
+            PaginaAtual.drawText('Assinado em '+dataFormatada, {
                 x: 47,
                 y: PosicaoY-10,
                 size: 7,
@@ -381,7 +398,7 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
 
             PosicaoY = PosicaoY-10
 
-            /*if (Signatario.SignatarioFormaAutenticacao === 'Email') {
+            if (Signatario.SignatarioFormaAutenticacao === 'email') {
                 PaginaAtual.drawText('Email: '+Signatario.SignatarioEmail+' (autenticado com código enviado exclusivamente a este e-mail)', {
                     x: 47,
                     y: PosicaoY-10,
@@ -392,7 +409,7 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
         
                 PosicaoY = PosicaoY-10
         
-                PaginaAtual.drawText('Celular: '+Signatario.SignatarioCelular, {
+                PaginaAtual.drawText('Celular: '+Signatario.SignatarioTokenWhatsApp, {
                     x: 47,
                     y: PosicaoY-10,
                     size: 7,
@@ -410,14 +427,14 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
         
                 PosicaoY = PosicaoY-10
         
-                PaginaAtual.drawText('Celular: '+Signatario.SignatarioCelular+' (autenticado com código enviado exclusivamente a este WhatsApp)', {
+                PaginaAtual.drawText('Celular: '+Signatario.SignatarioTokenWhatsApp+' (autenticado com código enviado exclusivamente a este WhatsApp)', {
                     x: 47,
                     y: PosicaoY-10,
                     size: 7,
                     font: Helvetica,
                     color: rgb(0.46,0.46,0.46)
                 }) 
-            }*/
+            }
 
             PosicaoY = PosicaoY-50
 
