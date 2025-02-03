@@ -79,7 +79,14 @@ module.exports = async (Requisicao, Resposta) => {
             }, { where: { AssinaturaId: signatario.AssinaturaId } })            
         }
 
-        Resposta.status(200).json(ColecaoDeDocumentos)
+        const documentosAssinados = await Documentos.findAll({
+            raw: true,
+            where: {
+                AssinaturaId: signatario.AssinaturaId
+            }
+        });
+
+        Resposta.status(200).json(documentosAssinados)
 
     } catch (error) {
 
