@@ -11,7 +11,6 @@ module.exports = (NomeDoArquivo) => {
         const { exec } = require('child_process');
 
         const command = 'cd '+process.env.BaseDir+'\\Arquivos\\Permanente & java -jar JSignPdf.jar -d ' + process.env.BaseDir + '\\Arquivos\\Temporario -kst PKCS12 -ksf cert.pfx -ksp ' + process.env.SENHA_DO_CERTIFICADO + ' -pr DISALLOW_PRINTING ' + process.env.BaseDir + '\\Arquivos\\Temporario\\' + NomeDoArquivo;
-        console.log(command);
 
         exec(command, { windowsHide: true }, (error, stdout, stderr) => {
             if (error) {
@@ -21,7 +20,6 @@ module.exports = (NomeDoArquivo) => {
             if (stderr) {
                 console.error(`stderr: ${stderr}`);
             }
-            console.log(`stdout: ${stdout}`);
             resolve(true);
         });
 

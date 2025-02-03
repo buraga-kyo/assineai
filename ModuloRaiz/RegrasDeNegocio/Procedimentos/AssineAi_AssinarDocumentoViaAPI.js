@@ -51,54 +51,41 @@ module.exports = async (Requisicao, Resposta) => {
         });
 
         const ColecaoDeDocumentos = []
-        var DocumentoBase64Atualizado = ""
         var NomeDoArquivo = ""
         var CaminhoDoArquivo = ""
-        var ArquivoPDFCriadoComSucesso = false
 
         for await (const documento of documentos) {
 
             NomeDoArquivo = documento.DocumentoToken + ".pdf"
             const buffer = await AssineAi_ConstruirPaginaComDadosDeAssinatura(documento, signatarios, false)
             CaminhoDoArquivo = process.env.BaseDir + "/Arquivos/Temporario/" + NomeDoArquivo
-            
-            fs.writeFile(CaminhoDoArquivo, buffer, (err) => {
-                if (err) throw err;
-                console.log('Arquivo PDF salvo com sucesso! no caminho: ' + CaminhoDoArquivo);
-            });
+            await fs.promises.writeFile(CaminhoDoArquivo, buffer);
+            await AssinarPDFcomCertificadoDigital(NomeDoArquivo)
+            const BufferDoPDFcomCertificado =  fs.readFileSync(process.env.BaseDir+"/Arquivos/Temporario/"+documento.DocumentoToken+"_signed.pdf")
 
+            await Documentos.update({
+                DocumentoAssinadoBuffer: BufferDoPDFcomCertificado
+            }, { where: { DocumentoToken: documento.DocumentoToken } })
 
-            /*ArquivoPDFCriadoComSucesso = await CriarArquivoPDFApartirDoBase64(CaminhoDoArquivo, DocumentoBase64Atualizado)
+        }
 
-            if (ArquivoPDFCriadoComSucesso) {
-        
-                const PDFAssinadoComSucesso = await AssinarPDFcomCertificadoDigital(NomeDoArquivo)
-        
-                if (PDFAssinadoComSucesso) {
-                    const BufferDoPDFcomCertificado =  fs.readFileSync(process.env.BaseDir+"/Arquivos/Temporario/"+documento.DocumentoToken+"_signed.pdf")
-                    var Base64PDFComCertificado = BufferDoPDFcomCertificado.toString('base64')
-                    var DadosCriptografiaAssimetrica = AssinarPDFcomCriptografiaAssimetrica(Base64PDFComCertificado)
-                } else {
-                    console.log('Ocorreu um erro na assinatura do pdf com certificado')
-                    return Resposta.status(500).json('Ocorreu um erro na assinatura do pdf com certificado')
-                }
-        
-            } else {
-                console.log('Ocorreu um erro na criação do arquivo fisico')
-                return Resposta.status(500).json('Ocorreu um erro na assinatura do pdf com certificado')
-            }
-
-            ColecaoDeDocumentos.push({
-                DocumentoToken: documento.DocumentoToken,
-                DocumentoBase64Atualizado: Base64PDFComCertificado,
-                ChavePublica: DadosCriptografiaAssimetrica.ChavePublica,
-                Assinatura: DadosCriptografiaAssimetrica.Assinatura
-            })*/
+        if(signatarios.filter(signatario => signatario.SignatarioAssinou === false).length === 0) {
+            await Assinatura.update({
+                AssinaturaStatus: "Finalizada"
+            }, { where: { AssinaturaId: signatario.AssinaturaId } })
+        } else {
+            await Assinatura.update({
+                AssinaturaStatus: "Em Andamento"
+            }, { where: { AssinaturaId: signatario.AssinaturaId } })            
         }
 
         Resposta.status(200).json(ColecaoDeDocumentos)
 
     } catch (error) {
+
+        await Signatarios.update({ 
+            SignatarioAssinou: false,
+         }, { where: { SignatarioTokenLinkAssinatura: Requisicao.body.SignatarioToken } })
 
         console.error('-----------------------------------------------------------------------------------')
         console.error('***********************************************************************************')
