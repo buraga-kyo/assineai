@@ -10,6 +10,8 @@ module.exports = async (Requisicao, Resposta) => {
 
     try {
 
+        console.log(Requisicao.body);
+
         const signatario = await Signatarios.findOne({
             raw: true,
             where: {
@@ -33,7 +35,8 @@ module.exports = async (Requisicao, Resposta) => {
             SignatarioAssinou: true,
             SignatarioIp: Requisicao.connection.remoteAddress || Requisicao.socket.remoteAddress || Requisicao.connection.socket.remoteAddress,
             SignatarioDispositivo: Requisicao.headers['user-agent'],
-            SignatarioAutenticadoVia: autenticadoVia           
+            SignatarioAutenticadoVia: autenticadoVia,
+            SignatarioSelfieBase64: Requisicao.body.selfie      
          }, { where: { SignatarioTokenLinkAssinatura: Requisicao.body.SignatarioToken } })
 
         const signatarios = await Signatarios.findAll({
@@ -50,14 +53,13 @@ module.exports = async (Requisicao, Resposta) => {
             }
         });
 
-        const ColecaoDeDocumentos = []
         var NomeDoArquivo = ""
         var CaminhoDoArquivo = ""
 
         for await (const documento of documentos) {
 
             NomeDoArquivo = documento.DocumentoToken + ".pdf"
-            const buffer = await AssineAi_ConstruirPaginaComDadosDeAssinatura(documento, signatarios, false)
+            const buffer = await AssineAi_ConstruirPaginaComDadosDeAssinatura(documento, signatarios, Requisicao.body.selfie!==null)
             CaminhoDoArquivo = process.env.BaseDir + "/Arquivos/Temporario/" + NomeDoArquivo
             await fs.promises.writeFile(CaminhoDoArquivo, buffer);
             await AssinarPDFcomCertificadoDigital(NomeDoArquivo)
