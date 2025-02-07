@@ -64,7 +64,10 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
         },
         SignatarioAutenticadoVia: {
             type: Sequelize.STRING
-        }
+        },
+        SignatarioSelfieBase64: {
+            type: Sequelize.TEXT
+        },   
     });
 
     return AssinaturaSignatarios;

@@ -4,7 +4,7 @@ const fs = require("fs");
 const NewPDFDocument = require('pdfkit');
 const sizeOf = require('image-size');
 
-module.exports = async (Documento, Signatarios, GravarSelfie) =>  {
+module.exports = async (Documento, Signatarios, selfie) =>  {
     
     const PDF = await PDFDocument.load(Documento.DocumentoBuffer)
 
@@ -65,7 +65,7 @@ module.exports = async (Documento, Signatarios, GravarSelfie) =>  {
         Documento.DocumentoToken
     )
 
-    if (GravarSelfie) {
+    if (selfie) {
         let pdfKitDoc = new NewPDFDocument();
         let buffers = [];
 
@@ -98,8 +98,7 @@ module.exports = async (Documento, Signatarios, GravarSelfie) =>  {
                 pdfKitDoc.font('Helvetica').fontSize(10).text(Signatarios[i].SignatarioDataAssinatura, 300, 140+posicao)
                 pdfKitDoc.font('Helvetica').fontSize(10).text('Token: '+Signatarios[i].SignatarioLinkToken, 300, 160+posicao)
 
-                const imgBuffer = Buffer.from(Signatarios[i].SignatarioSelfieBase64, 'base64')
-
+                const imgBuffer = Buffer.from(Signatarios[i].SignatarioSelfieBase64.split(',')[1], 'base64')
                 const dimensoesDaImagem = sizeOf(imgBuffer);
 
                 // se for selfie
