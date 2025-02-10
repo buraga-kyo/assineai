@@ -22,74 +22,14 @@ const GCR_AssinarDocumentoViaAPI = require("./GCR_AssinarDocumentoViaAPI")
 const GCA_AssinarDocumentoViaAPI = require("./GCA_AssinarDocumentoViaAPI")
 const AssineAi_AssinarDocumentoViaAPI = require("./AssineAi_AssinarDocumentoViaAPI")
 const ValidarToken = require("./ValidarToken")
+const EnviarToken = require("./EnviarToken")
 const multer = require('multer');
 
 rotas.post("/ValidarToken", ValidarToken)
 
 rotas.post("/AssineAi_AssinarDocumentoViaAPI", AssineAi_AssinarDocumentoViaAPI)
 
-rotas.post('/enviarEmail', async (req, res) => { 
-    console.log(req.body);
-
-    const token = req.body.token;
-
-    const mandrill = require('@mailchimp/mailchimp_transactional')('md-e1dx4awbFEd78CVxXvATrQ');
-
-    try {
-        const response = await mandrill.messages.send({
-          message: {
-            html: `token: ${token}`,
-            text: `token: ${token}`,
-            subject: `token: ${token}`,
-            from_email: 'contato@dwith.com.br',
-            to: [{ email: 'bragaus@outlook.com' }],
-          },
-        });
-        console.log('E-mail enviado:', response);
-        res.send(response);
-      } catch (error) {
-        console.error('Erro:', error);
-        res.send(error);
-      }
-
-    /*const nodemailer = require('nodemailer');
-
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          type: 'OAuth2',
-          user: 'mannoplay@gmail.com', // Seu e-mail do Gmail
-          clientId: '310311605738-q236bgra8o2nrsaro9jfhirnts91f6t2.apps.googleusercontent.com',
-          clientSecret: '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',
-          refreshToken: '1//04AEGcKz80q1HCgYIARAAGAQSNwF-L9Ir4thZsS3NY03I99dANZh3tYv5Avar9r5bP3gLtw8zJkLetIGJJTLkA64WXsS7gqIG4BY',
-        },        
-        // host: 'smtp.gmail.com',
-        // port: 587,
-        // secure: false,
-        // auth: {
-        //     user: 'mannoplay@gmail.com',
-        //     pass: '5889813hp',
-        // }
-    });
-
-    const mailOptions = {
-        from: 'mannoplay@gmail.com',
-        to: 'bragaus@outlook.com',
-        //to: `${process.env.MENSAGEIRO_DESTINO_EMAIL}, ${process.env.MENSAGEIRO_DESTINO_EMAIL_COPIA}`,
-        subject: 'titulo',
-        text: 'corpo'
-    };
-
-    // Função que, efetivamente, envia o email.
-    transporter.sendMail(mailOptions, (erro, info) => {
-        if (erro) {
-            console.log(erro);
-        }
-    
-        console.log(info);
-        res.send(info);
-    });   */   
-})
+rotas.post('/EnviarToken', EnviarToken)
 
 rotas.post("/teste", async (req, res) => {
     const { PDFDocument, StandardFonts, rgb, PDFName, PDFString, degrees } = require("pdf-lib");
