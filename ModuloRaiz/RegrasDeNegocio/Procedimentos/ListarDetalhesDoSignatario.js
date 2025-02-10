@@ -10,7 +10,7 @@ module.exports = async (Requisicao, Resposta) => {
       where: {
         SignatarioTokenLinkAssinatura: Requisicao.query.SignatarioToken
       },
-      attributes: ["AssinaturaId", "SignatarioNome", "SignatarioEmail", "SignatarioWhatsApp", "SignatarioTokenEmail", "SignatarioTokenWhatsApp", "SignatarioAssinou"]
+      attributes: ["AssinaturaId", "SignatarioNome", "SignatarioEmail", "SignatarioWhatsApp", "SignatarioAssinou"]
     });
 
     /*const assinaturaId = await Signatarios.findOne({
