@@ -13,26 +13,14 @@ module.exports = async (Requisicao, Resposta) => {
       attributes: ["AssinaturaId", "SignatarioNome", "SignatarioEmail", "SignatarioWhatsApp", "SignatarioAssinou"]
     });
 
-    /*const assinaturaId = await Signatarios.findOne({
-      where: {
-        SignatarioTokenLinkAssinatura: Requisicao.query.SignatarioToken
-      },
-      attributes: ["AssinaturaId"]
-    });
-
-    const signatario = await Signatarios.findAll({
-      where: {
-        AssinaturaId: assinaturaId.dataValues.AssinaturaId
-      }
-    });*/
-
     const documentos = await Documentos.findAll({
       where: {
         AssinaturaId: signatario.dataValues.AssinaturaId
-      }
+      },
+      attributes: ["DocumentoBuffer", "DocumentoTitulo"]
     });
 
-    Resposta.json({ Signatario: signatario, Documentos: documentos })
+    Resposta.status(200).json({ Signatario: signatario, Documentos: documentos })
 
   } catch (Erro) {
     console.log(Erro)
@@ -40,3 +28,16 @@ module.exports = async (Requisicao, Resposta) => {
   }
 
 }
+
+/*const assinaturaId = await Signatarios.findOne({
+  where: {
+    SignatarioTokenLinkAssinatura: Requisicao.query.SignatarioToken
+  },
+  attributes: ["AssinaturaId"]
+});
+
+const signatario = await Signatarios.findAll({
+  where: {
+    AssinaturaId: assinaturaId.dataValues.AssinaturaId
+  }
+});*/
