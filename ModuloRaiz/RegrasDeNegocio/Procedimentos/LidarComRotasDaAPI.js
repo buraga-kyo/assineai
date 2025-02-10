@@ -21,6 +21,7 @@ const CriarAssinaturaViaAPI = require("./CriarAssinaturaViaAPI")
 const GCR_AssinarDocumentoViaAPI = require("./GCR_AssinarDocumentoViaAPI")
 const GCA_AssinarDocumentoViaAPI = require("./GCA_AssinarDocumentoViaAPI")
 const AssineAi_AssinarDocumentoViaAPI = require("./AssineAi_AssinarDocumentoViaAPI")
+const ValidarToken = require("./ValidarToken")
 const multer = require('multer');
 
 rotas.post("/ValidarToken", ValidarToken)
