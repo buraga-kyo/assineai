@@ -3,18 +3,20 @@ const mandrill = require('@mailchimp/mailchimp_transactional')('md-e1dx4awbFEd78
 const axios = require('axios');
 
 module.exports = async (Requisicao, Resposta) => {
-    const signatarios = await Signatarios.findOne({
-        raw: true,
-        where: {
-            SignatarioTokenLinkAssinatura: Requisicao.body.SignatarioToken
-        },
-        attributes: ["SignatarioTokenWhatsApp", "SignatarioTokenEmail"]
-    });
+
     try {
-        const url = 'https://evolutiondesafioia7d.assineae.online/message/sendText/dev_assi';
+
+        const signatarios = await Signatarios.findOne({
+            raw: true,
+            where: {
+                SignatarioTokenLinkAssinatura: Requisicao.body.SignatarioToken
+            },
+            attributes: ["SignatarioTokenWhatsApp", "SignatarioTokenEmail"]
+        });
+
+        await axios.post('https://evolutiondesafioia7d.assineae.online/message/sendText/dev_assi', 
         
-        // Dados a serem enviados
-        const data = {
+        {
             number: "5521969099714@s.whatsapp.net",
             options: {
                 presence: "composing",
@@ -23,36 +25,31 @@ module.exports = async (Requisicao, Resposta) => {
             textMessage: {
                 text: `Token: ${signatarios.SignatarioTokenWhatsApp}`
             }
-        };
+        }, 
         
-        const config = {
+        {
             headers: {
                 'Content-Type': 'application/json',
                 'apiKey': 'u7gdscwr46sgxdbhil58q',
             }
-        };        
+        })
 
-        // Enviar requisição POST
-        const respostaWhats = await axios.post(url, data, config)
-        console.log(respostaWhats)
-
-        const response = await mandrill.messages.send({
-          message: {
-            html: `token: ${signatarios.SignatarioTokenEmail}`,
-            text: `token: ${signatarios.SignatarioTokenEmail}`,
-            subject: `token: ${signatarios.SignatarioTokenEmail}`,
-            from_email: 'contato@dwith.com.br',
-            to: [{ email: 'bragaus@outlook.com' }],
-          },
+        await mandrill.messages.send({
+            message: {
+                html: `token: ${signatarios.SignatarioTokenEmail}`,
+                text: `token: ${signatarios.SignatarioTokenEmail}`,
+                subject: `token: ${signatarios.SignatarioTokenEmail}`,
+                from_email: 'contato@dwith.com.br',
+                to: [{ email: 'bragaus@outlook.com' }],
+            },
         });
-        console.log('E-mail enviado:', response);
 
         Resposta.status(200).send(true)
-      } catch (error) {
+    } catch (error) {
         console.error('Erro:', error);
-        Resposta.status(200).send(error)
-      }
-    
+        Resposta.status(500).send(error)
+    }
+
     /*const nodemailer = require('nodemailer');
     
     const transporter = nodemailer.createTransport({
@@ -89,6 +86,6 @@ module.exports = async (Requisicao, Resposta) => {
     
         console.log(info);
         res.send(info);
-    });   */ 
+    });   */
 
 }
