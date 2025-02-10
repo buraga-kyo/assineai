@@ -10,6 +10,10 @@ module.exports = async (Requisicao, Resposta) => {
         attributes: ["AssinaturaId", "SignatarioTokenEmail", "SignatarioTokenWhatsApp"]
     });
 
-    console.log(signatario);
+    if (Requisicao.body.otp == signatario.SignatarioTokenEmail || Requisicao.body.otp == signatario.SignatarioTokenWhatsApp) {
+        Resposta.status(200).send(true)
+    } else {
+        Resposta.status(200).send(false)
+    }
 
 }
