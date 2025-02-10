@@ -23,6 +23,8 @@ const GCA_AssinarDocumentoViaAPI = require("./GCA_AssinarDocumentoViaAPI")
 const AssineAi_AssinarDocumentoViaAPI = require("./AssineAi_AssinarDocumentoViaAPI")
 const multer = require('multer');
 
+rotas.post("/ValidarToken", ValidarToken)
+
 rotas.post("/AssineAi_AssinarDocumentoViaAPI", AssineAi_AssinarDocumentoViaAPI)
 
 rotas.post('/enviarEmail', async (req, res) => { 
