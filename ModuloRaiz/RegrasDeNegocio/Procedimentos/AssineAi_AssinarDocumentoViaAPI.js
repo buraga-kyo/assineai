@@ -36,7 +36,8 @@ module.exports = async (Requisicao, Resposta) => {
             SignatarioIp: Requisicao.connection.remoteAddress || Requisicao.socket.remoteAddress || Requisicao.connection.socket.remoteAddress,
             SignatarioDispositivo: Requisicao.headers['user-agent'],
             SignatarioAutenticadoVia: autenticadoVia,
-            SignatarioSelfieBase64: Requisicao.body.selfie      
+            SignatarioSelfieBase64: Requisicao.body.selfie,
+            SignatarioAssinaturaEscritaBase64: Requisicao.body.SignatarioAssinaturaEscritaBase64   
          }, { where: { SignatarioTokenLinkAssinatura: Requisicao.body.SignatarioToken } })
 
         const signatarios = await Signatarios.findAll({
