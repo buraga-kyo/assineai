@@ -5,7 +5,7 @@ const NewPDFDocument = require('pdfkit');
 const sizeOf = require('image-size');
 
 module.exports = async (Documento, Signatarios, selfie) =>  {
-    
+
     const PDF = await PDFDocument.load(Documento.DocumentoBuffer)
 
     const HelveticaBold = await PDF.embedFont(StandardFonts.HelveticaBold)
@@ -53,7 +53,8 @@ module.exports = async (Documento, Signatarios, selfie) =>  {
         Pagina, 
         Helvetica, 
         HelveticaBold,
-        Signatarios
+        Signatarios,
+        Documento.DocumentoColecaoDeDivArrastavel
     )
    
     await ConstruirRodaPe(
@@ -266,7 +267,7 @@ async function ConstruirCabecalho(
  * @param {<import('pdf-lib').PDFFont>} HelveticaBold  
  * @param {object} Signatarios  
 */
-async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios) {
+async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios, ColecaoDeDivArrastavel) {
 
     Pagina.drawText('Assinaturas', {
         x: 26,
@@ -310,7 +311,30 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
         })
 
         if (Signatario.SignatarioAssinou == true) {
-            
+            const divArrastavel = ColecaoDeDivArrastavel.find(div => div.GUID === Signatario.SignatarioTokenLinkAssinatura)
+            const bufferAssinaturaEscrita = Buffer.from(Signatario.SignatarioAssinaturaEscritaBase64.replace(/^data:image\/png;base64,/, ""), 'base64');
+            const pngAssinaturaEscrita = await PDF.embedPng(bufferAssinaturaEscrita);
+            const PaginaAssinatura = PDF.getPage(0)
+
+            const novoLargura = 200
+            const novoAltura = (novoLargura * pngAssinaturaEscrita.height) / pngAssinaturaEscrita.width
+
+            console.log('divArrastavel.x',divArrastavel.x)
+            console.log('divArrastavel.y',divArrastavel.y)
+            console.log('novoLargura',novoLargura)
+            console.log('novoAltura',novoAltura)
+
+            console.log('pagina width',PaginaAssinatura.getWidth())
+            console.log('pagina height',PaginaAssinatura.getHeight())
+
+            PaginaAssinatura.drawImage(pngAssinaturaEscrita, {
+                x: divArrastavel.x,
+                y: PaginaAssinatura.getHeight() - divArrastavel.y,
+                width: novoLargura,
+                height: novoAltura,
+                blendMode: 'Overlay'
+            })
+
             PaginaAtual.drawImage(AssinadoPNG, {
                 x: 25,
                 y: PosicaoY-7,
