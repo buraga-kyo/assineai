@@ -319,14 +319,6 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
             const novoLargura = 200
             const novoAltura = (novoLargura * pngAssinaturaEscrita.height) / pngAssinaturaEscrita.width
 
-            console.log('divArrastavel.x',divArrastavel.x)
-            console.log('divArrastavel.y',divArrastavel.y)
-            console.log('novoLargura',novoLargura)
-            console.log('novoAltura',novoAltura)
-
-            console.log('pagina width',PaginaAssinatura.getWidth())
-            console.log('pagina height',PaginaAssinatura.getHeight())
-
             PaginaAssinatura.drawImage(pngAssinaturaEscrita, {
                 x: divArrastavel.x,
                 y: PaginaAssinatura.getHeight() - divArrastavel.y,
