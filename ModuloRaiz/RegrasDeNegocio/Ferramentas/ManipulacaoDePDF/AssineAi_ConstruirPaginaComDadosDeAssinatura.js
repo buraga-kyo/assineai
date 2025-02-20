@@ -321,7 +321,7 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
 
             PaginaAssinatura.drawImage(pngAssinaturaEscrita, {
                 x: divArrastavel.x,
-                y: PaginaAssinatura.getHeight() - divArrastavel.y,
+                y: (PaginaAssinatura.getHeight() - divArrastavel.y) - 10,
                 width: novoLargura,
                 height: novoAltura,
                 blendMode: 'Overlay'
