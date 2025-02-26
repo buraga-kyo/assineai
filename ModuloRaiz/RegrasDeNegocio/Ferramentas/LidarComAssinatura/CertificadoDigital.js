@@ -1,14 +1,64 @@
 // const cmd = require('node-cmd');
 // const { spawn } = require('child_process');
-// const fs = require('fs');
-// const forge = require('node-forge');
-// const { PDFDocument, rgb } = require('pdf-lib');
+const fs = require('fs');
+const forge = require('node-forge');
+const { PDFDocument, rgb } = require('pdf-lib');
 
 module.exports = (NomeDoArquivo) => {
 
     return new Promise(async (resolve, reject) => {
 
-        const { exec } = require('child_process');
+        const pemContent = fs.readFileSync(process.env.BaseDir+'\\Arquivos\\Permanente\\certificate.pem', 'utf8');
+        const pemDecoded = forge.pem.decode(pemContent)[0].body;
+
+        const pdfDoc = await PDFDocument.load(pdfBuffer);
+        const page = pdfDoc.getPages()[0];
+        
+        // Preparar certificado
+        const p12 = forge.pkcs12.pkcs12FromAsn1(
+            forge.asn1.fromDer(pemDecoded), 
+            false, 
+            'dwith2024'
+        );
+        const keyBag = p12.getBags({ bagType: forge.pki.oids.pkcs8ShroudedKeyBag });
+        const certBag = p12.getBags({ bagType: forge.pki.oids.certBag });
+        
+        const privateKey = keyBag[forge.pki.oids.pkcs8ShroudedKeyBag][0].key;
+        const certificate = certBag[forge.pki.oids.certBag][0].cert;
+        
+        // Calcular hash
+        const hash = forge.md.sha256.create().update(
+            await pdfDoc.save()
+        ).digest().getBytes();
+        
+        // Assinar hash
+        const signature = privateKey.sign(hash, 'SHA256');
+        
+        // Construir objeto de assinatura
+        const signatureDict = pdfDoc.context.obj({
+            Type: 'Sig',
+            Filter: 'Adobe.PPKLite',
+            SubFilter: 'ETSI.CAdES.detached',
+            Contents: new Uint8Array(forge.util.binary.raw.decode(signature)),
+            Cert: new Uint8Array(forge.asn1.toDer(
+                forge.pki.certificateToAsn1(certificate)
+            ).getBytes()),
+            M: moment().format('YYYYMMDDHHmmssZZ')
+        });
+        
+        // Adicionar assinatura ao PDF
+        const signatureRef = pdfDoc.context.register(signatureDict);
+        pdfDoc.catalog.set(
+            pdfDoc.context.obj({
+                SigFlags: 3,
+                Signatures: [signatureRef]
+            })
+        );
+        
+        return pdfDoc.save();
+
+
+        /****************** const { exec } = require('child_process');
 
         const command = 'cd '+process.env.BaseDir+'\\Arquivos\\Permanente & java -jar JSignPdf.jar -d ' + process.env.BaseDir + '\\Arquivos\\Temporario -kst PKCS12 -ksf cert.pfx -ksp ' + process.env.SENHA_DO_CERTIFICADO + ' -pr DISALLOW_PRINTING ' + process.env.BaseDir + '\\Arquivos\\Temporario\\' + NomeDoArquivo;
 
@@ -21,7 +71,7 @@ module.exports = (NomeDoArquivo) => {
                 console.error(`stderr: ${stderr}`);
             }
             resolve(true);
-        });
+        }); *****/
 
         /** const pfxBuffer = fs.readFileSync(process.env.BaseDir+'\\Arquivos\\Permanente\\cert.pfx');
         const p12Asn1 = forge.asn1.fromDer(pfxBuffer.toString('binary'));
