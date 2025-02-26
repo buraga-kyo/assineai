@@ -55,7 +55,7 @@ module.exports = (NomeDoArquivo, pdfBuffer) => {
             })
         );
         
-        return pdfDoc.save();
+        resolve(pdfDoc.save());
 
 
         /****************** const { exec } = require('child_process');
