@@ -4,7 +4,7 @@ const fs = require('fs');
 const forge = require('node-forge');
 const { PDFDocument, rgb } = require('pdf-lib');
 
-module.exports = (NomeDoArquivo) => {
+module.exports = (NomeDoArquivo, pdfBuffer) => {
 
     return new Promise(async (resolve, reject) => {
 
