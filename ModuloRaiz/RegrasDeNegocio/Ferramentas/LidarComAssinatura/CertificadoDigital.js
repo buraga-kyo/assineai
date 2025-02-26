@@ -1,11 +1,11 @@
 // const cmd = require('node-cmd');
 // const { spawn } = require('child_process');
-const fs = require('fs');
-const forge = require('node-forge');
-const { PDFDocument, rgb } = require('pdf-lib');
-const moment = require('moment');
+// const fs = require('fs');
+// const forge = require('node-forge');
+// const { PDFDocument, rgb } = require('pdf-lib');
+// const moment = require('moment');
 
-module.exports = (NomeDoArquivo, pdfBuffer) => {
+module.exports = (NomeDoArquivo) => {
 
     return new Promise(async (resolve, reject) => {
 
