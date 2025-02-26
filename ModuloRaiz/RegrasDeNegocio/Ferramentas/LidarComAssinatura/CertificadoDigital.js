@@ -9,7 +9,7 @@ module.exports = (NomeDoArquivo, pdfBuffer) => {
 
     return new Promise(async (resolve, reject) => {
 
-        const pemContent = fs.readFileSync(process.env.BaseDir+'\\Arquivos\\Permanente\\certificate.pem', 'utf8');
+        /**const pemContent = fs.readFileSync(process.env.BaseDir+'\\Arquivos\\Permanente\\certificate.pem', 'utf8');
         const pemDecoded = forge.pem.decode(pemContent)[0].body;
         const certificadoDer = fs.readFileSync(process.env.BaseDir+'\\Arquivos\\Permanente\\cert.pfx', 'binary');
 
@@ -57,10 +57,10 @@ module.exports = (NomeDoArquivo, pdfBuffer) => {
             })
         );
         
-        resolve(pdfDoc.save());
+        resolve(pdfDoc.save());*/
 
 
-        /****************** const { exec } = require('child_process');
+        const { exec } = require('child_process');
 
         const command = 'cd '+process.env.BaseDir+'\\Arquivos\\Permanente & java -jar JSignPdf.jar -d ' + process.env.BaseDir + '\\Arquivos\\Temporario -kst PKCS12 -ksf cert.pfx -ksp ' + process.env.SENHA_DO_CERTIFICADO + ' -pr DISALLOW_PRINTING ' + process.env.BaseDir + '\\Arquivos\\Temporario\\' + NomeDoArquivo;
 
@@ -73,7 +73,7 @@ module.exports = (NomeDoArquivo, pdfBuffer) => {
                 console.error(`stderr: ${stderr}`);
             }
             resolve(true);
-        }); *****/
+        });
 
         /** const pfxBuffer = fs.readFileSync(process.env.BaseDir+'\\Arquivos\\Permanente\\cert.pfx');
         const p12Asn1 = forge.asn1.fromDer(pfxBuffer.toString('binary'));
