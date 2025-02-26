@@ -10,13 +10,14 @@ module.exports = (NomeDoArquivo, pdfBuffer) => {
 
         const pemContent = fs.readFileSync(process.env.BaseDir+'\\Arquivos\\Permanente\\certificate.pem', 'utf8');
         const pemDecoded = forge.pem.decode(pemContent)[0].body;
+        const certificadoDer = fs.readFileSync(process.env.BaseDir+'\\Arquivos\\Permanente\\cert.pfx', 'binary');
 
         const pdfDoc = await PDFDocument.load(pdfBuffer);
         const page = pdfDoc.getPages()[0];
         
         // Preparar certificado
         const p12 = forge.pkcs12.pkcs12FromAsn1(
-            forge.asn1.fromDer(pemDecoded), 
+            forge.asn1.fromDer(certificadoDer), 
             false, 
             'dwith2024'
         );
