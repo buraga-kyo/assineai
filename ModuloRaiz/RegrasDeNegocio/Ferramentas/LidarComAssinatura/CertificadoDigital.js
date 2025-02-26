@@ -3,6 +3,7 @@
 const fs = require('fs');
 const forge = require('node-forge');
 const { PDFDocument, rgb } = require('pdf-lib');
+const moment = require('moment');
 
 module.exports = (NomeDoArquivo, pdfBuffer) => {
 
