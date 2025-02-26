@@ -59,18 +59,16 @@ module.exports = async (Requisicao, Resposta) => {
 
         for await (const documento of documentos) {
 
-            NomeDoArquivo = documento.DocumentoToken + ".pdf"
-            const buffer = await AssineAi_ConstruirPaginaComDadosDeAssinatura(documento, signatarios, Requisicao.body.selfie!==null)
-            CaminhoDoArquivo = process.env.BaseDir + "/Arquivos/Temporario/" + NomeDoArquivo
+            NomeDoArquivo = documento.DocumentoToken + ".pdf";
+            const buffer = await AssineAi_ConstruirPaginaComDadosDeAssinatura(documento, signatarios, Requisicao.body.selfie!==null);
+            CaminhoDoArquivo = process.env.BaseDir + "/Arquivos/Temporario/" + NomeDoArquivo;
             await fs.promises.writeFile(CaminhoDoArquivo, buffer);
-            const pdfassinadobuffer = await AssinarPDFcomCertificadoDigital(NomeDoArquivo, buffer)
-            CaminhoDoArquivo = process.env.BaseDir + "/Arquivos/Temporario/ASSINADO.pdf"
-            await fs.promises.writeFile(CaminhoDoArquivo, pdfassinadobuffer);
-            const BufferDoPDFcomCertificado =  fs.readFileSync(process.env.BaseDir+"/Arquivos/Temporario/"+documento.DocumentoToken+"_signed.pdf")
+            await AssinarPDFcomCertificadoDigital(NomeDoArquivo);
+            const BufferDoPDFcomCertificado =  fs.readFileSync(process.env.BaseDir+"/Arquivos/Temporario/"+documento.DocumentoToken+"_signed.pdf");
 
             await Documentos.update({
                 DocumentoAssinadoBuffer: BufferDoPDFcomCertificado
-            }, { where: { DocumentoToken: documento.DocumentoToken } })
+            }, { where: { DocumentoToken: documento.DocumentoToken } });
 
         }
 
