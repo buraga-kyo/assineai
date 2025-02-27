@@ -2,10 +2,11 @@ const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
-const { SignPdf } = require('node-signpdf');
+//const { SignPdf } = require('node-signpdf');
 const { plainAddPlaceholder } = require('node-signpdf/dist/helpers');
 const forge = require('node-forge');
 const { execSync } = require('child_process');
+const signpdf = require('@signpdf/signpdf');
 
 const app = express();
 const port = 3000;
@@ -237,10 +238,12 @@ app.post('/sign', upload.fields([
       });
 
       // Assinar o PDF
-      const signer = new SignPdf();
-      console.log(fs.readFileSync(pemPath));
-      console.log(pdfBuffer);
-      const signedPdf = signer.sign(pdfBuffer, fs.readFileSync(pemPath));
+      //const signer = new SignPdf();
+
+      console.log(signpdf);
+      const assinar = new signpdf.SignPdf();
+      console.log(fs.readFileSync(pemPath))
+      const signedPdf = assinar.sign(pdfBuffer, fs.readFileSync(pemPath));
 
       // Salvar o PDF assinado
       if (!fs.existsSync(path.join(__dirname, 'outputs'))) {
