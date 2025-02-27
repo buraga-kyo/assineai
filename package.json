@@ -12,6 +12,9 @@
   "dependencies": {
     "@ginpei/exif-orientation": "^1.2.0",
     "@mailchimp/mailchimp_transactional": "^1.0.59",
+    "@signpdf/placeholder-pdfkit010": "^3.2.4",
+    "@signpdf/signer-p12": "^3.2.4",
+    "@signpdf/signpdf": "^3.2.4",
     "base64-arraybuffer": "^1.0.2",
     "body-parser": "^1.20.0",
     "cors": "^2.8.5",
