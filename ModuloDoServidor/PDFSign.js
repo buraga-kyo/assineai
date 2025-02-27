@@ -11,7 +11,92 @@ const signpdf = require('@signpdf/signpdf');
 const app = express();
 const port = 3000;
 
-// Configuração de armazenamento temporário para os arquivos
+const { PDFDocument } = require('pdf-lib');
+const { SignPdf } = require('node-signpdf');
+//const { Certificate } = require('@fidm/x509');
+
+
+class PDFSigner {
+  constructor() {
+    this.signPdf = new SignPdf();
+  }
+
+  async signPDF(pdfBuffer, certData, keyData, password) {
+    // Carregar certificado e chave
+    const { privateKey, certificate } = await this.loadCertificate(
+      certData,
+      keyData,
+      password
+    );
+
+    // Criar assinatura CMS
+    const signature = await this.createCMSSignature(pdfBuffer, privateKey, certificate);
+
+    // Inserir assinatura no PDF
+    return this.signPdf.sign(pdfBuffer, signature);
+  }
+
+  async loadCertificate(certData, keyData, password) {
+    if (certData.includes('-----BEGIN PKCS7-----')) {
+      return this.loadPEM(certData, keyData);
+    } else {
+      return this.loadPFX(certData, password);
+    }
+  }
+
+  async loadPFX(pfxData, password) {
+    const p12Asn1 = forge.asn1.fromDer(pfxData.toString('binary'), false);
+    const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, password);
+
+    // Extrair certificado e chave
+    const certBag = p12.getBags({ bagType: forge.pki.oids.certBag })[forge.pki.oids.certBag][0];
+    const keyBag = p12.getBags({ bagType: forge.pki.oids.pkcs8ShroudedKeyBag })[forge.pki.oids.pkcs8ShroudedKeyBag][0];
+
+    return {
+      certificate: forge.pki.certificateToPem(certBag.cert),
+      privateKey: forge.pki.privateKeyToPem(keyBag.key)
+    };
+  }
+
+  async createCMSSignature(content, privateKey, certificate) {
+    const p7 = forge.pkcs7.createSignedData();
+    p7.content = forge.util.createBuffer(content);
+    p7.addCertificate(certificate);
+    p7.addSigner({
+      key: privateKey,
+      certificate,
+      digestAlgorithm: forge.pki.oids.sha256,
+      authenticatedAttributes: [
+        {
+          type: forge.pki.oids.contentType,
+          value: forge.pki.oids.data
+        },
+        {
+          type: forge.pki.oids.messageDigest
+        },
+        {
+          type: forge.pki.oids.signingTime,
+          value: new Date()
+        }
+      ]
+    });
+
+    p7.sign();
+    return forge.asn1.toDer(p7.toAsn1()).getBytes();
+  }
+}
+
+const signer = new PDFSigner();
+
+const pdfBuffer = fs.readFileSync('C:\\Users\\dwith\\Downloads\\teste.pdf');
+const certBuffer = fs.readFileSync('C:\\Users\\dwith\\Downloads\\certificado.pfx');
+
+signer.signPDF(pdfBuffer, certBuffer, null, 'dwith2024')
+  .then((signedPdf) => {
+    fs.writeFileSync('documento_assinado.pdf', signedPdf);
+  });
+
+/*// Configuração de armazenamento temporário para os arquivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = path.join(__dirname, 'uploads');
@@ -344,7 +429,7 @@ app.post('/verify', upload.single('pdf'), (req, res) => {
       }
     });
   }
-});
+});*/
 
 // Iniciar o servidor
 app.listen(port, () => {
