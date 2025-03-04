@@ -10,7 +10,7 @@ module.exports = async (Requisicao, Resposta) => {
 
     try {
 
-        console.log(Requisicao.body);
+        console.log(Requisicao.body.userLocation);
 
         const signatario = await Signatarios.findOne({
             raw: true,
