@@ -22,7 +22,7 @@ class GitHandler(FileSystemEventHandler):
 
             # Adicionar alterações ao repositório
             subprocess.run(['git', 'add', '.'], check=True)
-            subprocess.run(['ai-commit', '--force'], check=True, shell=True)
+            subprocess.run(['ai-commit', '--force'], check=True)
             subprocess.run(['git', 'push'], check=True)
             print('Alterações commitadas e enviadas para o repositório remoto.')
  
