@@ -8,7 +8,7 @@ class GitHandler(FileSystemEventHandler):
     def on_modified(self, event):
         # Ignorar alterações em diretórios ou arquivos dentro do diretório .git e node_modules
         if event.is_directory or '.git' in event.src_path or 'node_modules' in event.src_path:
-            return
+            return 
         
         print(f'Alteração detectada em: {event.src_path}')
         self.commit_and_push()
@@ -31,7 +31,8 @@ class GitHandler(FileSystemEventHandler):
 
 if __name__ == "__main__":
     #path = 'C:\\Users\\Dwith\\Documents\\5_PROJETOS\\ASSINE_AI\\BACKEND' 
-    path = '/home/bragaus/Documentos/AssineAi/ASSINATURA_BACKEND' 
+    #path = '/home/bragaus/Documentos/AssineAi/ASSINATURA_BACKEND' 
+    path = '/home/bragaus/Documentos/AssineAi/BACKEND'
     event_handler = GitHandler()
     observer = Observer()
     observer.schedule(event_handler, path=path, recursive=True)
