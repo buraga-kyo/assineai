@@ -61,7 +61,7 @@ module.exports = async (Requisicao, Resposta) => {
 
             NomeDoArquivo = documento.DocumentoToken + ".pdf";
             const buffer = await AssineAi_ConstruirPaginaComDadosDeAssinatura(documento, signatarios, Requisicao.body.selfie!==null);
-            CaminhoDoArquivo = process.env.BaseDir + "/Arquivos/Temporario/" + NomeDoArquivo;
+            CaminhoDoArquivo = process.env.BaseDir + "/Arquivos/Temporario/" + NomeDoArquivo; 
             await fs.promises.writeFile(CaminhoDoArquivo, buffer);
             await AssinarPDFcomCertificadoDigital(NomeDoArquivo);
             const BufferDoPDFcomCertificado =  fs.readFileSync(process.env.BaseDir+"/Arquivos/Temporario/"+documento.DocumentoToken+"_signed.pdf");
