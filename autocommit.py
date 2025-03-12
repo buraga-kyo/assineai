@@ -13,7 +13,7 @@ class GitHandler(FileSystemEventHandler):
         print(f'Alteração detectada em: {event.src_path}')
         self.commit_and_push()
 
-    def commit_and_push(self):
+    def commit_and_push(self): 
         try:
             # Verificar se há alterações a serem adicionadas
             status_result = subprocess.run(['git', 'status', '--porcelain'], capture_output=True, text=True)
@@ -30,9 +30,9 @@ class GitHandler(FileSystemEventHandler):
             print(f'Erro ao executar comando Git: {e}')
 
 if __name__ == "__main__":
-    #path = 'C:\\Users\\Dwith\\Documents\\5_PROJETOS\\ASSINE_AI\\BACKEND' 
+    path = 'C:\\Users\\Dwith\\Documents\\5_PROJETOS\\ASSINE_AI\\BACKEND'  
     #path = '/home/bragaus/Documentos/AssineAi/ASSINATURA_BACKEND' 
-    path = '/home/bragaus/Documentos/AssineAi/BACKEND'
+    #path = '/home/bragaus/Documentos/AssineAi/BACKEND'
     event_handler = GitHandler()
     observer = Observer()
     observer.schedule(event_handler, path=path, recursive=True)

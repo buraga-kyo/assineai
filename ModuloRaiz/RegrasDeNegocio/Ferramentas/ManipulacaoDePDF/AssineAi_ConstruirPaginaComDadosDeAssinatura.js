@@ -68,7 +68,7 @@ module.exports = async (Documento, Signatarios, selfie) =>  {
 
     if (selfie) {
         let pdfKitDoc = new NewPDFDocument();
-        let buffers = [];
+        let buffers = []; 
 
         pdfKitDoc.on('data', buffers.push.bind(buffers))
         pdfKitDoc.font('Helvetica-Bold').fontSize(20).text('Selfies dos Assinantes Verificados.', 27, 27)
@@ -77,7 +77,7 @@ module.exports = async (Documento, Signatarios, selfie) =>  {
 
         const pdfKitBufferPromise = new Promise((resolve, reject) => {
             pdfKitDoc.on('end', () => {
-                resolve(Buffer.concat(buffers));
+                resolve(Buffer.concat(buffers)); 
             });
         });
 
@@ -100,9 +100,9 @@ module.exports = async (Documento, Signatarios, selfie) =>  {
                 pdfKitDoc.font('Helvetica').fontSize(10).text('Token: '+Signatarios[i].SignatarioLinkToken, 300, 160+posicao)
 
                 const imgBuffer = Buffer.from(Signatarios[i].SignatarioSelfieBase64.split(',')[1], 'base64')
-                const dimensoesDaImagem = sizeOf(imgBuffer);
-
-                // se for selfie
+                const dimensoesDaImagem = sizeOf(imgBuffer); 
+ 
+                // se for selfie 
                 if ((dimensoesDaImagem.height > dimensoesDaImagem.width) || (dimensoesDaImagem.height < dimensoesDaImagem.width && dimensoesDaImagem.orientation == 6)) {
                     pdfKitDoc.image(imgBuffer, 100, 115+posicao, { height: 150 })
                 } else { // se for paisagem
@@ -110,7 +110,7 @@ module.exports = async (Documento, Signatarios, selfie) =>  {
                 }
 
                 // Define a opacidade da marca d'água
-                pdfKitDoc.opacity(0.3);
+                pdfKitDoc.opacity(0.3); 
 
                 // Define a fonte, tamanho e cor do texto da marca d'água
                 pdfKitDoc.font('Helvetica-Bold').fontSize(30)
