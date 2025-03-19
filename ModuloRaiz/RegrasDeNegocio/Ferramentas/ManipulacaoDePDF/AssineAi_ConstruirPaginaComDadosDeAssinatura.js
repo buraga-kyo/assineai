@@ -64,7 +64,7 @@ module.exports = async (Documento, Signatarios, selfie) =>  {
         Helvetica, 
         HelveticaBold, 
         Documento.DocumentoToken
-    )
+    ) 
 
     if (selfie) {
         let pdfKitDoc = new NewPDFDocument();
