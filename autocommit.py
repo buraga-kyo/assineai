@@ -24,14 +24,14 @@ class GitHandler(FileSystemEventHandler):
             subprocess.run(['git', 'add', '.'], check=True)
             subprocess.run(['ai-commit', '--force'], check=True)
             subprocess.run(['git', 'push'], check=True)
-            print('Alterações commitadas e enviadas para o repositório remoto.')
+            print('Alterações commitadas e enviadas para o repositório remoto.') 
  
         except subprocess.CalledProcessError as e:
             print(f'Erro ao executar comando Git: {e}')
 
 if __name__ == "__main__":
-    path = 'C:\\Users\\Dwith\\Documents\\5_PROJETOS\\ASSINE_AI\\BACKEND'  
-    #path = '/home/bragaus/Documentos/AssineAi/ASSINATURA_BACKEND' 
+    #path = 'C:\\Users\\Dwith\\Documents\\5_PROJETOS\\ASSINE_AI\\BACKEND'  
+    path = '/home/bragaus/Documentos/AssineAi/ASSINATURA_BACKEND' 
     #path = '/home/bragaus/Documentos/AssineAi/BACKEND'
     event_handler = GitHandler()
     observer = Observer()
