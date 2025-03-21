@@ -165,7 +165,7 @@ class PdfSignatureService {
         targetPage, 
         signaturePosition
       );
-      signatureField.setReadOnly(true);
+      //signatureField.setReadOnly(true);
       
       // Se fornecido texto para o campo de assinatura
       if (options.signatureText) {
