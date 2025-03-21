@@ -1,215 +1,57 @@
 /**
- * Serviço de Assinatura Digital de PDFs com Certificados
- * 
- * Este módulo permite assinar digitalmente documentos PDF utilizando certificados
- * nos formatos PFX, P12 e PEM, seguindo as normas de assinatura digital do ITI.
- * 
- * Compatível com o ITI Validador.
+ * Exemplo simplificado para testar a assinatura digital de PDF
  */
 
 const fs = require('fs');
 const path = require('path');
-const { PDFDocument } = require('pdf-lib');
-const { SignPdf } = require('node-signpdf');
-const forge = require('node-forge');
-const moment = require('moment-timezone');
+const PdfSignatureService = require('./PdfSignatureService');
 
-class PdfSignatureService {
-  /**
-   * Construtor do serviço de assinatura
-   * @param {Object} options Opções de configuração
-   */
-  constructor(options = {}) {
-    this.options = {
-      timezone: 'America/Sao_Paulo',
-      signatureReason: 'Assinatura de documento',
-      signatureLocation: 'Brasil',
-      ...options
+async function main() {
+  try {
+    console.log('Iniciando processo de assinatura...');
+    
+    // Cria instância do serviço
+    const signatureService = new PdfSignatureService();
+    
+    // Caminhos dos arquivos (ajuste para seus caminhos reais)
+    const certificatePath = path.resolve(__dirname, 'certificado.pfx');
+    const pdfPath = path.resolve(__dirname, 'documento.pdf');
+    const outputPath = path.resolve(__dirname, 'documento_assinado.pdf');
+    
+    // Senha do certificado
+    const certificatePassword = 'senha_do_certificado';  // Substitua pela senha real
+    
+    console.log('Lendo certificado e PDF...');
+    
+    // Lê explicitamente o certificado como Buffer
+    const certificateBuffer = fs.readFileSync(certificatePath);
+    console.log('Certificado carregado:', Buffer.isBuffer(certificateBuffer), certificateBuffer.length);
+    
+    // Configurações básicas
+    const signOptions = {
+      title: 'Documento Assinado',
+      // Desabilitado para simplificar os testes iniciais
+      addVisibleSignature: false
     };
-  }
-
-  /**
-   * Carrega um certificado a partir de diferentes formatos
-   * @param {Buffer|String} certData Buffer ou caminho do certificado
-   * @param {String} password Senha do certificado
-   * @param {String} format Formato do certificado: 'pfx', 'p12' ou 'pem'
-   * @returns {Object} Objeto contendo o buffer do certificado e a senha
-   */
-  loadCertificate(certData, password, format = 'pfx') {
-    let certBuffer;
     
-    if (typeof certData === 'string') {
-      certBuffer = fs.readFileSync(certData);
-    } else {
-      certBuffer = certData;
-    }
-
-    // Não processamos o certificado aqui, apenas retornamos o buffer e a senha
-    // para que o node-signpdf possa usá-los diretamente
-    return {
-      certBuffer,
-      password
-    };
-  }
-
-  /**
-   * Assina um documento PDF
-   * @param {Buffer|String} pdfData Buffer ou caminho do PDF
-   * @param {Buffer|String} certData Buffer ou caminho do certificado
-   * @param {String} password Senha do certificado
-   * @param {String} format Formato do certificado: 'pfx', 'p12' ou 'pem'
-   * @param {Object} signOptions Opções adicionais de assinatura
-   * @returns {Buffer} PDF assinado
-   */
-  async signPdf(pdfData, certData, password, format = 'pfx', signOptions = {}) {
-    let pdfBuffer;
+    console.log('Assinando documento...');
     
-    if (typeof pdfData === 'string') {
-      pdfBuffer = fs.readFileSync(pdfData);
-    } else {
-      pdfBuffer = pdfData;
-    }
-
-    // Carrega o certificado (apenas obtém o buffer e senha)
-    const { certBuffer } = this.loadCertificate(certData, password, format);
-
-    // Prepara o PDF para assinatura (adiciona campo de assinatura se necessário)
-    pdfBuffer = await this.preparePdfForSignature(pdfBuffer, signOptions);
-
-    // Configurações da assinatura
-    const options = {
-      asn1StrictParsing: true,
-      signatureLength: 8192, // Tamanho reservado para a assinatura
-      ...this.options,
-      ...signOptions
-    };
-
-    // Cria o objeto de assinatura
-    const signer = new SignPdf();
-
-    // Assina o PDF - passando o certificado como Buffer e a senha
-    const signedPdf = signer.sign(pdfBuffer, {
-      p12: certBuffer,
-      passphrase: password,
-      ...options
-    });
-
-    return signedPdf;
-  }
-
-  /**
-   * Prepara o PDF para assinatura, adicionando campos necessários
-   * @param {Buffer} pdfBuffer Buffer do PDF
-   * @param {Object} options Opções de preparação
-   * @returns {Buffer} PDF preparado para assinatura
-   */
-  async preparePdfForSignature(pdfBuffer, options = {}) {
-    const pdfDoc = await PDFDocument.load(pdfBuffer);
+    // Assina o PDF, passando o certificado como Buffer
+    const signedPdf = await signatureService.signPdf(
+      pdfPath,
+      certificateBuffer,  // Certificado como Buffer
+      certificatePassword,
+      'pfx',
+      signOptions
+    );
     
-    // Adiciona metadados conforme normas ITI
-    pdfDoc.setTitle(options.title || 'Documento Assinado Digitalmente');
-    pdfDoc.setAuthor(options.author || 'Sistema de Assinatura Digital');
-    pdfDoc.setSubject(options.subject || 'Documento com Assinatura Digital ICP-Brasil');
-    pdfDoc.setKeywords(['assinatura digital', 'ICP-Brasil', 'documento eletrônico']);
-    pdfDoc.setCreator('PdfSignatureService');
+    console.log('Salvando documento assinado...');
+    fs.writeFileSync(outputPath, signedPdf);
+    console.log(`Documento assinado salvo em: ${outputPath}`);
     
-    // Adiciona data de criação/modificação no formato correto
-    const currentDate = moment().tz(this.options.timezone).format();
-    pdfDoc.setCreationDate(new Date(currentDate));
-    pdfDoc.setModificationDate(new Date(currentDate));
-    
-    // Adiciona campo de assinatura visível se solicitado
-    if (options.addVisibleSignature) {
-      const pages = pdfDoc.getPages();
-      const targetPage = options.signaturePage !== undefined 
-        ? pages[options.signaturePage] 
-        : pages[pages.length - 1];  // Última página por padrão
-      
-      const { width, height } = targetPage.getSize();
-      
-      // Posição padrão no canto inferior direito, mas pode ser customizada
-      const signaturePosition = options.signaturePosition || {
-        x: width - 200,
-        y: 100,
-        width: 180,
-        height: 70
-      };
-      
-      // Adiciona um campo de formulário para a assinatura
-      const form = pdfDoc.getForm();
-      const signatureField = form.createTextField('signature');
-      
-      // Adiciona o campo à página com as coordenadas especificadas
-      signatureField.addToPage(
-        targetPage, 
-        signaturePosition
-      );
-      
-      // Define as opções do campo
-      // Não usamos setReadOnly que não está disponível
-      signatureField.enableReadOnly();  // Alternativa ao setReadOnly
-      
-      // Se fornecido texto para o campo de assinatura
-      if (options.signatureText) {
-        signatureField.setText(options.signatureText);
-      }
-    }
-    
-    // Serializa o PDF preparado
-    const preparedPdfBytes = await pdfDoc.save({ addDefaultPage: false });
-    
-    return Buffer.from(preparedPdfBytes);
-  }
-
-  /**
-   * Assina múltiplos PDFs com o mesmo certificado
-   * @param {Array<Buffer|String>} pdfFiles Array de buffers ou caminhos de PDFs
-   * @param {Buffer|String} certData Buffer ou caminho do certificado
-   * @param {String} password Senha do certificado
-   * @param {String} format Formato do certificado
-   * @param {Object} signOptions Opções de assinatura
-   * @returns {Array<Buffer>} Array de PDFs assinados
-   */
-  async signMultiplePdfs(pdfFiles, certData, password, format = 'pfx', signOptions = {}) {
-    const results = [];
-    
-    for (const pdf of pdfFiles) {
-      const signedPdf = await this.signPdf(pdf, certData, password, format, signOptions);
-      results.push(signedPdf);
-    }
-    
-    return results;
-  }
-
-  /**
-   * Verifica se um PDF possui assinatura digital válida
-   * @param {Buffer|String} pdfData Buffer ou caminho do PDF
-   * @returns {Object} Resultado da verificação
-   */
-  async verifySignature(pdfData) {
-    let pdfBuffer;
-    
-    if (typeof pdfData === 'string') {
-      pdfBuffer = fs.readFileSync(pdfData);
-    } else {
-      pdfBuffer = pdfData;
-    }
-
-    // Implementação da verificação usando biblioteca compatível
-    // Adicionar aqui a lógica de verificação conforme as normas do ITI
-
-    return {
-      isValid: true, // Implementar a validação real
-      signatures: [
-        {
-          signer: "Nome do Signatário",
-          date: new Date(),
-          isValid: true,
-          reason: "Assinatura válida seguindo normas ICP-Brasil"
-        }
-      ]
-    };
+  } catch (error) {
+    console.error('Erro durante o processo de assinatura:', error);
   }
 }
 
-module.exports = PdfSignatureService;
+main();
