@@ -18,12 +18,11 @@ const { SignPdf } = require('node-signpdf');
  * Exemplo de uso do serviço de assinatura digital de PDFs
  */
 
-const PdfSignatureService = require('./PdfSignatureService');
+const PdfSignatureService = require('./AssinarPDF');
 const fs = require('fs');
 const path = require('path');
 
 // Função principal de exemplo
-
 
 async function main() {
   try {
@@ -37,11 +36,11 @@ async function main() {
     console.log('Iniciando serviço de assinatura digital...');
 
     // Caminho para o certificado (exemplo com PFX)
-    const certificatePath = path.resolve(__dirname, 'certificados/certificado.pfx');
-    const certificatePassword = 'senha_do_certificado';
+    const certificatePath = path.resolve('/home/bragaus/Documentos/AssineAi/ASSINATURA_BACKEND/ModuloDoServidor/Arquivos/Permanente/cert.pfx');
+    const certificatePassword = 'dwith2024';
 
     // Caminho para o PDF a ser assinado
-    const pdfPath = path.resolve(__dirname, 'documentos/documento.pdf');
+    const pdfPath = path.resolve('/home/bragaus/Downloads/documento.pdf');
 
     // Configurações da assinatura
     const signOptions = {
@@ -71,7 +70,8 @@ async function main() {
     );
 
     // Salva o PDF assinado
-    const outputPath = path.resolve(__dirname, 'documentos/documento_assinado.pdf');
+    const outputPath = path.resolve(__dirname, 'documento_assinado.pdf');
+    console.log(outputPath);
     fs.writeFileSync(outputPath, signedPdf);
 
     console.log(`Documento assinado com sucesso! Salvo em: ${outputPath}`);
@@ -87,6 +87,7 @@ async function main() {
       console.log('A assinatura é inválida!');
     }
 
+    /*
     // Exemplo de assinatura de múltiplos documentos
     console.log('\nAssinando múltiplos documentos...');
     const pdfFiles = [
@@ -108,7 +109,7 @@ async function main() {
       const multiOutputPath = path.resolve(__dirname, `documentos/documento${i+1}_assinado.pdf`);
       fs.writeFileSync(multiOutputPath, signedPdfs[i]);
       console.log(`Documento ${i+1} assinado e salvo em: ${multiOutputPath}`);
-    }
+    }*/
 
   } catch (error) {
     console.error('Erro durante o processo de assinatura:', error);
