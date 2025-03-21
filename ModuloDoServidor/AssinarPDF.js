@@ -44,35 +44,12 @@ class PdfSignatureService {
       certBuffer = certData;
     }
 
-    let privateKey, certificate;
-
-    switch (format.toLowerCase()) {
-      case 'pfx':
-      case 'p12':
-        const p12Asn1 = forge.asn1.fromDer(forge.util.createBuffer(certBuffer));
-        const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, password);
-        
-        // Extrai chave privada
-        const keyBags = p12.getBags({ bagType: forge.pki.oids.pkcs8ShroudedKeyBag });
-        const keyBag = keyBags[forge.pki.oids.pkcs8ShroudedKeyBag][0];
-        privateKey = forge.pki.privateKeyToPem(keyBag.key);
-        
-        // Extrai certificado
-        const certBags = p12.getBags({ bagType: forge.pki.oids.certBag });
-        const certBag = certBags[forge.pki.oids.certBag][0];
-        certificate = forge.pki.certificateToPem(certBag.cert);
-        break;
-        
-      case 'pem':
-        privateKey = certBuffer.toString();
-        certificate = certBuffer.toString();
-        break;
-        
-      default:
-        throw new Error(`Formato de certificado não suportado: ${format}`);
-    }
-
-    return { privateKey, certificate };
+    // Não processamos o certificado aqui, apenas retornamos o buffer e a senha
+    // para que o node-signpdf possa usá-los diretamente
+    return {
+      certBuffer,
+      password
+    };
   }
 
   /**
@@ -93,8 +70,8 @@ class PdfSignatureService {
       pdfBuffer = pdfData;
     }
 
-    // Carrega o certificado
-    const { privateKey, certificate } = this.loadCertificate(certData, password, format);
+    // Carrega o certificado (apenas obtém o buffer e senha)
+    const { certBuffer } = this.loadCertificate(certData, password, format);
 
     // Prepara o PDF para assinatura (adiciona campo de assinatura se necessário)
     pdfBuffer = await this.preparePdfForSignature(pdfBuffer, signOptions);
@@ -110,10 +87,10 @@ class PdfSignatureService {
     // Cria o objeto de assinatura
     const signer = new SignPdf();
 
-    // Assina o PDF
+    // Assina o PDF - passando o certificado como Buffer e a senha
     const signedPdf = signer.sign(pdfBuffer, {
-      privateKey,
-      certificate,
+      p12: certBuffer,
+      passphrase: password,
       ...options
     });
 
@@ -165,7 +142,7 @@ class PdfSignatureService {
         targetPage, 
         signaturePosition
       );
-      //signatureField.setReadOnly(true);
+      signatureField.setReadOnly(true);
       
       // Se fornecido texto para o campo de assinatura
       if (options.signatureText) {
