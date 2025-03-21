@@ -20,7 +20,7 @@ const { SignPdf } = require('node-signpdf');
  * Exemplo simplificado para testar a assinatura digital de PDF
  */
 
-const PdfSignatureService = require('./PdfSignatureService');
+const PdfSignatureService = require('./AssinarPDF');
 
 async function main() {
   try {
