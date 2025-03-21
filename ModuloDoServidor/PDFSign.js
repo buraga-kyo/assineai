@@ -19,8 +19,6 @@ const { SignPdf } = require('node-signpdf');
  */
 
 const PdfSignatureService = require('./AssinarPDF');
-const fs = require('fs');
-const path = require('path');
 
 // Função principal de exemplo
 
