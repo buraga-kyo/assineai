@@ -33,7 +33,7 @@ class PdfSignatureService {
    * @param {Buffer|String} certData Buffer ou caminho do certificado
    * @param {String} password Senha do certificado
    * @param {String} format Formato do certificado: 'pfx', 'p12' ou 'pem'
-   * @returns {Object} Objeto contendo a chave privada e o certificado
+   * @returns {Object} Objeto contendo o buffer do certificado e a senha
    */
   loadCertificate(certData, password, format = 'pfx') {
     let certBuffer;
@@ -138,11 +138,16 @@ class PdfSignatureService {
       // Adiciona um campo de formulário para a assinatura
       const form = pdfDoc.getForm();
       const signatureField = form.createTextField('signature');
+      
+      // Adiciona o campo à página com as coordenadas especificadas
       signatureField.addToPage(
         targetPage, 
         signaturePosition
       );
-      signatureField.setReadOnly(true);
+      
+      // Define as opções do campo
+      // Não usamos setReadOnly que não está disponível
+      signatureField.enableReadOnly();  // Alternativa ao setReadOnly
       
       // Se fornecido texto para o campo de assinatura
       if (options.signatureText) {
