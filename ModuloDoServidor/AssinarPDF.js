@@ -29,30 +29,6 @@ class PdfSignatureService {
   }
 
   /**
-   * Carrega um certificado a partir de diferentes formatos
-   * @param {Buffer|String} certData Buffer ou caminho do certificado
-   * @param {String} password Senha do certificado
-   * @param {String} format Formato do certificado: 'pfx', 'p12' ou 'pem'
-   * @returns {Object} Objeto contendo o buffer do certificado e a senha
-   */
-  loadCertificate(certData, password, format = 'pfx') {
-    let certBuffer;
-    
-    if (typeof certData === 'string') {
-      certBuffer = fs.readFileSync(certData);
-    } else {
-      certBuffer = certData;
-    }
-
-    // Não processamos o certificado aqui, apenas retornamos o buffer e a senha
-    // para que o node-signpdf possa usá-los diretamente
-    return {
-      certBuffer,
-      password
-    };
-  }
-
-  /**
    * Assina um documento PDF
    * @param {Buffer|String} pdfData Buffer ou caminho do PDF
    * @param {Buffer|String} certData Buffer ou caminho do certificado
@@ -62,39 +38,54 @@ class PdfSignatureService {
    * @returns {Buffer} PDF assinado
    */
   async signPdf(pdfData, certData, password, format = 'pfx', signOptions = {}) {
+    // Carrega o PDF como buffer
     let pdfBuffer;
-    
     if (typeof pdfData === 'string') {
       pdfBuffer = fs.readFileSync(pdfData);
     } else {
       pdfBuffer = pdfData;
     }
 
-    // Carrega o certificado (apenas obtém o buffer e senha)
-    const { certBuffer } = this.loadCertificate(certData, password, format);
+    // Carrega o certificado como buffer
+    let certBuffer;
+    if (typeof certData === 'string') {
+      certBuffer = fs.readFileSync(certData);
+    } else {
+      certBuffer = certData;
+    }
 
-    // Prepara o PDF para assinatura (adiciona campo de assinatura se necessário)
+    // Prepara o PDF para assinatura
     pdfBuffer = await this.preparePdfForSignature(pdfBuffer, signOptions);
 
     // Configurações da assinatura
     const options = {
       asn1StrictParsing: true,
-      signatureLength: 8192, // Tamanho reservado para a assinatura
-      ...this.options,
+      signatureLength: 8192,
+      reason: this.options.signatureReason,
+      location: this.options.signatureLocation,
       ...signOptions
     };
 
     // Cria o objeto de assinatura
     const signer = new SignPdf();
 
-    // Assina o PDF - passando o certificado como Buffer e a senha
-    const signedPdf = signer.sign(pdfBuffer, {
-      p12: certBuffer,
-      passphrase: password,
-      ...options
-    });
+    try {
+      // Log para debug
+      console.log('Certificado Buffer:', Buffer.isBuffer(certBuffer), certBuffer.length);
+      
+      // Assina o PDF usando o objeto SignPdf
+      // Importante: propriedade p12 deve ser um Buffer
+      const signedPdf = signer.sign(pdfBuffer, {
+        p12: certBuffer,
+        passphrase: password,
+        ...options
+      });
 
-    return signedPdf;
+      return signedPdf;
+    } catch (error) {
+      console.error('Erro detalhado na assinatura:', error);
+      throw error;
+    }
   }
 
   /**
@@ -120,38 +111,44 @@ class PdfSignatureService {
     
     // Adiciona campo de assinatura visível se solicitado
     if (options.addVisibleSignature) {
-      const pages = pdfDoc.getPages();
-      const targetPage = options.signaturePage !== undefined 
-        ? pages[options.signaturePage] 
-        : pages[pages.length - 1];  // Última página por padrão
-      
-      const { width, height } = targetPage.getSize();
-      
-      // Posição padrão no canto inferior direito, mas pode ser customizada
-      const signaturePosition = options.signaturePosition || {
-        x: width - 200,
-        y: 100,
-        width: 180,
-        height: 70
-      };
-      
-      // Adiciona um campo de formulário para a assinatura
-      const form = pdfDoc.getForm();
-      const signatureField = form.createTextField('signature');
-      
-      // Adiciona o campo à página com as coordenadas especificadas
-      signatureField.addToPage(
-        targetPage, 
-        signaturePosition
-      );
-      
-      // Define as opções do campo
-      // Não usamos setReadOnly que não está disponível
-      signatureField.enableReadOnly();  // Alternativa ao setReadOnly
-      
-      // Se fornecido texto para o campo de assinatura
-      if (options.signatureText) {
-        signatureField.setText(options.signatureText);
+      try {
+        const pages = pdfDoc.getPages();
+        const targetPage = options.signaturePage !== undefined 
+          ? pages[options.signaturePage] 
+          : pages[pages.length - 1];  // Última página por padrão
+        
+        const { width, height } = targetPage.getSize();
+        
+        // Posição padrão no canto inferior direito, mas pode ser customizada
+        const signaturePosition = options.signaturePosition || {
+          x: width - 200,
+          y: 100,
+          width: 180,
+          height: 70
+        };
+        
+        // Adiciona um campo de formulário para a assinatura
+        const form = pdfDoc.getForm();
+        const signatureField = form.createTextField('signature');
+        
+        // Adiciona o campo à página com as coordenadas especificadas
+        signatureField.addToPage(
+          targetPage, 
+          signaturePosition
+        );
+        
+        // Se o método enableReadOnly existir, use-o
+        if (typeof signatureField.enableReadOnly === 'function') {
+          signatureField.enableReadOnly();
+        }
+        
+        // Se fornecido texto para o campo de assinatura
+        if (options.signatureText) {
+          signatureField.setText(options.signatureText);
+        }
+      } catch (error) {
+        console.error('Erro ao adicionar campo de assinatura visível:', error);
+        // Continua sem o campo de assinatura visível se houver erro
       }
     }
     
