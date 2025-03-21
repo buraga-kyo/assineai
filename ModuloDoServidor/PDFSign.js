@@ -14,7 +14,114 @@ const port = 3000;
 const { PDFDocument } = require('pdf-lib');
 const { SignPdf } = require('node-signpdf');
 //const { Certificate } = require('@fidm/x509');
+/**
+ * Exemplo de uso do serviço de assinatura digital de PDFs
+ */
 
+const PdfSignatureService = require('./PdfSignatureService');
+const fs = require('fs');
+const path = require('path');
+
+// Função principal de exemplo
+
+
+async function main() {
+  try {
+    // Cria instância do serviço
+    const signatureService = new PdfSignatureService({
+      timezone: 'America/Sao_Paulo',
+      signatureReason: 'Aprovação de documento',
+      signatureLocation: 'São Paulo, Brasil'
+    });
+
+    console.log('Iniciando serviço de assinatura digital...');
+
+    // Caminho para o certificado (exemplo com PFX)
+    const certificatePath = path.resolve(__dirname, 'certificados/certificado.pfx');
+    const certificatePassword = 'senha_do_certificado';
+
+    // Caminho para o PDF a ser assinado
+    const pdfPath = path.resolve(__dirname, 'documentos/documento.pdf');
+
+    // Configurações da assinatura
+    const signOptions = {
+      title: 'Contrato de Serviço',
+      author: 'ERP Comercial',
+      subject: 'Contrato assinado digitalmente',
+      addVisibleSignature: true,
+      signaturePage: 0, // Primeira página
+      signaturePosition: {
+        x: 50,
+        y: 100,
+        width: 200,
+        height: 80
+      },
+      signatureText: 'Assinado digitalmente por: João da Silva\nData: ' + new Date().toLocaleString('pt-BR')
+    };
+
+    console.log('Assinando documento...');
+    
+    // Assina o PDF
+    const signedPdf = await signatureService.signPdf(
+      pdfPath,
+      certificatePath,
+      certificatePassword,
+      'pfx',
+      signOptions
+    );
+
+    // Salva o PDF assinado
+    const outputPath = path.resolve(__dirname, 'documentos/documento_assinado.pdf');
+    fs.writeFileSync(outputPath, signedPdf);
+
+    console.log(`Documento assinado com sucesso! Salvo em: ${outputPath}`);
+
+    // Verificando a assinatura
+    console.log('Verificando assinatura...');
+    const verificationResult = await signatureService.verifySignature(outputPath);
+    
+    if (verificationResult.isValid) {
+      console.log('A assinatura é válida!');
+      console.log('Detalhes:', verificationResult.signatures[0]);
+    } else {
+      console.log('A assinatura é inválida!');
+    }
+
+    // Exemplo de assinatura de múltiplos documentos
+    console.log('\nAssinando múltiplos documentos...');
+    const pdfFiles = [
+      path.resolve(__dirname, 'documentos/documento1.pdf'),
+      path.resolve(__dirname, 'documentos/documento2.pdf'),
+      path.resolve(__dirname, 'documentos/documento3.pdf')
+    ];
+
+    const signedPdfs = await signatureService.signMultiplePdfs(
+      pdfFiles,
+      certificatePath,
+      certificatePassword,
+      'pfx',
+      signOptions
+    );
+
+    // Salvando os documentos assinados
+    for (let i = 0; i < signedPdfs.length; i++) {
+      const multiOutputPath = path.resolve(__dirname, `documentos/documento${i+1}_assinado.pdf`);
+      fs.writeFileSync(multiOutputPath, signedPdfs[i]);
+      console.log(`Documento ${i+1} assinado e salvo em: ${multiOutputPath}`);
+    }
+
+  } catch (error) {
+    console.error('Erro durante o processo de assinatura:', error);
+  }
+}
+
+// Executa o exemplo
+main();
+
+
+
+
+/*
 
 class PDFSigner {
   constructor() {
@@ -96,7 +203,8 @@ signer.signPDF(pdfBuffer, certBuffer, null, 'dwith2024')
     fs.writeFileSync('documento_assinado.pdf', signedPdf);
   });
 
-/*// Configuração de armazenamento temporário para os arquivos
+
+// Configuração de armazenamento temporário para os arquivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = path.join(__dirname, 'uploads');
