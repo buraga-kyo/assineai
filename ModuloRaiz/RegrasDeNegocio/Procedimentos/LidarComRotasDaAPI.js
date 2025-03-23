@@ -25,6 +25,26 @@ const ValidarToken = require("./ValidarToken")
 const EnviarToken = require("./EnviarToken")
 const multer = require('multer');
 
+rotas.get("/PegarTemaTelaAssinatura", async (req, res) => {
+    const { Empresa } = require("../../BancoDeDados/Conector").Tabelas;
+
+    try {
+        const retorno = await Empresa.findOne({
+            order: [['EmpresaId', 'DESC']], // Ordena pelo ID em ordem decrescente
+        });
+
+        if (!retorno) {
+            return res.status(404).send({ mensagem: "Nenhum registro encontrado" });
+        }
+
+        res.send(retorno);
+    } catch (error) {
+        console.error("Erro ao buscar o último tema:", error);
+        res.status(500).send({ erro: "Erro interno do servidor" });
+    }
+});
+
+
 rotas.post("/AtualizarTemaTelaAssinatura", async (req, res) => {
     const { Empresa } = require("../../BancoDeDados/Conector").Tabelas;
     const retorno = await Empresa.create({
