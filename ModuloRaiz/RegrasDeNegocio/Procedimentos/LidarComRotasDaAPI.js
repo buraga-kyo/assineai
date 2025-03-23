@@ -25,6 +25,13 @@ const ValidarToken = require("./ValidarToken")
 const EnviarToken = require("./EnviarToken")
 const multer = require('multer');
 
+rotas.post("AtualizarTemaTelaAssinatura", async (req, res) => {
+    const { Empresa } = require("../../BancoDeDados/Conector").Tabelas;
+    await Empresa.create({
+        EmpresaTemaTelaAssinatura: 'assinaturaNome',
+    });
+})
+
 rotas.post("/ValidarToken", ValidarToken)
 
 rotas.post("/AssineAi_AssinarDocumentoViaAPI", AssineAi_AssinarDocumentoViaAPI)
