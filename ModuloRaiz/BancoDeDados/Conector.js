@@ -5,6 +5,7 @@ const Assinatura = require("./Tabelas/Assinatura");
 const Documentos = require("./Tabelas/Documentos");
 const Signatarios = require("./Tabelas/Signatarios");
 const SignatarioHistorico = require("./Tabelas/SignatarioHistorico");
+const Empresa = require("./Tabelas/Empresa");
 
 const BancoDeDados = {};
 
@@ -34,6 +35,7 @@ BancoDeDados.Tabelas = {
   Documentos: Documentos(InstanciaConfiguradaDoSequelize, Sequelize),
   Signatarios: Signatarios(InstanciaConfiguradaDoSequelize, Sequelize),
   SignatarioHistorico: SignatarioHistorico(InstanciaConfiguradaDoSequelize, Sequelize),
+  Empresa: Empresa(InstanciaConfiguradaDoSequelize, Sequelize),
   InstanciaConfiguradaDoSequelize
 };
 
