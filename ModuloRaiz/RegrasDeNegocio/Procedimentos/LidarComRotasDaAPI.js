@@ -26,7 +26,6 @@ const EnviarToken = require("./EnviarToken")
 const multer = require('multer');
 
 rotas.post("/AtualizarTemaTelaAssinatura", async (req, res) => {
-    console.log(req.body)
     const { Empresa } = require("../../BancoDeDados/Conector").Tabelas;
     const retorno = await Empresa.create({
         EmpresaTemaTelaAssinatura: req.body.EmpresaTemaTelaAssinatura,
