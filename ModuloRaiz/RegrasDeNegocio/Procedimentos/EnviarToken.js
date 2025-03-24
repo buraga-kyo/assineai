@@ -14,25 +14,19 @@ module.exports = async (Requisicao, Resposta) => {
             attributes: ["SignatarioTokenWhatsApp", "SignatarioTokenEmail"]
         });
 
-       /* await axios.post('https://evolutiondesafioia7d.assineae.online/message/sendText/dev_assi', 
+       await axios.post('https://evolutionv2.assineae.online/message/sendText/CITIZENAI BOTS', 
         
         {
             number: "5521969099714@s.whatsapp.net",
-            options: {
-                presence: "composing",
-                linkPreview: false
-            },
-            textMessage: {
-                text: `Token: ${signatarios.SignatarioTokenWhatsApp}`
-            }
+            text: `Token: ${signatarios.SignatarioTokenWhatsApp}`
         }, 
         
         {
             headers: {
                 'Content-Type': 'application/json',
-                'apiKey': 'u7gdscwr46sgxdbhil58q',
+                'apiKey': 'C969759BB4F1-49E0-AC3D-5F35BA94C34E',
             }
-        }) */
+        })
 
         await mandrill.messages.send({
             message: {
