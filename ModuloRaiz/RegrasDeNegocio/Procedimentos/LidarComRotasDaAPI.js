@@ -28,6 +28,7 @@ const multer = require('multer');
 // Registrar usuario
 rotas.post("/q9zePu74UYPUaDqUyay4fIjwNV", async (req, res) => {
     const { Empresa } = require("../../BancoDeDados/Conector").Tabelas;
+    const bcrypt = require('bcrypt');
 
     const { username, password, email } = req.body;
     // Validação e sanitização do input aqui...
