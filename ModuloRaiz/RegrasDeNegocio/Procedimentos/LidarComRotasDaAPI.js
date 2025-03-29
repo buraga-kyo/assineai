@@ -25,6 +25,25 @@ const ValidarToken = require("./ValidarToken")
 const EnviarToken = require("./EnviarToken")
 const multer = require('multer');
 
+// Registrar usuario
+rotas.post("YTcD&48OKY%$*ytXEC4ZpmUvEX", async (req, res) => {
+    const { Empresa } = require("../../BancoDeDados/Conector").Tabelas;
+
+    const { username, password, email } = req.body;
+    // Validação e sanitização do input aqui...
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const retorno = await Empresa.create({
+        EmpresaUsuario: username,
+        EmpresaSenha: hashedPassword,
+        EmpresaEmail: req.body.email
+    });
+
+    // Salve o usuário no banco de dados com a senha hasheada
+    res.status(201).send({ message: 'Usuário registrado com sucesso.' });
+});
+
 rotas.get("/PegarTemaTelaAssinatura", async (req, res) => {
     const { Empresa } = require("../../BancoDeDados/Conector").Tabelas;
 
