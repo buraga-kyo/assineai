@@ -26,7 +26,7 @@ const EnviarToken = require("./EnviarToken")
 const multer = require('multer');
 
 // Registrar usuario
-rotas.post("q9zePu74UYPUaDqUyay4fIjwNV", async (req, res) => {
+rotas.post("/q9zePu74UYPUaDqUyay4fIjwNV", async (req, res) => {
     const { Empresa } = require("../../BancoDeDados/Conector").Tabelas;
 
     const { username, password, email } = req.body;
