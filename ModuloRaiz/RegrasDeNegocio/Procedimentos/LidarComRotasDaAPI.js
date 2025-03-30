@@ -31,8 +31,9 @@ rotas.post('/JLv3HEzbcO2uKlg0rsELA66dou', async (req, res) => {
     const { Empresa } = require("../../BancoDeDados/Conector").Tabelas;
 
     const empresa = await Empresa.findOne({
+        raw: true,
         where: {
-            EmpresaUsuario: username,
+            EmpresaEmail: username
         },
     });
 
