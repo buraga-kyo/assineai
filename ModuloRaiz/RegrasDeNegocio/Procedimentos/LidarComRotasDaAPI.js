@@ -27,13 +27,13 @@ const multer = require('multer');
 
 // Exemplo de rota de login
 rotas.post('/JLv3HEzbcO2uKlg0rsELA66dou', async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
     const { Empresa } = require("../../BancoDeDados/Conector").Tabelas;
 
     const empresa = await Empresa.findOne({
         raw: true,
         where: {
-            EmpresaEmail: username
+            EmpresaEmail: email
         },
     });
 
