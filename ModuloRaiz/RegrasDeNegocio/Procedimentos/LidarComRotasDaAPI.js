@@ -51,7 +51,6 @@ rotas.post('/JLv3HEzbcO2uKlg0rsELA66dou', async (req, res) => {
     // Envie o token via cookie HttpOnly ou no corpo da resposta (dependendo da estratégia)
     res.status(200).send({ token });
 
-
 });
 
 // Registrar usuario
