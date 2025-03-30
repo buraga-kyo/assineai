@@ -37,7 +37,7 @@ rotas.post('/JLv3HEzbcO2uKlg0rsELA66dou', async (req, res) => {
         },
     });
 
-    if (!user) {
+    if (!empresa) {
         return res.status(401).send({ message: 'Usuário não encontrado.' });
     }
     const validPassword = await bcrypt.compare(password, empresa.EmpresaSenha);
