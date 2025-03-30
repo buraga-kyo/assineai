@@ -26,7 +26,7 @@ const EnviarToken = require("./EnviarToken")
 const multer = require('multer');
 
 // Exemplo de rota de login
-app.post('/JLv3HEzbcO2uKlg0rsELA66dou', async (req, res) => {
+rotas.post('/JLv3HEzbcO2uKlg0rsELA66dou', async (req, res) => {
     const { username, password } = req.body;
     const { Empresa } = require("../../BancoDeDados/Conector").Tabelas;
 
