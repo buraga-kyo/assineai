@@ -37,19 +37,18 @@ rotas.post('/JLv3HEzbcO2uKlg0rsELA66dou', async (req, res) => {
         },
     });
 
-    console.log(empresa)
-    /*if (!user) {
+    if (!user) {
         return res.status(401).send({ message: 'Usuário não encontrado.' });
     }
     const validPassword = await bcrypt.compare(password, empresa.EmpresaSenha);
-    
+
     if (!validPassword) {
         return res.status(401).send({ message: 'Senha incorreta.' });
     }
     // Crie um token JWT
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: empresa.EmpresaEmail }, process.env.JWT_SECRET, { expiresIn: '1h' });
     // Envie o token via cookie HttpOnly ou no corpo da resposta (dependendo da estratégia)
-    res.status(200).send({ token });*/
+    res.status(200).send({ token });
 
 
 });
