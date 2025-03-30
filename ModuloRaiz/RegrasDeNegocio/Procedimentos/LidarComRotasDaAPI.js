@@ -25,6 +25,34 @@ const ValidarToken = require("./ValidarToken")
 const EnviarToken = require("./EnviarToken")
 const multer = require('multer');
 
+// Exemplo de rota de login
+app.post('/JLv3HEzbcO2uKlg0rsELA66dou', async (req, res) => {
+    const { username, password } = req.body;
+    const { Empresa } = require("../../BancoDeDados/Conector").Tabelas;
+
+    const empresa = await Empresa.findOne({
+        where: {
+            EmpresaUsuario: username,
+        },
+    });
+
+    console.log(empresa)
+    /*if (!user) {
+        return res.status(401).send({ message: 'Usuário não encontrado.' });
+    }
+    const validPassword = await bcrypt.compare(password, empresa.EmpresaSenha);
+    
+    if (!validPassword) {
+        return res.status(401).send({ message: 'Senha incorreta.' });
+    }
+    // Crie um token JWT
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // Envie o token via cookie HttpOnly ou no corpo da resposta (dependendo da estratégia)
+    res.status(200).send({ token });*/
+
+
+});
+
 // Registrar usuario
 rotas.post("/q9zePu74UYPUaDqUyay4fIjwNV", async (req, res) => {
     const { Empresa } = require("../../BancoDeDados/Conector").Tabelas;
