@@ -29,6 +29,7 @@ const multer = require('multer');
 rotas.post('/JLv3HEzbcO2uKlg0rsELA66dou', async (req, res) => {
     const { email, password } = req.body;
     const { Empresa } = require("../../BancoDeDados/Conector").Tabelas;
+    const bcrypt = require('bcrypt');
 
     const empresa = await Empresa.findOne({
         raw: true,
