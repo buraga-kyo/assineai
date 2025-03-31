@@ -1,4 +1,4 @@
-require('dotenv')
+require('dotenv').config({ path: __dirname + '/.env' }) // Carrega as variáveis de ambiente do arquivo .env
 require("./ModuloRaiz/BancoDeDados/Conector")
     .InstanciaConfiguradaDoSequelize
     .sync({ alter: true })
