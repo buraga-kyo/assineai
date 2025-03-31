@@ -10,6 +10,8 @@ const morgan = require('morgan')
 const helmet = require('helmet')
 const rateLimit = require('express-rate-limit')
 
+process.env.BaseDir = __dirname; // Define o diretório base para o projeto
+
 const LidarComRotasDaAPI = require("./ModuloRaiz/RegrasDeNegocio/Procedimentos/LidarComRotasDaAPI")
 
 const Servidor = express()
