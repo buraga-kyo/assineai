@@ -8,6 +8,9 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
         SignatarioFormaDeAutenticacao: {
             type: Sequelize.ARRAY(Sequelize.STRING)
         },
+        SignatarioFormaDeNotificacao: {
+            type: Sequelize.ARRAY(Sequelize.STRING)
+        },
         SignatarioAssinou: {
             type: Sequelize.BOOLEAN,
         },
