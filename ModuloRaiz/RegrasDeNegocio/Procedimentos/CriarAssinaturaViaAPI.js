@@ -51,6 +51,7 @@ module.exports = async (Requisicao, Resposta) => {
                 SignatarioRG: signatario.RG,
                 SignatarioCPF: signatario.CPF,
                 SignatarioFormaDeAutenticacao: signatario.FormaDeAutenticacao,
+                SignatarioFormaDeNotificacao: signatario.FormaDeNotificacao,
                 SignatarioSituacaoAssinatura: "Não abriu o link",
                 SignatarioTokenLinkAssinatura: signatario.GUID,
                 SignatarioTokenEmail: Math.floor(100000 + Math.random() * 900000).toString().substring(0, 6),
