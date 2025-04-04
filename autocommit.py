@@ -31,8 +31,8 @@ class GitHandler(FileSystemEventHandler):
 
 if __name__ == "__main__":
     #path = 'C:\\Users\\Dwith\\Documents\\5_PROJETOS\\ASSINE_AI\\BACKEND'  
-    path = '/home/bragaus/Documentos/AssineAi/ASSINATURA_BACKEND'  
-    #path = '/home/bragaus/Documentos/AssineAi/BACKEND'
+    #path = '/home/bragaus/Documentos/AssineAi/ASSINATURA_BACKEND'  
+    path = '/home/bragaus/Documentos/AssineAi/BACKEND'
     event_handler = GitHandler()
     observer = Observer()
     observer.schedule(event_handler, path=path, recursive=True)
@@ -41,5 +41,5 @@ if __name__ == "__main__":
         while True:
             time.sleep(1)
     except KeyboardInterrupt: 
-        observer.stop()
+        observer.stop() 
     observer.join()
