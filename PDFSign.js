@@ -16,7 +16,7 @@ const { SignPdf } = require('node-signpdf');
     // Caminho para o certificado (exemplo com PFX)
 
 
-/**
+/** 
  * Exemplo simplificado para testar a assinatura digital de PDF
  */
 
