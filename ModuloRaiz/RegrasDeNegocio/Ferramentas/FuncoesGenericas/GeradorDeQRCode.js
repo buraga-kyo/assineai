@@ -1,18 +1,29 @@
-const fs = require("fs");
+const fs = require('fs');
+const path = require('path');
 const QRCode = require('qrcode');
 
-module.exports = async (DocumentoGUID, link) =>  {
+module.exports = async (DocumentoGUID, link) => {
+  return new Promise((resolve, reject) => {
+    const filePath =
+      path.join(process.env.BaseDir, 'Arquivos', 'Temporario', `${DocumentoGUID}_QRCode.png`);
 
-    return new Promise((resolve, reject) => {
+    QRCode.toFile(
+      filePath,
+      link,
+      { errorCorrectionLevel: 'H' },
+      function (err) {
+        if (err) {
+          return reject(err);
+        }
 
-        QRCode.toFile(process.env.BaseDir+'/Arquivos/Temporario/'+DocumentoGUID+'_QRCode.png', link, {
-            errorCorrectionLevel: 'H'
-        }, function(err) {
-            if (err) throw err;
-            const QRCodeBuffer = fs.readFileSync(process.env.BaseDir+'/Arquivos/Temporario/'+DocumentoGUID+'_QRCode.png');
-            resolve(QRCodeBuffer)
-        });        
-
-    })
-
-}
+        try {
+          const qrCodeBuffer = fs.readFileSync(filePath);
+          fs.unlinkSync(filePath);
+          resolve(qrCodeBuffer);
+        } catch (readErr) {
+          reject(readErr);
+        }
+      }
+    );
+  });
+};
