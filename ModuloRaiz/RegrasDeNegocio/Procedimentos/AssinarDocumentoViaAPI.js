@@ -14,7 +14,7 @@ module.exports = async (Requisicao, Resposta) => {
     RegistrosDoSignatario.SignatarioIp = Requisicao.connection.remoteAddress || Requisicao.socket.remoteAddress || Requisicao.connection.socket.remoteAddress
     RegistrosDoSignatario.SignatarioDispositivo = Requisicao.headers['user-agent']
     RegistrosDoSignatario.SignatarioDataAssinatura = DataAtualFormatada()
-    RegistrosDoSignatario.SignatarioStatusAssinatura = "Assinado"
+    RegistrosDoSignatario.SignatarioSituacaoAssinatura = "Assinado"
     
     Signatario.update(RegistrosDoSignatario, { where: { SignatarioId: RegistrosDoSignatario.SignatarioId } })    
     Documento.update({ DocumentoStatusAssinatura: "Em Processo" }, { where: { DocumentoId: RegistrosDoSignatario.DocumentoId } })
@@ -40,8 +40,8 @@ module.exports = async (Requisicao, Resposta) => {
                 where: { DocumentoId: RegistrosDoSignatario.DocumentoId } 
             })
     
-            const TotalDeAssinaturas = await Signatario.count({ 
-                where: { SignatarioStatusAssinatura: 'Assinado', DocumentoId: RegistrosDoSignatario.DocumentoId } 
+            const TotalDeAssinaturas = await Signatario.count({
+                where: { SignatarioSituacaoAssinatura: 'Assinado', DocumentoId: RegistrosDoSignatario.DocumentoId }
             })
 
             const Data = new Date();
@@ -50,9 +50,9 @@ module.exports = async (Requisicao, Resposta) => {
 
             //new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')
             
-            Signatario.update({ 
+            Signatario.update({
                 SignatarioMensagemSobreVisualizacaoDoLinkDeAssinatura: Mensagem,
-                SignatarioStatusAssinatura: 'Assinado',
+                SignatarioSituacaoAssinatura: 'Assinado',
              }, { where: { SignatarioToken: Requisicao.body.SignatarioToken } })
 
             Documento.update({

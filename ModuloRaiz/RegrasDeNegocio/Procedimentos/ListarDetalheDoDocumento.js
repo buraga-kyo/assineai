@@ -23,17 +23,17 @@ module.exports = async (Requisicao, Resposta) => {
             ]            
         })
 
-        RegistrosDosSignatarios = await Signatario.findAll({ 
+        RegistrosDosSignatarios = await Signatario.findAll({
             where: { DocumentoId },
-            attributes: ["SignatarioNome", "SignatarioStatusAssinatura", "SignatarioId", "SignatarioLinkAssinatura", "SignatarioMensagemSobreVisualizacaoDoLinkDeAssinatura"]
+            attributes: ["SignatarioNome", "SignatarioSituacaoAssinatura", "SignatarioId", "SignatarioLinkAssinatura", "SignatarioMensagemSobreVisualizacaoDoLinkDeAssinatura"]
         })
 
         TotalDeSignatarios = await Signatario.count({ 
             where: { DocumentoId } 
         })
 
-        TotalDeAssinaturas = await Signatario.count({ 
-            where: { SignatarioStatusAssinatura: 'Assinado', DocumentoId } 
+        TotalDeAssinaturas = await Signatario.count({
+            where: { SignatarioSituacaoAssinatura: 'Assinado', DocumentoId }
         })
 
         RegistrosDoDocumento.dataValues.RegistrosDosDocumentosExtras = RegistrosDosDocumentosExtras
@@ -88,7 +88,7 @@ module.exports = async (Requisicao, Resposta) => {
 
         //     Signatarios = await Signatario.findAll({ 
         //         where: { DocumentoId: Documento.dataValues.DocumentoId },
-        //         attributes: ["SignatarioNome", "SignatarioStatusAssinatura", "SignatarioId", "SignatarioLinkAssinatura"]
+//         attributes: ["SignatarioNome", "SignatarioSituacaoAssinatura", "SignatarioId", "SignatarioLinkAssinatura"]
         //     })
                 
         //     Base64DocumentoOriginal = await Arquivo.findOne({
@@ -106,7 +106,7 @@ module.exports = async (Requisicao, Resposta) => {
         //     }   
 
         //     TotalDeSignatarios = await Signatario.count({ where: { DocumentoId: Documento.dataValues.DocumentoId } })
-        //     TotalDeAssinaturas = await Signatario.count({ where: { SignatarioStatusAssinatura: 'Assinado', DocumentoId: Documento.dataValues.DocumentoId } })
+//     TotalDeAssinaturas = await Signatario.count({ where: { SignatarioSituacaoAssinatura: 'Assinado', DocumentoId: Documento.dataValues.DocumentoId } })
             
         //     Documentos[Documentos.indexOf(Documento)].dataValues.Signatarios = Signatarios;
         //     Documentos[Documentos.indexOf(Documento)].dataValues.Extras = Extras;

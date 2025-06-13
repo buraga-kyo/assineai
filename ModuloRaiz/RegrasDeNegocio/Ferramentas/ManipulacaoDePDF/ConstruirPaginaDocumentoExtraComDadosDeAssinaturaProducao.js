@@ -161,9 +161,9 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoId
     let PosicaoY = 650
     var PaginaAtual = Pagina
 
-    const ColecaoDeSignatarios = await Signatario.findAll({ where: { DocumentoId } , 
-        order: [ 
-            ['SignatarioStatusAssinatura', 'ASC'],
+    const ColecaoDeSignatarios = await Signatario.findAll({ where: { DocumentoId } ,
+        order: [
+            ['SignatarioSituacaoAssinatura', 'ASC'],
             ['SignatarioQualificacao', 'ASC'],
             ['SignatarioId', 'ASC']
         ]
@@ -190,7 +190,7 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, DocumentoId
             color: rgb(0.14,0.14,0.14)
         })
 
-        if (Signatario.SignatarioStatusAssinatura == "Pendente") {
+        if (Signatario.SignatarioSituacaoAssinatura == "Pendente") {
             
             PaginaAtual.drawImage(AssinaturaPendentePNG, {
                 x: 25,
