@@ -4,7 +4,7 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.addColumn('AssinaturaSignatarios', 'SignatarioAssinou', {
-      type: Sequelize.BOOlEAN,
+      type: Sequelize.BOOLEAN,
       allowNull: true,
       defaultValue: false
     });
