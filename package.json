@@ -4,7 +4,7 @@
   "description": "",
   "main": "Iniciar.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "prod": "pm2 start ModuloDoServidor/Iniciar.js --name backend_assineai_gcr"
   },
   "author": "",
@@ -30,5 +30,8 @@
     "qrcode": "^1.5.3",
     "router": "^2.2.0",
     "sequelize": "^6.37.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }
