@@ -296,7 +296,7 @@ async function ConstruirCorpo(PDF, Pagina, Helvetica, HelveticaBold, Signatarios
             color: rgb(0.14,0.14,0.14)
         })
 
-        if (Signatario.SignatarioStatusAssinatura == "Assinado") {
+        if (Signatario.SignatarioSituacaoAssinatura == "Assinado") {
             
             PaginaAtual.drawImage(AssinadoPNG, {
                 x: 25,
