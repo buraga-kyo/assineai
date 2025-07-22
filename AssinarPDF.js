@@ -29,7 +29,7 @@ class PdfSignatureService {
   }
 
   /**
-   * Assina um documento PDF
+   *
    * @param {Buffer|String} pdfData Buffer ou caminho do PDF
    * @param {Buffer|String} certData Buffer ou caminho do certificado
    * @param {String} password Senha do certificado
