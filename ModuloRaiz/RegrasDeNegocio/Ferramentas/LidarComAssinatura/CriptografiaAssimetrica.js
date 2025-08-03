@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 
-module.exports = (DocumentoBase64) => {
+module.exports = (Documento) => {
 
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
         modulusLength: 2048,
@@ -24,7 +24,7 @@ module.exports = (DocumentoBase64) => {
     })
     
     const AssinaturaSHA256 = crypto.createSign('SHA256')
-    AssinaturaSHA256.update(DocumentoBase64)
+    AssinaturaSHA256.update(Documento)
     AssinaturaSHA256.end()
     const BufferDocumentoAssinado = AssinaturaSHA256.sign(ChavePrivada)
 
