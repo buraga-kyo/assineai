@@ -5,7 +5,7 @@ const CriarArquivoPDFApartirDoBase64 = require("../Ferramentas/ManipulacaoDePDF/
 const AssinarPDFcomCertificadoDigital = require("../Ferramentas/LidadorDeAssinatura/CertificadoDigital")
 const AssinarPDFcomCriptografiaAssimetrica = require("../Ferramentas/LidadorDeAssinatura/CriptografiaAssimetrica")
 const ConstruirPaginaDocumentoExtraComDadosDeAssinaturaProducao = require("../Ferramentas/ManipulacaoDePDF/ConstruirPaginaDocumentoExtraComDadosDeAssinaturaProducao")
-const fs = require("fs");
+const fs = require("fs"); 
 
 module.exports = async (Requisicao, Resposta) => {
     const { dataValues: RegistrosDoSignatario } = await Signatario.findOne({ where: { SignatarioToken: Requisicao.body.SignatarioToken } })
