@@ -2,8 +2,8 @@ const { Signatario, Documento, Arquivo, DocumentoExtra } = require("../../BancoD
 const DataAtualFormatada = require("../Ferramentas/FuncoesGenericas/DataAtualFormatada")
 const ConstruirPaginaComDadosDeAssinatura = require("../Ferramentas/ManipulacaoDePDF/ConstruirPaginaComDadosDeAssinaturaProducao")
 const CriarArquivoPDFApartirDoBase64 = require("../Ferramentas/ManipulacaoDePDF/CriarArquivoPDFApartirDoBase64")
-const AssinarPDFcomCertificadoDigital = require("../Ferramentas/LidadorDeAssinatura/CertificadoDigital")
-const AssinarPDFcomCriptografiaAssimetrica = require("../Ferramentas/LidadorDeAssinatura/CriptografiaAssimetrica")
+const AssinarPDFcomCertificadoDigital = require("../Ferramentas/LidarComAssinatura/CertificadoDigital")
+const AssinarPDFcomCriptografiaAssimetrica = require("../Ferramentas/LidarComAssinatura/CriptografiaAssimetrica")
 const ConstruirPaginaDocumentoExtraComDadosDeAssinaturaProducao = require("../Ferramentas/ManipulacaoDePDF/ConstruirPaginaDocumentoExtraComDadosDeAssinaturaProducao")
 const fs = require("fs"); 
 
