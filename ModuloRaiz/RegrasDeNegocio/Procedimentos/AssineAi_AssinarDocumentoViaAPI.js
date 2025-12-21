@@ -30,7 +30,10 @@ module.exports = async (Requisicao, Resposta) => {
         await Signatarios.update({ 
             SignatarioGeolocalizacao: {
                 type: 'Point',
-                coordinates: [Requisicao.body.userLocation.longitude, Requisicao.body.userLocation.latitude]
+		coordinates: [
+                   Requisicao.body.userLocation?.longitude ?? 0,
+                   Requisicao.body.userLocation?.latitude ?? 0
+                 ]     
             },
             SignatarioAssinou: true,
             SignatarioIp: Requisicao.connection.remoteAddress || Requisicao.socket.remoteAddress || Requisicao.connection.socket.remoteAddress,
@@ -62,7 +65,8 @@ module.exports = async (Requisicao, Resposta) => {
             NomeDoArquivo = documento.DocumentoToken + ".pdf";
             const buffer = await AssineAi_ConstruirPaginaComDadosDeAssinatura(documento, signatarios, Requisicao.body.selfie!==null);
             CaminhoDoArquivo = process.env.BaseDir + "/Arquivos/Temporario/" + NomeDoArquivo; 
-            await fs.promises.writeFile(CaminhoDoArquivo, buffer);
+            console.log('CaminhoDoArquivo', CaminhoDoArquivo);
+	    await fs.promises.writeFile(CaminhoDoArquivo, buffer);
             await AssinarPDFcomCertificadoDigital(NomeDoArquivo);
             const BufferDoPDFcomCertificado =  fs.readFileSync(process.env.BaseDir+"/Arquivos/Temporario/"+documento.DocumentoToken+"_signed.pdf");
 

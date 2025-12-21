@@ -4,10 +4,92 @@
 // const forge = require('node-forge');
 // const { PDFDocument, rgb } = require('pdf-lib');
 // const moment = require('moment');
+require('dotenv').config();
 
 module.exports = (NomeDoArquivo) => {
 
     return new Promise(async (resolve, reject) => {
+        
+	const { spawn } = require('child_process');
+	const path = require('path');
+	const baseDir = process.env.BaseDir;
+        const Caminho = path.join(baseDir, 'Arquivos', 'Temporario')
+        const CaminhoNomeDoArquivo = path.join(baseDir, 'Arquivos', 'Temporario', NomeDoArquivo)
+	const ArquivoPermanente = path.join(baseDir, 'Arquivos', 'Permanente')
+	const CaminhoFinal = baseDir + '/Arquivos/Temporario/' + NomeDoArquivo
+
+        console.log('CaminhoFinal', CaminhoFinal)
+        console.log('Arquivo Permanente', ArquivoPermanente)
+        console.log('nome do arquivo', NomeDoArquivo)
+	console.log('Caminho', Caminho)
+	console.log('BaseDir:', process.env.BaseDir);
+	console.log('CaminhoNomeDoArquivo', CaminhoNomeDoArquivo)
+
+	const java = spawn('java', [
+	    '-jar', 'JSignPdf.jar',
+	    '-d', Caminho,
+	    '-kst', 'PKCS12',
+	    '-ksf', 'cert.pfx',
+	    '-ksp', process.env.SENHA_DO_CERTIFICADO,
+	    '-pr', 'DISALLOW_PRINTING',
+	    CaminhoFinal  
+	  ], {
+	    cwd: ArquivoPermanente,
+	    windowsHide: true
+	  });
+
+		console.log(java)
+
+	  let stdout = '';
+	  let stderr = '';
+
+	  java.stdout.on('data', data => {
+	    stdout += data.toString();
+	  });
+
+	  java.stderr.on('data', data => {
+	    stderr += data.toString();
+	  });
+
+	  java.on('close', code => {
+	    if (code !== 0) {
+	      console.error('❌ Erro ao assinar PDF');
+	      console.error(stderr);
+	      return reject(new Error(`JSignPdf saiu com código ${code}`));
+	    }
+
+	    console.log('✅ PDF assinado com sucesso');
+	    if (stdout) console.log(stdout);
+
+	    resolve(true);
+	  });
+
+	  java.on('error', err => {
+	    console.error('🔥 Falha ao iniciar o Java');
+	    reject(err);
+	  });
+
+
+
+      /*  const { spawn } = require('child_process');
+
+	const path = require('path');
+
+	const baseDir = process.env.BaseDir;
+
+	const java = spawn('java', [
+	  '-jar', 'JSignPdf.jar',
+	  '-d', `${baseDir}/Arquivos/Temporario`,
+	  '-kst', 'PKCS12',
+	  '-ksf', 'cert.pfx',
+	  '-ksp', process.env.SENHA_DO_CERTIFICADO,
+	  '-pr', 'DISALLOW_PRINTING',
+	  `${baseDir}/Arquivos/Temporario/${NomeDoArquivo}`
+	], {
+	  cwd: `${baseDir}/Arquivos/Permanente`
+	});
+
+	*/
 
         /**const pemContent = fs.readFileSync(process.env.BaseDir+'\\Arquivos\\Permanente\\certificate.pem', 'utf8');
         const pemDecoded = forge.pem.decode(pemContent)[0].body;
@@ -59,7 +141,10 @@ module.exports = (NomeDoArquivo) => {
         
         resolve(pdfDoc.save());*/
 
+        // so funciona no windows
+	
 
+	    /*
         const { exec } = require('child_process');
 
         const command = 'cd '+process.env.BaseDir+'/Arquivos/Permanente & java -jar JSignPdf.jar -d ' + process.env.BaseDir + '/Arquivos/Temporario -kst PKCS12 -ksf cert.pfx -ksp ' + process.env.SENHA_DO_CERTIFICADO + ' -pr DISALLOW_PRINTING ' + process.env.BaseDir + '/Arquivos/Temporario/' + NomeDoArquivo;
@@ -74,7 +159,7 @@ module.exports = (NomeDoArquivo) => {
             }
             resolve(true);
         });
-
+*/
         /** const pfxBuffer = fs.readFileSync(process.env.BaseDir+'\\Arquivos\\Permanente\\cert.pfx');
         const p12Asn1 = forge.asn1.fromDer(pfxBuffer.toString('binary'));
         const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, 'dwith2024');
@@ -189,6 +274,14 @@ module.exports = (NomeDoArquivo) => {
 
         })*/
 
-    });
+    
+	})
+	.then(() => {
+	  // Aqui o mundo já mudou
+	})
+	.catch(err => {
+	  // Aqui algo quebrou no tecido da realidade
+	  console.error(err);
+	});
 
 }
