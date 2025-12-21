@@ -10,11 +10,11 @@ const Empresa = require("./Tabelas/Empresa");
 const BancoDeDados = {};
 
 const InstanciaConfiguradaDoSequelize = new Sequelize(
-  Configuracao.DB,
-  Configuracao.USER,
-  Configuracao.PASSWORD,
+  process.env.NAME,
+  process.env.DB_USER,
+  process.env.PASSWORD,
   {
-    host: Configuracao.HOST,
+    host: Configuracao.host,
     dialect: Configuracao.dialect,
     logging: false,
     operatorsAliases: 0,

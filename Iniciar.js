@@ -22,7 +22,7 @@ const limiter = rateLimit({
 })
 Servidor.use(limiter)
 Servidor.use(helmet())
-Servidor.use(morgan('dev'))
+Servidor.use(morgan('combined'))
 Servidor.use(cors())
 Servidor.use(express.json({ limit: '50mb' }))
 Servidor.use(express.urlencoded({ extended: false }))
