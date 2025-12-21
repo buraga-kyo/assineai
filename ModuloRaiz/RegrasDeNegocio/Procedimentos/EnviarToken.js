@@ -4,7 +4,7 @@ const axios = require('axios');
 
 module.exports = async (Requisicao, Resposta) => {
 
-    try {
+    //try {
 
         const signatarios = await Signatarios.findOne({
             raw: true,
@@ -14,7 +14,11 @@ module.exports = async (Requisicao, Resposta) => {
             attributes: ["SignatarioTokenWhatsApp", "SignatarioTokenEmail"]
         });
 
-       await axios.post('https://evolutionv2.assineae.online/message/sendText/CITIZENAI BOTS', 
+	console.log(signatarios.SignatarioTokenWhatsApp)
+	
+        Resposta.status(200).send(true)
+
+       /* await axios.post('https://evolutionv2.assineae.online/message/sendText/CITIZENAI BOTS', 
         
         {
             number: "5521969099714@s.whatsapp.net",
@@ -43,6 +47,8 @@ module.exports = async (Requisicao, Resposta) => {
         console.error('Erro:', error);
         Resposta.status(500).send(error)
     }
+
+	*/
 
     /*const nodemailer = require('nodemailer');
     

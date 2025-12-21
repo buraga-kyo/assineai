@@ -1,4 +1,5 @@
 require('dotenv').config()
+console.log(typeof process.env.DB_PASS, process.env.DB_PASS)
 
 require("../ModuloRaiz/BancoDeDados/Conector")
     .InstanciaConfiguradaDoSequelize
@@ -9,7 +10,7 @@ const express = require("express")
 const cors = require("cors")
 const morgan = require('morgan')
 
-const LidadorDeRotasDaAPI = require("../ModuloRaiz/RegrasDeNegocio/Procedimentos/LidadorDeRotaDaAPI")
+const LidadorDeRotasDaAPI = require("../ModuloRaiz/RegrasDeNegocio/Procedimentos/LidarComRotasDaAPI.js")
 
 const Servidor = express()
 
