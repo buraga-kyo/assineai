@@ -6,7 +6,7 @@ module.exports = async (Requisicao, Resposta) => {
 
         let RegistroSignatario = await Signatario.findOne({
             where: { SignatarioToken: Requisicao.params.SignatarioToken },
-            attributes: ["DocumentoId", "SignatarioQuantidadeDeAcessosNoLinkDeAssinatura", "SignatarioStatusAssinatura", "SignatarioMensagemSobreVisualizacaoDoLinkDeAssinatura"]
+            attributes: ["DocumentoId", "SignatarioQuantidadeDeAcessosNoLinkDeAssinatura", "SignatarioSituacaoAssinatura", "SignatarioMensagemSobreVisualizacaoDoLinkDeAssinatura"]
         })
 
         let RegistroDocumento = await Documento.findOne({
@@ -19,7 +19,7 @@ module.exports = async (Requisicao, Resposta) => {
             attributes: ["DocumentoExtraId", "DocumentoId", "DocumentoExtraNome"]
         }) 
         
-        if (RegistroSignatario.SignatarioStatusAssinatura != "Assinado") {
+        if (RegistroSignatario.SignatarioSituacaoAssinatura != "Assinado") {
             let SignatarioQuantidadeDeAcessosNoLinkDeAssinatura = RegistroSignatario.SignatarioQuantidadeDeAcessosNoLinkDeAssinatura
 
             Signatario.update(
@@ -35,7 +35,7 @@ module.exports = async (Requisicao, Resposta) => {
             }
     
             Signatario.update(
-                { SignatarioMensagemSobreVisualizacaoDoLinkDeAssinatura: Mensagem, SignatarioStatusAssinatura: 'Em Processo' },
+                { SignatarioMensagemSobreVisualizacaoDoLinkDeAssinatura: Mensagem, SignatarioSituacaoAssinatura: 'Em Processo' },
                 { where: { SignatarioToken: Requisicao.params.SignatarioToken } }
             )
         }
