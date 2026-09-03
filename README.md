@@ -1,1 +1,1 @@
-esse projetinho esperto, assina documentos PDF digitalmente; passa na verificação do ITI Validador
+na época eu usei o jsignpdf para lidar com injeção do certificado digital no PDF; javinha tava pagando bem :)
