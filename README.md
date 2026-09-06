@@ -1,5 +1,3 @@
-na época eu usei o jsignpdf para lidar com injeção do certificado digital no PDF; javinha tava pagando bem :)
-
 ## Licença
 
 Uso interno permitido para qualquer empresa ou pessoa: você pode rodar, modificar e usar o AssineAi para assinar **os próprios documentos da sua organização**, com os seus próprios certificados.
