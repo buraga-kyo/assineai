@@ -8,7 +8,7 @@
     "prod": "pm2 start ModuloDoServidor/Iniciar.js --name backend_assineai_gcr"
   },
   "author": "",
-  "license": "ISC",
+  "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "@mailchimp/mailchimp_transactional": "^1.0.59",
     "bcrypt": "^6.0.0",
