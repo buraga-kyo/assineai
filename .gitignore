@@ -9,3 +9,9 @@ node_modules
 *.rar
 # planejamento interno, fica fora do historico (o repositorio volta a ser publico)
 /docs/interno/
+
+# monorepo
+dist/
+*.tsbuildinfo
+coverage/
+.turbo/
