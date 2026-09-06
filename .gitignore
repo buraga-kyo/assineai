@@ -7,3 +7,5 @@ node_modules
 !ICP.png
 !pendente.png
 *.rar
+# planejamento interno, fica fora do historico (o repositorio volta a ser publico)
+/docs/interno/
