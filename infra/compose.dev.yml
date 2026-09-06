@@ -1,0 +1,31 @@
+# Infra de desenvolvimento do AssineAi: Postgres com PostGIS, Redis, MinIO com
+# o bucket assineai e Mailpit. Sobe com `bash infra/dev.sh up` (infra/README.md).
+# A Evolution (WhatsApp) entra na issue do canal WhatsApp.
+name: assineai-dev
+
+services:
+  postgres:
+    image: postgis/postgis:18-3.6
+    container_name: assineai-dev-postgres
+    environment:
+      POSTGRES_DB: assineai
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      # a imagem do Postgres 18 guarda os dados em /var/lib/postgresql/18/docker;
+      # montar em /var/lib/postgresql/data deixaria o volume nomeado vazio
+      - postgres-dados:/var/lib/postgresql
+      # roda uma vez, no primeiro boot do volume: cria as roles (01-roles.sql)
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # por TCP de proposito: o boot inicial so abre o socket unix, e nao conta
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d assineai"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+volumes:
+  postgres-dados:
