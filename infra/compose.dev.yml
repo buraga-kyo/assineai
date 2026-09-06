@@ -1,6 +1,7 @@
 # Infra de desenvolvimento do AssineAi: Postgres com PostGIS, Redis, MinIO com
 # o bucket assineai e Mailpit. Sobe com `bash infra/dev.sh up` (infra/README.md).
 # A Evolution (WhatsApp) entra na issue do canal WhatsApp.
+# As portas ficam só no localhost da máquina: as senhas de dev são públicas.
 name: assineai-dev
 
 services:
@@ -12,7 +13,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       # a imagem do Postgres 18 guarda os dados em /var/lib/postgresql/18/docker;
       # montar em /var/lib/postgresql/data deixaria o volume nomeado vazio
@@ -31,7 +32,7 @@ services:
     image: redis:7-alpine
     container_name: assineai-dev-redis
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -47,8 +48,8 @@ services:
       MINIO_ROOT_USER: assineai
       MINIO_ROOT_PASSWORD: assineai-dev-segredo
     ports:
-      - "9000:9000" # API S3
-      - "9001:9001" # console web
+      - "127.0.0.1:9000:9000" # API S3
+      - "127.0.0.1:9001:9001" # console web
     volumes:
       - minio-dados:/data
     healthcheck:
@@ -76,8 +77,8 @@ services:
     image: axllent/mailpit:v1.31.1
     container_name: assineai-dev-mailpit
     ports:
-      - "8025:8025" # caixa de entrada web
-      - "1025:1025" # SMTP
+      - "127.0.0.1:8025:8025" # caixa de entrada web
+      - "127.0.0.1:1025:1025" # SMTP
     healthcheck:
       test: ["CMD", "/mailpit", "readyz"]
       interval: 5s
