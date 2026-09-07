@@ -1,6 +1,7 @@
 // Unico lugar que le process.env. Valida tudo no boot: variavel faltando ou
 // invalida derruba o processo com uma mensagem que diz qual foi.
 import { existsSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 import { z } from 'zod'
 
 const esquema = z.object({
@@ -38,16 +39,33 @@ export function carregarConfig(env: NodeJS.ProcessEnv = process.env): Config {
   throw new ErroDeConfig(problemas)
 }
 
-// Para os pontos de entrada: le o .env da pasta atual (o ambiente real ganha
+// Procura o .env a partir de `inicio` subindo ate a raiz do monorepo (a pasta
+// com pnpm-workspace.yaml, inclusive), porque o README manda copiar o modelo
+// para a raiz e o `pnpm dev` roda com cwd em apps/api. Sem essa raiz acima
+// (dist em producao, por exemplo), so olha a propria pasta.
+export function acharArquivoEnv(inicio = process.cwd()): string | undefined {
+  const pastas = [inicio]
+  let pasta = inicio
+  while (!existsSync(join(pasta, 'pnpm-workspace.yaml'))) {
+    const acima = dirname(pasta)
+    if (acima === pasta) return existsSync(join(inicio, '.env')) ? join(inicio, '.env') : undefined
+    pasta = acima
+    pastas.push(pasta)
+  }
+  return pastas.map((p) => join(p, '.env')).find((arquivo) => existsSync(arquivo))
+}
+
+// Para os pontos de entrada: carrega o .env se houver (o ambiente real ganha
 // do arquivo), valida e sai com codigo 1 se algo faltar.
 export function carregarConfigOuSair(): Config {
-  if (existsSync('.env')) process.loadEnvFile('.env')
+  const arquivo = acharArquivoEnv()
+  if (arquivo) process.loadEnvFile(arquivo)
   try {
     return carregarConfig()
   } catch (erro) {
     if (!(erro instanceof ErroDeConfig)) throw erro
     process.stderr.write(`a api nao subiu, a configuracao esta incompleta:\n${erro.message}\n`)
-    process.stderr.write('confira o .env (modelo em .env.example)\n')
+    process.stderr.write('confira o .env na raiz do repositorio (modelo em .env.example)\n')
     process.exit(1)
   }
 }
