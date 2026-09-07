@@ -15,6 +15,13 @@
       "when": 1788780837401,
       "tag": "0001_usuario",
       "breakpoints": false
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788780880201,
+      "tag": "0002_sessao",
+      "breakpoints": false
     }
   ]
 }
