@@ -4,6 +4,8 @@ import { sql } from 'drizzle-orm'
 import { readMigrationFiles } from 'drizzle-orm/migrator'
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { migrate } from 'drizzle-orm/node-postgres/migrator'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { Pool } from 'pg'
 import type { Logger } from 'pino'
@@ -17,11 +19,12 @@ export async function rodarMigracoes(url: string, log: Logger, pasta = PASTA_MIG
   const banco = drizzle(pool)
   try {
     const arquivos = readMigrationFiles({ migrationsFolder: pasta })
+    const nomes = lerNomes(pasta)
     const ultima = await ultimaAplicada(banco)
     const pendentes = arquivos.filter((m) => m.folderMillis > ultima)
     log.info({ total: arquivos.length, pendentes: pendentes.length }, 'migracoes lidas')
     for (const m of arquivos) {
-      const passo = { migracao: m.hash.slice(0, 12) }
+      const passo = { migracao: nomes.get(m.folderMillis) ?? m.hash.slice(0, 12) }
       if (m.folderMillis > ultima) log.info(passo, 'aplicando migracao')
       else log.debug(passo, 'migracao ja aplicada')
     }
@@ -31,6 +34,14 @@ export async function rodarMigracoes(url: string, log: Logger, pasta = PASTA_MIG
   } finally {
     await pool.end()
   }
+}
+
+// O journal do drizzle-kit liga o instante de cada migracao ao nome do arquivo.
+function lerNomes(pasta: string) {
+  const journal = JSON.parse(readFileSync(join(pasta, 'meta', '_journal.json'), 'utf8')) as {
+    entries: { when: number; tag: string }[]
+  }
+  return new Map(journal.entries.map((e) => [e.when, e.tag]))
 }
 
 // created_at da tabela de controle do drizzle e o `when` do journal. Sem a
