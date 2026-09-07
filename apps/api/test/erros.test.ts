@@ -15,6 +15,9 @@ function appComRotasDeErro() {
     app.get('/explode', publico, async () => {
       throw new Error('tabela X nao existe')
     })
+    app.get('/estranho', publico, async () => {
+      throw Object.assign(new Error('detalhe interno da lib'), { statusCode: 418 })
+    })
   })
   return teste
 }
@@ -28,6 +31,7 @@ describe('erro padrao', () => {
       headers: { cookie: 'sessao=SEGREDO123' },
     })
     expect(resposta.statusCode).toBe(404)
+    // a prova de que o cookie sairia redigido caso fosse logado esta em logger.test.ts
     expect(resposta.json()).toEqual({
       erro: { codigo: 'nao_encontrado', mensagem: 'rota nao encontrada' },
     })
@@ -42,6 +46,14 @@ describe('erro padrao', () => {
     expect(resposta.json()).toEqual({ erro: { codigo: 'erro_interno', mensagem: 'erro interno' } })
     expect(resposta.body).not.toContain('tabela X')
     expect(texto()).toContain('tabela X nao existe')
+    await app.close()
+  })
+
+  it('4xx que nao e do fastify nem ErroDaApi nao repassa a mensagem', async () => {
+    const { app } = appComRotasDeErro()
+    const resposta = await app.inject({ method: 'GET', url: '/estranho' })
+    expect(resposta.statusCode).toBe(418)
+    expect(resposta.json()).toEqual({ erro: { codigo: 'erro_418', mensagem: 'erro 418' } })
     await app.close()
   })
 

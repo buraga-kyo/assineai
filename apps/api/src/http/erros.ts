@@ -58,9 +58,12 @@ export function tratarErro(erro: unknown, request: FastifyRequest, reply: Fastif
   }
   const status = statusDoErro(erro)
   if (status < 500) {
-    // erro do proprio fastify: json quebrado, corpo grande demais, tipo nao aceito
-    const mensagem = erro instanceof Error ? erro.message : 'requisicao invalida'
     const codigo = CODIGO_POR_STATUS[status] ?? `erro_${status}`
+    // so a mensagem do proprio fastify (json quebrado, corpo grande demais, tipo
+    // nao aceito) e segura de repassar; qualquer outro 4xx fala pelo codigo
+    const doFastify =
+      erro instanceof Error && (erro as Partial<FastifyError>).code?.startsWith('FST_')
+    const mensagem = doFastify ? erro.message : codigo.replaceAll('_', ' ')
     return reply.code(status).send({ erro: { codigo, mensagem } })
   }
   request.log.error({ err: erro }, 'erro interno')
