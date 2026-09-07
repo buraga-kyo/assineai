@@ -41,3 +41,46 @@ export function redigir(texto: string, segredos: string | readonly (string | und
   }
   return limpo
 }
+
+export interface SaidaDoProcesso {
+  codigo: number | null
+  sinal: string | null
+  stderr: string
+}
+
+/** Primeira linha do stderr que não é ruído do JSignPdf ("DETALHADO ...") nem pilha. */
+export function resumirStderr(stderr: string): string {
+  const linha = stderr
+    .split('\n')
+    .map((l) => l.trimEnd())
+    .find((l) => l !== '' && !l.startsWith('DETALHADO') && !/^\s/.test(l))
+  return linha ?? '(sem detalhe no stderr)'
+}
+
+/** Traduz o código de saída do JSignPdf (tabela do --help) no erro tipado. */
+export function erroPorSaida(saida: SaidaDoProcesso): ErroJSignPdf {
+  const detalhes = { codigoDeSaida: saida.codigo, stderr: saida.stderr }
+  const resumo = resumirStderr(saida.stderr)
+  switch (saida.codigo) {
+    case 1:
+      return new ErroLinhaDeComandoJSignPdf(
+        `o JSignPdf recusou a linha de comando: ${resumo}`,
+        detalhes,
+      )
+    case 2:
+      return new ErroNenhumaOperacaoJSignPdf(
+        `o JSignPdf não recebeu nenhuma operação: ${resumo}`,
+        detalhes,
+      )
+    case 3:
+    case 4:
+      return new ErroSelagemJSignPdf(`o JSignPdf não conseguiu selar o PDF: ${resumo}`, detalhes)
+    default: {
+      const como = `código ${saida.codigo ?? 'nenhum'}, sinal ${saida.sinal ?? 'nenhum'}`
+      return new ErroSelagemJSignPdf(
+        `o java terminou de um jeito inesperado (${como}): ${resumo}`,
+        detalhes,
+      )
+    }
+  }
+}
