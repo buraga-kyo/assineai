@@ -61,7 +61,12 @@ export function rodarJava(opcoes: OpcoesDoJava): Promise<SaidaDoJava> {
       const saida = { codigo, sinal, stdout: limpar(stdout), stderr: limpar(stderr), duracaoMs }
       encerrar(() => resolver(saida))
     })
-    if (processo.pid !== undefined) opcoes.aoIniciar?.(processo.pid)
+    // Callback de quem chamou não derruba a selagem: ler /proc/<pid>/cmdline pode dar ENOENT.
+    try {
+      if (processo.pid !== undefined) opcoes.aoIniciar?.(processo.pid)
+    } catch {
+      // ignorado de propósito
+    }
   })
 }
 

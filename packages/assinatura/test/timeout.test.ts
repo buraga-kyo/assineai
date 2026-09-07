@@ -3,7 +3,12 @@ import { chmod, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, test } from 'vitest'
-import { ErroJavaIndisponivel, ErroTimeoutJSignPdf, selarPdf } from '../src/index.js'
+import {
+  ErroJavaIndisponivel,
+  ErroSelagemJSignPdf,
+  ErroTimeoutJSignPdf,
+  selarPdf,
+} from '../src/index.js'
 import { jar } from './apoio/config.js'
 import { capturarLinhaDeComando, type Captura } from './apoio/processo.js'
 
@@ -18,6 +23,7 @@ const pedido = {
 let pasta: string
 let javaLento: string
 let javaComNeto: string
+let javaQueFalha: string
 
 async function script(nome: string, corpo: string): Promise<string> {
   const caminho = join(pasta, nome)
@@ -31,6 +37,7 @@ beforeAll(async () => {
   javaLento = await script('java-lento', 'sleep 30\n')
   // sai na hora, mas deixa um filho segurando o stdout: o close só viria dali a 30 s
   javaComNeto = await script('java-com-neto', 'sleep 30 &\nexit 0\n')
+  javaQueFalha = await script('java-que-falha', 'exit 4\n')
 })
 afterAll(() => rm(pasta, { recursive: true, force: true }))
 
@@ -58,6 +65,15 @@ describe('selarPdf sem java de verdade', () => {
     expect(levou).toBeLessThan(2000)
     expect(erro).toBeInstanceOf(ErroTimeoutJSignPdf)
     expect(existsSync(pasta ?? '')).toBe(false)
+  })
+  test('aoIniciar que lança não derruba a selagem', async () => {
+    const aoIniciar = () => {
+      throw new Error('callback quebrado')
+    }
+    const ambiente = { jar, javaBin: javaQueFalha, aoIniciar }
+    const erro = await selarPdf(pedido, ambiente).catch((e: unknown) => e)
+    expect(erro).toBeInstanceOf(ErroSelagemJSignPdf)
+    expect((erro as Error).message).not.toContain('callback quebrado')
   })
   test('java inexistente vira ErroJavaIndisponivel', async () => {
     const erro = await selarPdf(pedido, { jar, javaBin: '/nao/existe/java' }).catch(
