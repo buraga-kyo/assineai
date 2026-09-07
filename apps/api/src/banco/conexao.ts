@@ -3,6 +3,7 @@
 import { sql } from 'drizzle-orm'
 import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
+import { z } from 'zod'
 import * as esquema from './esquema/index.js'
 
 export type Banco = NodePgDatabase<typeof esquema>
@@ -25,6 +26,9 @@ export function criarBanco(url: string) {
   // commit ou rollback) e entrega o banco marcado. Toda leitura e escrita
   // dentro de fn passa pelas politicas de RLS filtrando por essa empresa.
   async function comoEmpresa<T>(empresaId: string, fn: (banco: BancoDaEmpresa) => Promise<T>) {
+    if (!z.uuid().safeParse(empresaId).success) {
+      throw new TypeError(`comoEmpresa precisa do uuid da empresa, recebeu "${empresaId}"`)
+    }
     return bancoSistema.transaction(async (tx) => {
       await tx.execute(sql`select set_config('app.empresa_id', ${empresaId}, true)`)
       return fn(tx as BancoDaEmpresa)
