@@ -1,0 +1,31 @@
+name: verificar
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# só leitura por padrão; o job que precisar de mais pede no próprio job
+permissions:
+  contents: read
+
+# push novo no mesmo PR cancela a rodada anterior (poupa minutos da cota)
+concurrency:
+  group: verificar-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verificar:
+    name: typecheck, lint e teste
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      # sem `version`: a action lê a versão do campo packageManager
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm verificar
