@@ -83,3 +83,34 @@ export function listarAliases(opcoes: OpcoesDaVerificacao): Promise<string[]> {
       .filter((linha) => linha !== '')
   })
 }
+
+/** No boot: valida o PKCS12, confere que o JSignPdf o abre e alimenta o alerta de 30 dias. */
+export async function verificarCertificado(
+  opcoes: OpcoesDaVerificacao,
+): Promise<DadosDoCertificado> {
+  const cert = await lerCertificadoPkcs12(opcoes.arquivo, opcoes.senha)
+  const aliases = await listarAliases(opcoes)
+  if (opcoes.alias !== undefined && !aliases.includes(opcoes.alias)) {
+    const lista = aliases.join(', ')
+    throw new ErroCertificado(
+      `o alias "${opcoes.alias}" não existe no certificado; existem: ${lista}`,
+    )
+  }
+  const { notBefore, notAfter } = cert.validity
+  return {
+    titular: nomeComum(cert.subject),
+    emissor: nomeComum(cert.issuer),
+    numeroSerie: cert.serialNumber,
+    validoDe: notBefore,
+    validoAte: notAfter,
+    ...calcularVencimento(notAfter, opcoes.agora ?? new Date()),
+    aliases,
+  }
+}
+
+/** CN do nome; sem CN, o nome inteiro (O=..., C=...). */
+function nomeComum(nome: forge.pki.Certificate['subject']): string {
+  const cn: unknown = nome.getField('CN')?.value
+  if (typeof cn === 'string') return cn
+  return nome.attributes.map((a) => `${a.shortName ?? a.name ?? '?'}=${String(a.value)}`).join(', ')
+}
