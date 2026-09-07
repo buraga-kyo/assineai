@@ -29,6 +29,13 @@
       "when": 1788780900510,
       "tag": "0003_atualizado_em_por_trigger",
       "breakpoints": false
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788782153750,
+      "tag": "0004_empresa_rls",
+      "breakpoints": false
     }
   ]
 }
