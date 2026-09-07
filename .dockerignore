@@ -1,0 +1,11 @@
+# o contexto do build e a raiz do repositorio (infra/compose.prod.yml)
+.git
+node_modules
+**/node_modules
+**/dist
+**/coverage
+*.env
+legado
+design
+Arquivos
+docs
