@@ -8,6 +8,13 @@
       "when": 1788780792782,
       "tag": "0000_empresa",
       "breakpoints": false
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788780837401,
+      "tag": "0001_usuario",
+      "breakpoints": false
     }
   ]
 }
