@@ -1,22 +1,32 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
+import type { App } from '../src/app.js'
 import { criarAppDeTeste } from './apoio.js'
 
 describe('acesso por rota', () => {
+  let app: App | undefined
+
+  afterEach(async () => {
+    await app?.close().catch(() => undefined)
+    app = undefined
+  })
+
   it('rota sem config.acesso derruba o registro', () => {
-    const { app } = criarAppDeTeste()
-    expect(() => app.get('/sem-acesso', async () => 'x')).toThrow(
+    ;({ app } = criarAppDeTeste())
+    const semAcesso = app
+    expect(() => semAcesso.get('/sem-acesso', async () => 'x')).toThrow(
       /GET \/sem-acesso nao declara acesso/,
     )
   })
 
   it('valor fora da lista tambem derruba', () => {
-    const { app } = criarAppDeTeste()
+    ;({ app } = criarAppDeTeste())
+    const errado = app
     const config = { acesso: 'admin' as never }
-    expect(() => app.get('/errado', { config }, async () => 'x')).toThrow(/nao declara acesso/)
+    expect(() => errado.get('/errado', { config }, async () => 'x')).toThrow(/nao declara acesso/)
   })
 
   it('dentro de um plugin, o boot inteiro falha', async () => {
-    const { app } = criarAppDeTeste()
+    ;({ app } = criarAppDeTeste())
     app.register(async (escopo) => {
       escopo.get('/esquecida', async () => 'x')
     })
@@ -24,10 +34,9 @@ describe('acesso por rota', () => {
   })
 
   it('rota declarada sobe e responde', async () => {
-    const { app } = criarAppDeTeste()
+    ;({ app } = criarAppDeTeste())
     app.get('/ok', { config: { acesso: 'sessao' } }, async () => ({ ok: true }))
     const resposta = await app.inject({ method: 'GET', url: '/ok' })
     expect(resposta.statusCode).toBe(200)
-    await app.close()
   })
 })
