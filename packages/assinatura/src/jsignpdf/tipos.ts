@@ -41,3 +41,20 @@ export interface PedidoDeSelagem {
   /** Padrão: 60 000 ms; estourou, o java leva SIGKILL. */
   timeoutMs?: number
 }
+
+export interface Ambiente {
+  /** Caminho do JSignPdf.jar. */
+  jar: string
+  /** Padrão: "java" no PATH. */
+  javaBin?: string
+  /** Quantas selagens ao mesmo tempo no criarSelador; vem de ASSINATURA_CONCORRENCIA. Padrão: 2. */
+  concorrencia?: number
+  /** Chamado com o pid do java assim que ele sobe (o teste lê /proc/<pid>/cmdline por aqui). */
+  aoIniciar?: (pid: number) => void
+}
+
+export interface ResultadoDaSelagem {
+  saida: Buffer
+  duracaoMs: number
+  stdout: string
+}
