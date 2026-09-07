@@ -34,7 +34,11 @@ export interface PedidoDeSelagem {
   contato: string
   /** Padrão: CERTIFIED_NO_CHANGES_ALLOWED. */
   nivel?: NivelDeCertificacao
-  /** true acrescenta a assinatura às que já existem em vez de substituir. */
+  /**
+   * true acrescenta a assinatura às que já existem em vez de substituir. Use com nivel
+   * NOT_CERTIFIED: um PDF já certificado com CERTIFIED_NO_CHANGES_ALLOWED não aceita outra
+   * assinatura, e o JSignPdf recusa a combinação.
+   */
   anexar?: boolean
   tsa?: CarimboDoTempo
   visivel?: AssinaturaVisivel
