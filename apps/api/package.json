@@ -6,11 +6,15 @@
   "scripts": {
     "dev": "tsx watch src/servidor.ts",
     "dev:worker": "tsx watch src/worker.ts",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && cp -r src/banco/migracoes dist/banco/migracoes",
     "start": "node dist/servidor.js",
     "start:worker": "node dist/worker.js",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "db:gerar": "drizzle-kit generate",
+    "db:migrar": "tsx src/banco/migrar.ts",
+    "db:studio": "drizzle-kit studio",
+    "db:push": "tsx src/banco/push.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.1127.0",
