@@ -97,6 +97,6 @@ pnpm verificar
 
 Uso interno permitido para qualquer empresa ou pessoa: você pode rodar, modificar e usar o AssineAi para assinar **os próprios documentos da sua organização**, com os seus próprios certificados.
 
-**Proibido**: vender, revender, oferecer como SaaS/API/white-label, ou cobrar (de qualquer forma) para assinar documentos de terceiros. Quem quiser fazer isso precisa de licença comercial separada.
+**Proibido**: vender, revender, oferecer como serviço a terceiros (SaaS, API ou com a marca de outra empresa) ou cobrar, de qualquer forma, para assinar documentos de terceiros. Quem quiser fazer isso precisa de uma licença comercial separada.
 
-Detalhes em [LICENSE](./LICENSE). Não é uma licença open source no sentido OSI (é *source-available*).
+O código fica aberto para ler e usar dentro de casa, mas não é open source: a licença é do tipo _source-available_. Detalhes em [LICENSE](./LICENSE).
