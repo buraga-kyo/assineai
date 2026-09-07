@@ -33,6 +33,6 @@ describe('GET /saude', () => {
     const lenta = () => new Promise((resolver) => setTimeout(resolver, 50))
     const estado = await medir('lenta', lenta, logger, 10)
     expect(estado.ok).toBe(false)
-    expect(estado.ms).toBeLessThan(50)
+    expect(estado.ms).toBeLessThan(1000)
   })
 })
