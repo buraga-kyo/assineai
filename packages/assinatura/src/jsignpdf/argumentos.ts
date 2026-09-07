@@ -39,3 +39,8 @@ export function montarArgumentosDeSelagem(
   args.push(caminhos.entrada)
   return args
 }
+
+/** Senhas que não podem aparecer em log: a do keystore e a do TSA. */
+export function segredosDoPedido(pedido: PedidoDeSelagem): string[] {
+  return [pedido.certificado.senha, pedido.tsa?.senha].filter((s): s is string => Boolean(s))
+}
