@@ -22,8 +22,10 @@ export const carimbos = {
 // set_config, current_setting devolve nulo (conexao nova) ou texto vazio
 // (conexao do pool que ja teve o valor numa transacao anterior); o nullif
 // cobre os dois e nenhuma linha passa.
+export const empresaDaSessao = sql`nullif(current_setting('app.empresa_id', true), '')::uuid`
+
 export function politicaDaEmpresa(tabela: string, empresaId: AnyPgColumn) {
-  const daEmpresa = sql`${empresaId} = nullif(current_setting('app.empresa_id', true), '')::uuid`
+  const daEmpresa = sql`${empresaId} = ${empresaDaSessao}`
   return pgPolicy(`${tabela}_da_empresa`, {
     for: 'all',
     to: assineaiApp,
