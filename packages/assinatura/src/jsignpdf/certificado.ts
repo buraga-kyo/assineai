@@ -1,6 +1,8 @@
 import { readFile } from 'node:fs/promises'
 import forge from 'node-forge'
-import { ErroCertificado } from './erros.js'
+import { ErroCertificado, resumirStderr } from './erros.js'
+import { comPastaTemporaria, gravarArgfile } from './pasta.js'
+import { TIMEOUT_PADRAO_MS, rodarJava } from './processo.js'
 
 export interface DadosDoCertificado {
   titular: string
@@ -45,4 +47,39 @@ export async function lerCertificadoPkcs12(
   const escolhido = (doPar ?? certificados[0])?.cert
   if (!escolhido) throw new ErroCertificado(`o arquivo "${arquivo}" não traz nenhum certificado`)
   return escolhido
+}
+
+export interface OpcoesDaVerificacao {
+  arquivo: string
+  senha: string
+  /** Se vier, precisa existir no keystore. */
+  alias?: string
+  jar: string
+  javaBin?: string
+  timeoutMs?: number
+  /** Só para teste: a data usada no cálculo do vencimento. */
+  agora?: Date
+}
+
+/** Confere que o JSignPdf abre o keystore listando os aliases com -lk -q (senha no argfile). */
+export function listarAliases(opcoes: OpcoesDaVerificacao): Promise<string[]> {
+  return comPastaTemporaria(async (pasta) => {
+    const chaves = ['-kst', 'PKCS12', '-ksf', opcoes.arquivo, '-ksp', opcoes.senha]
+    const argfile = await gravarArgfile(pasta, ['-jar', opcoes.jar, ...chaves, '-lk', '-q'])
+    const saida = await rodarJava({
+      javaBin: opcoes.javaBin ?? 'java',
+      argfile,
+      timeoutMs: opcoes.timeoutMs ?? TIMEOUT_PADRAO_MS,
+      segredos: [opcoes.senha],
+    })
+    if (saida.codigo !== 0) {
+      const motivo = resumirStderr(saida.stderr)
+      const mensagem = `o JSignPdf não abriu o certificado "${opcoes.arquivo}": ${motivo}`
+      throw new ErroCertificado(mensagem, { codigoDeSaida: saida.codigo, stderr: saida.stderr })
+    }
+    return saida.stdout
+      .split('\n')
+      .map((linha) => linha.trim())
+      .filter((linha) => linha !== '')
+  })
 }
