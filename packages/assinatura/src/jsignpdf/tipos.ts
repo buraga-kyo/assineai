@@ -1,0 +1,43 @@
+// Tipos públicos do wrapper. Nada aqui lê variável de ambiente: quem chama passa tudo.
+
+export type NivelDeCertificacao = 'CERTIFIED_NO_CHANGES_ALLOWED' | 'NOT_CERTIFIED'
+
+export interface Certificado {
+  /** Caminho do PKCS12 (.pfx ou .p12). */
+  arquivo: string
+  senha: string
+  /** Alias da chave dentro do keystore; sem ele o JSignPdf usa a primeira. */
+  alias?: string
+}
+
+export interface CarimboDoTempo {
+  url: string
+  usuario?: string
+  senha?: string
+}
+
+export interface AssinaturaVisivel {
+  pagina: number
+  llx: number
+  lly: number
+  urx: number
+  ury: number
+  /** Imagem do carimbo; com ela o modo passa a GRAPHIC_AND_DESCRIPTION. */
+  imagem?: string
+}
+
+export interface PedidoDeSelagem {
+  entrada: Buffer
+  certificado: Certificado
+  razao: string
+  local: string
+  contato: string
+  /** Padrão: CERTIFIED_NO_CHANGES_ALLOWED. */
+  nivel?: NivelDeCertificacao
+  /** true acrescenta a assinatura às que já existem em vez de substituir. */
+  anexar?: boolean
+  tsa?: CarimboDoTempo
+  visivel?: AssinaturaVisivel
+  /** Padrão: 60 000 ms; estourou, o java leva SIGKILL. */
+  timeoutMs?: number
+}
