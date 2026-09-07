@@ -62,4 +62,22 @@ describe.skipIf(!temCertificado)('selarPdf com o certificado de teste', () => {
     expect(contarMarca(primeira.saida, '/ByteRange')).toBe(1)
     expect(contarMarca(segunda.saida, '/ByteRange')).toBe(2)
   })
+  test('argfile com caminho com espaço e aspas, e razão com aspas e barra', async () => {
+    const pasta = await mkdtemp(join(tmpdir(), 'assinatura-teste-'))
+    const jarComEspaco = join(pasta, 'pasta com espaço e "aspas"', 'JSignPdf.jar')
+    await mkdir(dirname(jarComEspaco))
+    await symlink(jar, jarComEspaco)
+    try {
+      const razao = 'Prova "com aspas" e \\ barra marcador-9f3b'
+      const { saida } = await selarPdf(
+        { ...base, entrada: await gerarPdf(), razao },
+        { jar: jarComEspaco },
+      )
+      expect(contarMarca(saida, '/ByteRange')).toBe(1)
+      expect(saida.toString('latin1')).toContain('marcador-9f3b')
+      expect(saida.toString('latin1')).toContain('"com aspas"')
+    } finally {
+      await rm(pasta, { recursive: true, force: true })
+    }
+  })
 })
