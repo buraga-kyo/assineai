@@ -1,0 +1,39 @@
+# Compose de producao do AssineAi, so o pedaco desta issue: o Postgres e o
+# servico `migracao`, que aplica as migrations e sai. A api, o worker e o
+# caddy entram na issue de deploy; api e worker vao depender de
+# `migracao: condition: service_completed_successfully`, para nunca subirem
+# com esquema atrasado.
+#
+# Sobe com um .env de producao NAO versionado (docker compose --env-file):
+#   POSTGRES_SENHA       senha do superusuario postgres do container
+#   BANCO_URL_MIGRACAO   postgres://assineai_migracao:<senha>@postgres:5432/assineai
+#
+# Roles: infra/postgres-init/01-roles.sql roda uma vez, no primeiro boot do
+# volume, e cria assineai_migracao e assineai_app com as senhas DE
+# DESENVOLVIMENTO. Em producao as roles ganham senha propria logo depois do
+# primeiro boot (ALTER ROLE ... PASSWORD, com a senha que vai em
+# BANCO_URL_MIGRACAO e BANCO_URL) antes de abrir qualquer servico.
+name: assineai-prod
+
+services:
+  postgres:
+    image: postgis/postgis:18-3.6
+    restart: unless-stopped
+    # sem porta publicada: so os servicos desta rede falam com o banco
+    environment:
+      POSTGRES_DB: assineai
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_SENHA:?defina POSTGRES_SENHA no .env de producao}
+    volumes:
+      # a imagem do Postgres 18 guarda os dados em /var/lib/postgresql/18/docker
+      - postgres-dados:/var/lib/postgresql
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d assineai"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+volumes:
+  postgres-dados:
