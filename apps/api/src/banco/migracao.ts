@@ -20,17 +20,20 @@ export async function rodarMigracoes(url: string, log: Logger, pasta = PASTA_MIG
   try {
     const arquivos = readMigrationFiles({ migrationsFolder: pasta })
     const nomes = lerNomes(pasta)
-    const ultima = await ultimaAplicada(banco)
-    const pendentes = arquivos.filter((m) => m.folderMillis > ultima)
-    log.info({ total: arquivos.length, pendentes: pendentes.length }, 'migracoes lidas')
-    for (const m of arquivos) {
-      const passo = { migracao: nomes.get(m.folderMillis) ?? m.hash.slice(0, 12) }
-      if (m.folderMillis > ultima) log.info(passo, 'aplicando migracao')
-      else log.debug(passo, 'migracao ja aplicada')
-    }
+    const nome = (quando: number) => nomes.get(quando) ?? String(quando)
+    const antes = await ultimaAplicada(banco)
+    const pendentes = arquivos
+      .filter((m) => m.folderMillis > antes)
+      .map((m) => nome(m.folderMillis))
+    log.info({ total: arquivos.length, pendentes }, 'migracoes lidas')
     await migrate(banco, { migrationsFolder: pasta })
-    log.info({ aplicadas: pendentes.length }, 'migracoes concluidas')
-    return pendentes.length
+    // o que foi aplicado de fato e o que a tabela de controle ganhou
+    const depois = await ultimaAplicada(banco)
+    const aplicadas = arquivos
+      .filter((m) => m.folderMillis > antes && m.folderMillis <= depois)
+      .map((m) => nome(m.folderMillis))
+    log.info({ aplicadas }, 'migracoes concluidas')
+    return aplicadas.length
   } finally {
     await pool.end()
   }
