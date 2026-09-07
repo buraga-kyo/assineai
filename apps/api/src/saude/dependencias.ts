@@ -50,7 +50,16 @@ export function criarVerificacoes(config: Config, log: FastifyBaseLogger) {
     connectTimeout: LIMITE_MS,
     maxRetriesPerRequest: 1,
   })
-  redis.on('error', (erro) => log.debug({ err: erro }, 'redis indisponivel'))
+  // a primeira falha avisa em warn; as repetidas (o ioredis tenta de novo sem
+  // parar) ficam em debug para nao inundar o log; volta a avisar quando reconecta
+  let redisAvisou = false
+  redis.on('error', (erro) => {
+    log[redisAvisou ? 'debug' : 'warn']({ err: erro }, 'redis indisponivel')
+    redisAvisou = true
+  })
+  redis.on('ready', () => {
+    redisAvisou = false
+  })
   const storage = new S3Client({
     endpoint: config.ARMAZENAMENTO_ENDPOINT,
     region: config.ARMAZENAMENTO_REGIAO,
