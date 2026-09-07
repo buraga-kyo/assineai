@@ -31,7 +31,8 @@ export function carregarConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const resultado = esquema.safeParse(env)
   if (resultado.success) return resultado.data
   const problemas = resultado.error.issues.map((problema) => {
-    const nome = String(problema.path[0])
+    const nome = problema.path[0]
+    if (typeof nome !== 'string') return `o ambiente esta invalido: ${problema.message}`
     return env[nome] === undefined
       ? `faltou a variavel ${nome}`
       : `a variavel ${nome} esta invalida: ${problema.message}`
