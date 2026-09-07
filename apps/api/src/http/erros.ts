@@ -27,3 +27,42 @@ export function responderNaoEncontrado(_request: FastifyRequest, reply: FastifyR
     .code(404)
     .send({ erro: { codigo: 'nao_encontrado', mensagem: 'rota nao encontrada' } })
 }
+
+const CODIGO_POR_STATUS: Record<number, string> = {
+  400: 'requisicao_invalida',
+  401: 'nao_autenticado',
+  403: 'sem_permissao',
+  404: 'nao_encontrado',
+  413: 'corpo_grande_demais',
+  415: 'tipo_nao_aceito',
+  429: 'muitas_requisicoes',
+}
+
+function statusDoErro(erro: unknown): number {
+  const status = (erro as Partial<FastifyError> | null)?.statusCode
+  return typeof status === 'number' && status >= 400 && status <= 599 ? status : 500
+}
+
+export function tratarErro(erro: unknown, request: FastifyRequest, reply: FastifyReply) {
+  if (hasZodFastifySchemaValidationErrors(erro)) {
+    const detalhes = erro.validation.map((falha) => ({
+      campo: `${erro.validationContext ?? ''}${falha.instancePath}`,
+      mensagem: falha.message,
+    }))
+    const mensagem = 'os dados enviados nao passaram na validacao'
+    return reply.code(400).send({ erro: { codigo: 'dados_invalidos', mensagem, detalhes } })
+  }
+  if (erro instanceof ErroDaApi) {
+    const { codigo, message: mensagem, detalhes } = erro
+    return reply.code(erro.status).send({ erro: { codigo, mensagem, detalhes } })
+  }
+  const status = statusDoErro(erro)
+  if (status < 500) {
+    // erro do proprio fastify: json quebrado, corpo grande demais, tipo nao aceito
+    const mensagem = erro instanceof Error ? erro.message : 'requisicao invalida'
+    const codigo = CODIGO_POR_STATUS[status] ?? `erro_${status}`
+    return reply.code(status).send({ erro: { codigo, mensagem } })
+  }
+  request.log.error({ err: erro }, 'erro interno')
+  return reply.code(500).send({ erro: { codigo: 'erro_interno', mensagem: 'erro interno' } })
+}
