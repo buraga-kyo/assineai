@@ -1,12 +1,14 @@
 // Testes contra o Postgres de dev (bash infra/dev.sh up). Precisam de
 // BANCO_URL e BANCO_URL_MIGRACAO no ambiente; sem elas sao pulados.
-import { sql } from 'drizzle-orm'
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
+import { eq, sql } from 'drizzle-orm'
 import { afterAll, beforeAll, describe, expect, test } from 'vitest'
 import { criarBanco } from '../src/banco/conexao.js'
 import { empresa, usuario } from '../src/banco/esquema/index.js'
 import { rodarMigracoes } from '../src/banco/migracao.js'
 import { capturarLog } from './apoio.js'
-import { BANCO_URL, BANCO_URL_MIGRACAO, temBanco } from './config.js'
+import { ambiente, BANCO_URL, BANCO_URL_MIGRACAO, temBanco } from './config.js'
 
 const rodada = `teste-${Date.now()}`
 const dona = criarBanco(BANCO_URL_MIGRACAO ?? '')
@@ -82,4 +84,26 @@ describe.skipIf(!temBanco)('banco', () => {
     })
   })
 
+  test('update muda atualizado_em pelo trigger', async () => {
+    const [antes] = await dona.bancoSistema.select().from(empresa).where(eq(empresa.id, empresaA))
+    await new Promise((r) => setTimeout(r, 10))
+    const [depois] = await dona.bancoSistema
+      .update(empresa)
+      .set({ nome: 'Empresa A2' })
+      .where(eq(empresa.id, empresaA))
+      .returning()
+    expect(depois!.atualizadoEm.getTime()).toBeGreaterThan(antes!.atualizadoEm.getTime())
+    expect(depois!.criadoEm).toEqual(antes!.criadoEm)
+  })
+})
+
+test('db:push com NODE_ENV=production recusa com codigo 1', async () => {
+  const rodar = promisify(execFile)
+  const tentativa = rodar('node_modules/.bin/tsx', ['src/banco/push.ts'], {
+    env: { ...ambiente, NODE_ENV: 'production', BANCO_URL_MIGRACAO: 'postgres://x@localhost/x' },
+  })
+  await expect(tentativa).rejects.toMatchObject({
+    code: 1,
+    stderr: expect.stringContaining('db:push nao roda em producao; use db:migrar'),
+  })
 })
