@@ -29,3 +29,18 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm verificar
+
+  segredos:
+    name: segredo no código
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write # o gitleaks comenta no PR a linha do achado
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # histórico inteiro, para varrer só os commits do PR
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
