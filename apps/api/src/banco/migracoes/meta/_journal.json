@@ -36,6 +36,13 @@
       "when": 1788782153750,
       "tag": "0004_empresa_rls",
       "breakpoints": false
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788782187319,
+      "tag": "0005_sessao_fk_composta",
+      "breakpoints": false
     }
   ]
 }
