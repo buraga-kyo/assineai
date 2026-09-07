@@ -15,6 +15,10 @@
     "format:check": "prettier --check .",
     "test": "pnpm -r --if-present test",
     "verificar": "pnpm typecheck && pnpm lint && pnpm test && pnpm audit --prod",
+    "db:gerar": "pnpm --filter @assineai/api db:gerar",
+    "db:migrar": "pnpm --filter @assineai/api db:migrar",
+    "db:studio": "pnpm --filter @assineai/api db:studio",
+    "db:push": "pnpm --filter @assineai/api db:push",
     "infra:up": "bash infra/dev.sh up",
     "infra:down": "bash infra/dev.sh down"
   },

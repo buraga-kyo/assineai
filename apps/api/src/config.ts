@@ -9,6 +9,8 @@ const esquema = z.object({
   PORTA_API: z.coerce.number().int().positive().default(3000),
   LOG_NIVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
   BANCO_URL: z.url(),
+  // opcional na api: so o script de migracao precisa dela (ver esquemaMigracao)
+  BANCO_URL_MIGRACAO: z.url().optional(),
   REDIS_URL: z.url(),
   ARMAZENAMENTO_ENDPOINT: z.url(),
   ARMAZENAMENTO_REGIAO: z.string().min(1),
@@ -20,6 +22,14 @@ const esquema = z.object({
 
 export type Config = z.infer<typeof esquema>
 
+// O que o script de migracao (e o drizzle-kit) precisa: so a URL da role dona
+// e o basico do logger. O container de migracao nao recebe redis nem storage.
+const esquemaMigracao = esquema.pick({ NODE_ENV: true, LOG_NIVEL: true }).extend({
+  BANCO_URL_MIGRACAO: z.url(),
+})
+
+export type ConfigDeMigracao = z.infer<typeof esquemaMigracao>
+
 export class ErroDeConfig extends Error {
   constructor(readonly problemas: string[]) {
     super(problemas.join('\n'))
@@ -28,6 +38,14 @@ export class ErroDeConfig extends Error {
 }
 
 export function carregarConfig(env: NodeJS.ProcessEnv = process.env): Config {
+  return validar(esquema, env)
+}
+
+export function carregarConfigDeMigracao(env: NodeJS.ProcessEnv = process.env): ConfigDeMigracao {
+  return validar(esquemaMigracao, env)
+}
+
+function validar<T>(esquema: z.ZodType<T>, env: NodeJS.ProcessEnv): T {
   const resultado = esquema.safeParse(env)
   if (resultado.success) return resultado.data
   const problemas = resultado.error.issues.map((problema) => {
@@ -56,16 +74,32 @@ export function acharArquivoEnv(inicio = process.cwd()): string | undefined {
   return pastas.map((p) => join(p, '.env')).find((arquivo) => existsSync(arquivo))
 }
 
+// So o ambiente, sem exigir o resto: para scripts que decidem se podem rodar
+// antes de pedir qualquer credencial (db:push).
+export function emProducao(): boolean {
+  const arquivo = acharArquivoEnv()
+  if (arquivo) process.loadEnvFile(arquivo)
+  return process.env.NODE_ENV === 'production'
+}
+
 // Para os pontos de entrada: carrega o .env se houver (o ambiente real ganha
 // do arquivo), valida e sai com codigo 1 se algo faltar.
 export function carregarConfigOuSair(): Config {
+  return carregarOuSair(carregarConfig, 'a api nao subiu')
+}
+
+export function carregarConfigDeMigracaoOuSair(): ConfigDeMigracao {
+  return carregarOuSair(carregarConfigDeMigracao, 'a migracao nao rodou')
+}
+
+function carregarOuSair<T>(carregar: (env: NodeJS.ProcessEnv) => T, quem: string): T {
   const arquivo = acharArquivoEnv()
   if (arquivo) process.loadEnvFile(arquivo)
   try {
-    return carregarConfig()
+    return carregar(process.env)
   } catch (erro) {
     if (!(erro instanceof ErroDeConfig)) throw erro
-    process.stderr.write(`a api nao subiu, a configuracao esta incompleta:\n${erro.message}\n`)
+    process.stderr.write(`${quem}, a configuracao esta incompleta:\n${erro.message}\n`)
     process.stderr.write('confira o .env na raiz do repositorio (modelo em .env.example)\n')
     process.exit(1)
   }

@@ -9,3 +9,5 @@ Arquivos/
 design/
 infra/
 docs/
+# sql e snapshots gerados pelo drizzle-kit
+apps/api/src/banco/migracoes/
