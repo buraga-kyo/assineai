@@ -111,6 +111,12 @@ describe.skipIf(!temBanco)('banco', () => {
     expect(b).toBeDefined()
   })
 
+  test('comoEmpresa recusa o que nao e uuid antes de abrir transacao', async () => {
+    await expect(app.comoEmpresa('abc', async () => 1)).rejects.toThrow(
+      new TypeError('comoEmpresa precisa do uuid da empresa, recebeu "abc"'),
+    )
+  })
+
   test('update muda atualizado_em pelo trigger', async () => {
     const [antes] = await dona.bancoSistema.select().from(empresa).where(eq(empresa.id, empresaA))
     await new Promise((r) => setTimeout(r, 10))
@@ -124,10 +130,14 @@ describe.skipIf(!temBanco)('banco', () => {
   })
 })
 
-test('db:push com NODE_ENV=production recusa com codigo 1', async () => {
+test('db:push com NODE_ENV=production recusa com codigo 1, mesmo sem a url do banco', async () => {
   const rodar = promisify(execFile)
+  // sem BANCO_URL_MIGRACAO de proposito: a recusa tem que vir antes de pedir credencial
+  const semUrl = Object.fromEntries(
+    Object.entries(ambiente).filter(([nome]) => nome !== 'BANCO_URL_MIGRACAO'),
+  )
   const tentativa = rodar('node_modules/.bin/tsx', ['src/banco/push.ts'], {
-    env: { ...ambiente, NODE_ENV: 'production', BANCO_URL_MIGRACAO: 'postgres://x@localhost/x' },
+    env: { ...semUrl, NODE_ENV: 'production' },
   })
   await expect(tentativa).rejects.toMatchObject({
     code: 1,
