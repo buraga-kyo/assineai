@@ -67,6 +67,16 @@ Na raiz do repositório:
 
 Por enquanto não há servidor para subir: `pnpm dev` não faz nada até a API chegar. Portas, usuários e como zerar o banco estão em `infra/README.md`.
 
+## Antes de abrir um PR
+
+Rode na raiz:
+
+```bash
+pnpm verificar
+```
+
+É a soma de `pnpm typecheck`, `pnpm lint`, `pnpm test` e `pnpm audit --prod`. Para conferir o formato, `pnpm format:check`; para arrumar, `pnpm format`. O mesmo `verificar` roda no GitHub em todo PR e em todo push na main, junto com uma busca por segredo no código e por dependência com falha conhecida. O resultado é aviso: fica vermelho no PR, mas não trava o merge.
+
 ## Licença
 
 Uso interno permitido para qualquer empresa ou pessoa: você pode rodar, modificar e usar o AssineAi para assinar **os próprios documentos da sua organização**, com os seus próprios certificados.
