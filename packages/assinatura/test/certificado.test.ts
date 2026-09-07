@@ -1,5 +1,10 @@
 import { describe, expect, test } from 'vitest'
-import { ErroCertificado, calcularVencimento, verificarCertificado } from '../src/index.js'
+import {
+  ErroCertificado,
+  calcularVencimento,
+  lerCertificadoPkcs12,
+  verificarCertificado,
+} from '../src/index.js'
 import { certificadoDeTeste, jar, temCertificado } from './apoio/config.js'
 
 const DIA_MS = 86_400_000
@@ -33,6 +38,16 @@ describe('calcularVencimento', () => {
   })
 })
 
+describe('lerCertificadoPkcs12', () => {
+  test('arquivo que não abre vira ErroCertificado sem a senha e sem cause', async () => {
+    const erro = await lerCertificadoPkcs12('/nao/existe.pfx', 'segredo-x').catch((e: unknown) => e)
+    expect(erro).toBeInstanceOf(ErroCertificado)
+    expect((erro as Error).message).toContain('/nao/existe.pfx')
+    expect((erro as Error).message).not.toContain('segredo-x')
+    expect((erro as Error).cause).toBeUndefined()
+  })
+})
+
 describe.skipIf(!temCertificado)('verificarCertificado com o certificado de teste', () => {
   const certificado = certificadoDeTeste ?? { arquivo: '', senha: '' }
   test('devolve titular, validade, alerta coerente e os aliases do jsignpdf', async () => {
@@ -55,6 +70,7 @@ describe.skipIf(!temCertificado)('verificarCertificado com o certificado de test
     const erro = await verificarCertificado(opcoes).catch((e: unknown) => e)
     expect(erro).toBeInstanceOf(ErroCertificado)
     expect((erro as Error).message).not.toContain(senhaErrada)
+    expect((erro as Error).cause).toBeUndefined()
     const alias = await verificarCertificado({ ...certificado, alias: 'nao-existe', jar }).catch(
       (e: unknown) => e,
     )

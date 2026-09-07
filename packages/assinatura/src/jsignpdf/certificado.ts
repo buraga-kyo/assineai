@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import forge from 'node-forge'
-import { ErroCertificado, resumirStderr } from './erros.js'
+import { ErroCertificado, redigir, resumirStderr } from './erros.js'
 import { comPastaTemporaria, gravarArgfile } from './pasta.js'
 import { TIMEOUT_PADRAO_MS, rodarJava } from './processo.js'
 
@@ -37,8 +37,9 @@ export async function lerCertificadoPkcs12(
     const bytes = await readFile(arquivo)
     p12 = forge.pkcs12.pkcs12FromAsn1(forge.asn1.fromDer(bytes.toString('binary')), false, senha)
   } catch (causa) {
-    const motivo = causa instanceof Error ? causa.message : String(causa)
-    throw new ErroCertificado(`não deu para abrir o certificado "${arquivo}": ${motivo}`, { causa })
+    // A mensagem do node-forge passa por redigir e a causa fica de fora: logger serializa a cadeia de cause.
+    const motivo = redigir(causa instanceof Error ? causa.message : String(causa), senha)
+    throw new ErroCertificado(`não deu para abrir o certificado "${arquivo}": ${motivo}`)
   }
   const chave = p12.getBags({ bagType: BOLSA_CHAVE })[BOLSA_CHAVE]?.[0]
   const idDaChave: unknown = chave?.attributes?.localKeyId?.[0]
