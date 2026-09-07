@@ -1,6 +1,15 @@
 // Sessao de login: guarda so o hash do token (bytea), quem e de que empresa,
 // validade, ultimo uso e revogacao. Apagar o usuario apaga as sessoes dele.
-import { customType, index, pgTable, text, timestamp, uuid, inet } from 'drizzle-orm/pg-core'
+import {
+  customType,
+  foreignKey,
+  index,
+  inet,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core'
 import { carimbos, id, politicaDaEmpresa } from './comum.js'
 import { empresa } from './empresa.js'
 import { usuario } from './usuario.js'
@@ -26,5 +35,15 @@ export const sessao = pgTable(
     revogadaEm: timestamp('revogada_em', { withTimezone: true }),
     ...carimbos,
   },
-  (t) => [index('sessao_usuario_id_idx').on(t.usuarioId), politicaDaEmpresa('sessao', t.empresaId)],
+  (t) => [
+    index('sessao_usuario_id_idx').on(t.usuarioId),
+    // defesa em profundidade: mesmo com a RLS, uma sessao nao consegue apontar
+    // para usuario de outra empresa
+    foreignKey({
+      name: 'sessao_usuario_da_empresa_fk',
+      columns: [t.empresaId, t.usuarioId],
+      foreignColumns: [usuario.empresaId, usuario.id],
+    }),
+    politicaDaEmpresa('sessao', t.empresaId),
+  ],
 ).enableRLS()
