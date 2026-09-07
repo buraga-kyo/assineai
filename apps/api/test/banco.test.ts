@@ -84,6 +84,33 @@ describe.skipIf(!temBanco)('banco', () => {
     })
   })
 
+  test('a app le qualquer empresa mesmo sem tenant', async () => {
+    const slugs = await app.bancoSistema
+      .select({ slug: empresa.slug })
+      .from(empresa)
+      .where(sql`${empresa.slug} like ${`${rodada}-%`}`)
+    expect(slugs.map((e) => e.slug).sort()).toEqual([`${rodada}-a`, `${rodada}-b`])
+  })
+
+  test('dentro de A, alterar a empresa B nao pega linha nenhuma', async () => {
+    const alteradas = await app.comoEmpresa(empresaA, (banco) =>
+      banco.update(empresa).set({ nome: 'invadida' }).where(eq(empresa.id, empresaB)).returning(),
+    )
+    expect(alteradas).toEqual([])
+    const [b] = await dona.bancoSistema.select().from(empresa).where(eq(empresa.id, empresaB))
+    expect(b!.nome).toBe('Empresa b')
+  })
+
+  test('a app nao apaga empresa: sem politica de DELETE, zero linhas', async () => {
+    const apagadas = await app.bancoSistema
+      .delete(empresa)
+      .where(eq(empresa.id, empresaB))
+      .returning()
+    expect(apagadas).toEqual([])
+    const [b] = await dona.bancoSistema.select().from(empresa).where(eq(empresa.id, empresaB))
+    expect(b).toBeDefined()
+  })
+
   test('update muda atualizado_em pelo trigger', async () => {
     const [antes] = await dona.bancoSistema.select().from(empresa).where(eq(empresa.id, empresaA))
     await new Promise((r) => setTimeout(r, 10))
