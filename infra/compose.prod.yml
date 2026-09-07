@@ -35,5 +35,21 @@ services:
       retries: 12
       start_period: 10s
 
+  # Roda `node apps/api/dist/banco/migrar.js` e sai com 0 (Exited 0 e o normal).
+  migracao:
+    build:
+      context: ..
+      dockerfile: infra/docker/api.Dockerfile
+      target: migracao
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      LOG_NIVEL: info
+      BANCO_URL_MIGRACAO: ${BANCO_URL_MIGRACAO:?defina BANCO_URL_MIGRACAO no .env de producao}
+    command: ["node", "apps/api/dist/banco/migrar.js"]
+
 volumes:
   postgres-dados:
