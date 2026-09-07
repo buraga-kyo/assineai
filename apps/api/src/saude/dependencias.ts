@@ -1,7 +1,11 @@
 // As tres checagens da rota /saude: banco (select 1 pelo pg), redis (ping) e
 // storage (HeadBucket no S3). Cada uma tem 2 s para responder; o resultado
 // diz se passou e quanto demorou. O motivo da falha fica so no log.
+import { HeadBucketCommand, S3Client } from '@aws-sdk/client-s3'
 import type { FastifyBaseLogger } from 'fastify'
+import { Redis } from 'ioredis'
+import { Pool } from 'pg'
+import type { Config } from '../config.js'
 
 export type Estado = { ok: boolean; ms: number }
 export type Verificacao = () => Promise<unknown>
@@ -30,4 +34,43 @@ export async function medir(
   } finally {
     clearTimeout(temporizador)
   }
+}
+
+// Clientes de verdade, um por dependencia, criados uma vez no boot. Nenhum
+// tenta reconectar sem parar: a checagem que falhou responde rapido.
+export function criarVerificacoes(config: Config, log: FastifyBaseLogger) {
+  const banco = new Pool({
+    connectionString: config.BANCO_URL,
+    max: 1,
+    connectionTimeoutMillis: LIMITE_MS,
+  })
+  banco.on('error', (erro) => log.warn({ err: erro }, 'conexao ociosa do banco caiu'))
+  const redis = new Redis(config.REDIS_URL, {
+    lazyConnect: true,
+    connectTimeout: LIMITE_MS,
+    maxRetriesPerRequest: 1,
+  })
+  redis.on('error', (erro) => log.debug({ err: erro }, 'redis indisponivel'))
+  const storage = new S3Client({
+    endpoint: config.ARMAZENAMENTO_ENDPOINT,
+    region: config.ARMAZENAMENTO_REGIAO,
+    forcePathStyle: config.ARMAZENAMENTO_CAMINHO_FORCADO,
+    credentials: {
+      accessKeyId: config.ARMAZENAMENTO_CHAVE,
+      secretAccessKey: config.ARMAZENAMENTO_SEGREDO,
+    },
+    maxAttempts: 1,
+    requestHandler: { requestTimeout: LIMITE_MS, connectionTimeout: LIMITE_MS },
+  })
+  const verificacoes: Verificacoes = {
+    banco: () => banco.query('select 1'),
+    redis: () => redis.ping(),
+    storage: () => storage.send(new HeadBucketCommand({ Bucket: config.ARMAZENAMENTO_BUCKET })),
+  }
+  const fechar = async () => {
+    redis.disconnect()
+    storage.destroy()
+    await banco.end()
+  }
+  return { verificacoes, fechar }
 }
