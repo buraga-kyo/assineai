@@ -35,4 +35,31 @@ describe.skipIf(!temCertificado)('selarPdf com o certificado de teste', () => {
     expect(argv[3]?.endsWith('/args.txt')).toBe(true)
     expect(argv.join(' ')).not.toContain(certificado.senha)
   })
+  test('senha errada vira ErroSelagemJSignPdf sem a senha na mensagem nem no stderr', async () => {
+    const senhaErrada = 'senha-errada-7f2a'
+    const pedido = {
+      ...base,
+      entrada: await gerarPdf(),
+      certificado: { ...certificado, senha: senhaErrada },
+    }
+    const erro = await selarPdf(pedido, { jar }).catch((e: unknown) => e)
+    expect(erro).toBeInstanceOf(ErroSelagemJSignPdf)
+    const { message, stderr, codigoDeSaida } = erro as ErroSelagemJSignPdf
+    expect(codigoDeSaida).toBe(4)
+    expect(message).toContain('keystore password was incorrect')
+    expect(message).not.toContain(senhaErrada)
+    expect(stderr).not.toContain(senhaErrada)
+  })
+  test('anexar: true sela por cima e o PDF fica com duas assinaturas', async () => {
+    const primeira = await selarPdf({ ...base, entrada: await gerarPdf() }, { jar })
+    const pedido = {
+      ...base,
+      entrada: primeira.saida,
+      anexar: true,
+      nivel: 'NOT_CERTIFIED' as const,
+    }
+    const segunda = await selarPdf(pedido, { jar })
+    expect(contarMarca(primeira.saida, '/ByteRange')).toBe(1)
+    expect(contarMarca(segunda.saida, '/ByteRange')).toBe(2)
+  })
 })
