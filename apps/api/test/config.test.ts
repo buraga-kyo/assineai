@@ -1,5 +1,8 @@
-import { describe, expect, it } from 'vitest'
-import { carregarConfig, ErroDeConfig } from '../src/config.js'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { afterAll, describe, expect, it } from 'vitest'
+import { acharArquivoEnv, carregarConfig, ErroDeConfig } from '../src/config.js'
 
 const completo: Record<string, string> = {
   BANCO_URL: 'postgres://assineai_app:app_dev@localhost:5432/assineai',
@@ -40,5 +43,33 @@ describe('carregarConfig', () => {
     })
     expect(config.PORTA_API).toBe(4000)
     expect(config.ARMAZENAMENTO_CAMINHO_FORCADO).toBe(false)
+  })
+})
+
+describe('acharArquivoEnv', () => {
+  const pastas: string[] = []
+  const pastaTemporaria = (nome: string) => {
+    const pasta = mkdtempSync(join(tmpdir(), nome))
+    pastas.push(pasta)
+    return pasta
+  }
+  afterAll(() => pastas.forEach((pasta) => rmSync(pasta, { recursive: true, force: true })))
+
+  it('sobe ate a raiz do monorepo e acha o .env de la', () => {
+    const raiz = pastaTemporaria('assineai-raiz-')
+    writeFileSync(join(raiz, 'pnpm-workspace.yaml'), '')
+    writeFileSync(join(raiz, '.env'), '')
+    const fundo = join(raiz, 'apps', 'api')
+    mkdirSync(fundo, { recursive: true })
+    expect(acharArquivoEnv(fundo)).toBe(join(raiz, '.env'))
+  })
+
+  it('sem pnpm-workspace.yaml acima, nao sai da pasta', () => {
+    const solta = pastaTemporaria('assineai-solta-')
+    writeFileSync(join(solta, '.env'), '')
+    const fundo = join(solta, 'x', 'y')
+    mkdirSync(fundo, { recursive: true })
+    expect(acharArquivoEnv(fundo)).toBeUndefined()
+    expect(acharArquivoEnv(solta)).toBe(join(solta, '.env'))
   })
 })
