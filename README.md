@@ -77,6 +77,22 @@ pnpm verificar
 
 É a soma de `pnpm typecheck`, `pnpm lint`, `pnpm test` e `pnpm audit --prod`. Para conferir o formato, `pnpm format:check`; para arrumar, `pnpm format`. O mesmo `verificar` roda no GitHub em todo PR e em todo push na main, junto com uma busca por segredo no código e por dependência com falha conhecida. O resultado é aviso: fica vermelho no PR, mas não trava o merge.
 
+## Mapa do repositório
+
+| Pasta                 | O que mora ali                                                                          |
+| --------------------- | --------------------------------------------------------------------------------------- |
+| `apps/api`            | a API: o servidor e o worker que processa as filas; em construção                       |
+| `apps/web`            | o app web; ainda vazio                                                                  |
+| `packages/ui`         | componentes de tela compartilhados; ainda vazio                                         |
+| `packages/assinatura` | o selo digital dos PDFs, com o JSignPdf em Java; em construção                          |
+| `packages/modelos`    | os modelos de documento por profissão; ainda vazio                                      |
+| `packages/config`     | tsconfig, eslint e prettier que todos os pacotes usam                                   |
+| `infra/`              | o docker compose e o script da infra de desenvolvimento (`infra/README.md`)             |
+| `design/`             | as três direções visuais em HTML, para escolher pelo olho (`design/direcoes/README.md`) |
+| `legado/`             | o código antigo, congelado; a tag `legado-v0` marca como estava antes da reescrita      |
+| `Arquivos/`           | JSignPdf.jar e outros arquivos fixos que o código antigo usava                          |
+| `.github/`            | o fluxo que roda a verificação em todo PR                                               |
+
 ## Licença
 
 Uso interno permitido para qualquer empresa ou pessoa: você pode rodar, modificar e usar o AssineAi para assinar **os próprios documentos da sua organização**, com os seus próprios certificados.
