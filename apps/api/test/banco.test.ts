@@ -111,12 +111,6 @@ describe.skipIf(!temBanco)('banco', () => {
     expect(b).toBeDefined()
   })
 
-  test('comoEmpresa recusa o que nao e uuid antes de abrir transacao', async () => {
-    await expect(app.comoEmpresa('abc', async () => 1)).rejects.toThrow(
-      new TypeError('comoEmpresa precisa do uuid da empresa, recebeu "abc"'),
-    )
-  })
-
   test('update muda atualizado_em pelo trigger', async () => {
     const [antes] = await dona.bancoSistema.select().from(empresa).where(eq(empresa.id, empresaA))
     await new Promise((r) => setTimeout(r, 10))
@@ -128,6 +122,13 @@ describe.skipIf(!temBanco)('banco', () => {
     expect(depois!.atualizadoEm.getTime()).toBeGreaterThan(antes!.atualizadoEm.getTime())
     expect(depois!.criadoEm).toEqual(antes!.criadoEm)
   })
+})
+
+// nao precisa de banco: a recusa vem antes de abrir qualquer conexao
+test('comoEmpresa recusa o que nao e uuid antes de abrir transacao', async () => {
+  await expect(app.comoEmpresa('abc', async () => 1)).rejects.toThrow(
+    new TypeError('comoEmpresa precisa do uuid da empresa, recebeu "abc"'),
+  )
 })
 
 test('db:push com NODE_ENV=production recusa com codigo 1, mesmo sem a url do banco', async () => {
