@@ -74,6 +74,14 @@ export function acharArquivoEnv(inicio = process.cwd()): string | undefined {
   return pastas.map((p) => join(p, '.env')).find((arquivo) => existsSync(arquivo))
 }
 
+// So o ambiente, sem exigir o resto: para scripts que decidem se podem rodar
+// antes de pedir qualquer credencial (db:push).
+export function emProducao(): boolean {
+  const arquivo = acharArquivoEnv()
+  if (arquivo) process.loadEnvFile(arquivo)
+  return process.env.NODE_ENV === 'production'
+}
+
 // Para os pontos de entrada: carrega o .env se houver (o ambiente real ganha
 // do arquivo), valida e sai com codigo 1 se algo faltar.
 export function carregarConfigOuSair(): Config {
