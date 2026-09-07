@@ -13,7 +13,8 @@ describe('criarLogger', () => {
     logger.info(
       {
         senha: 'RAIZ1',
-        body: { codigo: 'COD1', dados: { token: 'TOK1', credenciais: 'CRED1' } },
+        body: { codigo_otp: 'COD1', dados: { token: 'TOK1', credenciais: 'CRED1' } },
+        erro: { codigo: 'nao_encontrado' },
         conta: { credenciais_cifradas: 'CIF1' },
       },
       'campos',
@@ -24,6 +25,8 @@ describe('criarLogger', () => {
     }
     expect(saida).toContain('[oculto]')
     expect(saida).toContain('curl')
+    // codigo (de erro, publico) nao e segredo: so codigo_otp sai redigido
+    expect(saida).toContain('nao_encontrado')
   })
 
   it('nao escreve abaixo do nivel', () => {

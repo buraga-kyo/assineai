@@ -1,10 +1,14 @@
 // Logger pino da api. O redact esconde cookie, authorization e qualquer campo
-// de senha, codigo, token ou credenciais ate dois niveis de profundidade; o
-// pino nao tem curinga profundo, por isso os tres formatos de cada chave.
+// de senha, codigo_otp, token ou credenciais ate dois niveis de profundidade;
+// o pino nao tem curinga profundo, por isso os tres formatos de cada chave.
+//
+// Convencao do repositorio: o codigo de 6 digitos em texto claro so viaja em
+// campos chamados `codigo_otp`. `codigo` fica livre para codigo de erro
+// ({ erro: { codigo } }) e identificador publico, e sai legivel no log.
 import { pino, type DestinationStream, type Logger } from 'pino'
 import type { Config } from './config.js'
 
-const CHAVES_SECRETAS = ['senha', 'codigo', 'token', 'credenciais', 'credenciais_cifradas']
+const CHAVES_SECRETAS = ['senha', 'codigo_otp', 'token', 'credenciais', 'credenciais_cifradas']
 
 export const CAMINHOS_OCULTOS = [
   'req.headers.cookie',
