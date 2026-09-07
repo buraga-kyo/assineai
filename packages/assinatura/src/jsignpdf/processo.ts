@@ -30,16 +30,24 @@ export function rodarJava(opcoes: OpcoesDoJava): Promise<SaidaDoJava> {
     })
     let stdout = ''
     let stderr = ''
+    let encerrado = false
     const limpar = (texto: string) => redigir(texto, opcoes.segredos)
+    // Resolve ou rejeita uma vez só: error e close podem chegar os dois (java que não existe).
+    const encerrar = (fim: () => void) => {
+      if (encerrado) return
+      encerrado = true
+      fim()
+    }
     processo.stdout.setEncoding('utf8').on('data', (pedaco: string) => (stdout += pedaco))
     processo.stderr.setEncoding('utf8').on('data', (pedaco: string) => (stderr += pedaco))
     processo.on('error', (erro) => {
       const mensagem = `não deu para rodar o java em "${opcoes.javaBin}": ${erro.message}`
-      rejeitar(new ErroJavaIndisponivel(mensagem, { causa: erro }))
+      encerrar(() => rejeitar(new ErroJavaIndisponivel(mensagem, { causa: erro })))
     })
     processo.on('close', (codigo, sinal) => {
       const duracaoMs = Date.now() - inicio
-      resolver({ codigo, sinal, stdout: limpar(stdout), stderr: limpar(stderr), duracaoMs })
+      const saida = { codigo, sinal, stdout: limpar(stdout), stderr: limpar(stderr), duracaoMs }
+      encerrar(() => resolver(saida))
     })
     if (processo.pid !== undefined) opcoes.aoIniciar?.(processo.pid)
   })
