@@ -9,7 +9,7 @@ import {
   ErroTimeoutJSignPdf,
   selarPdf,
 } from '../src/index.js'
-import { jar } from './apoio/config.js'
+import { ehLinux, jar } from './apoio/config.js'
 import { capturarLinhaDeComando, type Captura } from './apoio/processo.js'
 
 // Nada aqui precisa de java nem de certificado: o "java" é um script que dorme, ou não existe.
@@ -20,6 +20,7 @@ const pedido = {
   local: '',
   contato: '',
 }
+const testeLinux = test.skipIf(!ehLinux)
 let pasta: string
 let javaLento: string
 let javaComNeto: string
@@ -52,7 +53,7 @@ async function selarComTimeout(javaBin: string) {
 }
 
 describe('selarPdf sem java de verdade', () => {
-  test('java que dorme estoura o timeout, leva SIGKILL e a pasta some', async () => {
+  testeLinux('java que dorme estoura o timeout, leva SIGKILL e a pasta some', async () => {
     const { erro, levou, pasta } = await selarComTimeout(javaLento)
     expect(levou).toBeLessThan(2000)
     expect(erro).toBeInstanceOf(ErroTimeoutJSignPdf)
@@ -60,7 +61,7 @@ describe('selarPdf sem java de verdade', () => {
     expect(pasta).toBeDefined()
     expect(existsSync(pasta ?? '')).toBe(false)
   })
-  test('neto segurando o stdout não trava o timeout nem deixa a pasta', async () => {
+  testeLinux('neto segurando o stdout não trava o timeout nem deixa a pasta', async () => {
     const { erro, levou, pasta } = await selarComTimeout(javaComNeto)
     expect(levou).toBeLessThan(2000)
     expect(erro).toBeInstanceOf(ErroTimeoutJSignPdf)

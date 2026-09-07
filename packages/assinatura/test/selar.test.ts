@@ -4,15 +4,16 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { describe, expect, test } from 'vitest'
 import { ErroSelagemJSignPdf, PREFIXO_PASTA, selarPdf } from '../src/index.js'
-import { certificadoDeTeste, jar, temCertificado } from './apoio/config.js'
+import { certificadoDeTeste, ehLinux, jar, temCertificado } from './apoio/config.js'
 import { contarMarca, gerarPdf } from './apoio/pdf.js'
 import { capturarLinhaDeComando, type Captura } from './apoio/processo.js'
 
+const testeLinux = test.skipIf(!ehLinux)
 const certificado = certificadoDeTeste ?? { arquivo: '', senha: '' }
 const base = { certificado, razao: 'Teste', local: 'Sao Paulo', contato: 'contato@exemplo.com' }
 
 describe.skipIf(!temCertificado)('selarPdf com o certificado de teste', () => {
-  test('sela o PDF, devolve o arquivo maior e apaga a pasta temporária', async () => {
+  testeLinux('sela o PDF, devolve o arquivo maior e apaga a pasta temporária', async () => {
     const entrada = await gerarPdf()
     let captura: Captura | undefined
     const aoIniciar = (pid: number) => (captura = capturarLinhaDeComando(pid))
@@ -24,7 +25,7 @@ describe.skipIf(!temCertificado)('selarPdf com o certificado de teste', () => {
     expect(captura?.pasta).toContain(PREFIXO_PASTA)
     expect(existsSync(captura?.pasta ?? '')).toBe(false)
   })
-  test('a lista de processos vê só java ... @args.txt, nunca a senha', async () => {
+  testeLinux('a lista de processos vê só java ... @args.txt, nunca a senha', async () => {
     let captura: Captura | undefined
     const aoIniciar = (pid: number) => (captura = capturarLinhaDeComando(pid))
     await selarPdf({ ...base, entrada: await gerarPdf() }, { jar, aoIniciar })

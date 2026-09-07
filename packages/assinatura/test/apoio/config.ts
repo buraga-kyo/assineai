@@ -12,3 +12,6 @@ export const temCertificado = certificadoDeTeste !== undefined
 export const jar =
   process.env.TESTE_JSIGNPDF_JAR ??
   fileURLToPath(new URL('../../../../Arquivos/Permanente/JSignPdf.jar', import.meta.url))
+
+/** As leituras de /proc/<pid>/cmdline só existem no Linux. */
+export const ehLinux = process.platform === 'linux'
