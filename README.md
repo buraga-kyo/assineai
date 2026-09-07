@@ -10,6 +10,14 @@ Assinatura eletrônica de documentos para quem vende serviço: advogados, clíni
 - Modelos de documento prontos por profissão.
 - Kit para músicos, com prova de anterioridade: fica registrado que a música já existia naquela data.
 
+## Estado do projeto
+
+O AssineAi está sendo reescrito do zero, num monorepo: um repositório só para a API, o app web e os pacotes que eles compartilham. O código antigo continua em `legado/`, só para consulta.
+
+- Já roda: a infra de desenvolvimento (banco, filas, arquivos e caixa de email de teste, tudo em Docker) e a verificação de tipos, lint e teste em todos os pacotes.
+- Em construção: a API e o pacote de assinatura, que sela os PDFs.
+- Ainda não existe: login, envelopes (o conjunto de documentos que vai para assinatura), canais de envio e o app web. O primeiro login chega com a API.
+
 ## Licença
 
 Uso interno permitido para qualquer empresa ou pessoa: você pode rodar, modificar e usar o AssineAi para assinar **os próprios documentos da sua organização**, com os seus próprios certificados.
