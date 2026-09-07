@@ -44,4 +44,25 @@ describe('erro padrao', () => {
     expect(texto()).toContain('tabela X nao existe')
     await app.close()
   })
+
+  it('validacao do zod devolve 400 com o campo de cada falha', async () => {
+    const { app } = appComRotasDeErro()
+    const resposta = await app.inject({ method: 'POST', url: '/eco', payload: { nome: '' } })
+    expect(resposta.statusCode).toBe(400)
+    const { erro } = resposta.json()
+    expect(erro.codigo).toBe('dados_invalidos')
+    expect(erro.detalhes).toHaveLength(1)
+    expect(erro.detalhes[0].campo).toBe('body/nome')
+    await app.close()
+  })
+
+  it('ErroDaApi devolve o status e o codigo que a rota escolheu', async () => {
+    const { app } = appComRotasDeErro()
+    const resposta = await app.inject({ method: 'GET', url: '/previsto' })
+    expect(resposta.statusCode).toBe(401)
+    expect(resposta.json()).toEqual({
+      erro: { codigo: 'nao_autenticado', mensagem: 'sessao expirada' },
+    })
+    await app.close()
+  })
 })
