@@ -2,3 +2,4 @@
 // conexao.ts passa tudo para o drizzle(). Uma tabela por arquivo.
 export * from './comum.js'
 export * from './empresa.js'
+export * from './usuario.js'
