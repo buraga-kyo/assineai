@@ -23,7 +23,7 @@ export function criarLogger(opcoes: OpcoesLogger, destino?: DestinationStream): 
     ...base,
     transport: {
       target: 'pino-pretty',
-      options: { translateTime: 'HH:MM:ss', ignore: 'pid,hostname' },
+      options: { translateTime: 'SYS:HH:MM:ss', ignore: 'pid,hostname' },
     },
   })
 }
