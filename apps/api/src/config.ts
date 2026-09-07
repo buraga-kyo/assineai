@@ -37,3 +37,17 @@ export function carregarConfig(env: NodeJS.ProcessEnv = process.env): Config {
   })
   throw new ErroDeConfig(problemas)
 }
+
+// Para os pontos de entrada: le o .env da pasta atual (o ambiente real ganha
+// do arquivo), valida e sai com codigo 1 se algo faltar.
+export function carregarConfigOuSair(): Config {
+  if (existsSync('.env')) process.loadEnvFile('.env')
+  try {
+    return carregarConfig()
+  } catch (erro) {
+    if (!(erro instanceof ErroDeConfig)) throw erro
+    process.stderr.write(`a api nao subiu, a configuracao esta incompleta:\n${erro.message}\n`)
+    process.stderr.write('confira o .env (modelo em .env.example)\n')
+    process.exit(1)
+  }
+}
