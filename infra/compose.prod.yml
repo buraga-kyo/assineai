@@ -30,7 +30,7 @@ services:
       # roles de producao com as senhas do ambiente (nao o postgres-init de dev)
       - ./postgres-init-prod:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d assineai"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d ${POSTGRES_DB:-assineai}"]
       interval: 5s
       timeout: 5s
       retries: 12
