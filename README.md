@@ -18,6 +18,55 @@ O AssineAi está sendo reescrito do zero, num monorepo: um repositório só para
 - Em construção: a API e o pacote de assinatura, que sela os PDFs.
 - Ainda não existe: login, envelopes (o conjunto de documentos que vai para assinatura), canais de envio e o app web. O primeiro login chega com a API.
 
+## Como subir em desenvolvimento
+
+Você precisa de:
+
+- Node 22 (a versão está em `.nvmrc`)
+- pnpm 9.15: rode `corepack enable` e, na primeira chamada de `pnpm`, o Node baixa a versão que o `package.json` pede
+- Docker com o plugin compose
+- Java 21, só para selar PDF com o JSignPdf; hoje nada chama o Java, porque o pacote de assinatura está em construção
+
+Na raiz do repositório:
+
+1. Instale as dependências:
+
+   ```bash
+   pnpm install
+   ```
+
+2. Suba a infra: Postgres 18 com PostGIS, Redis, MinIO (guarda os arquivos, já com o bucket `assineai` criado) e Mailpit (caixa de email de teste). O comando espera cada serviço ficar saudável, mostra o estado de cada um e termina com esta linha:
+
+   ```bash
+   pnpm infra:up
+   ```
+
+   ```
+   Mailpit: http://localhost:8025   Console do MinIO: http://localhost:9001
+   ```
+
+3. Copie as variáveis de ambiente. O `.env.example` explica cada uma e já vem com os valores da infra de desenvolvimento; o `.env` fica fora do git:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+4. Confira que está tudo certo:
+
+   ```bash
+   pnpm verificar
+   ```
+
+5. Todo email mandado em desenvolvimento cai no Mailpit, em http://localhost:8025. Os arquivos ficam no MinIO; o console em http://localhost:9001 abre com o usuário `assineai` e a senha `assineai-dev-segredo`.
+
+6. Para derrubar a infra (os dados ficam guardados):
+
+   ```bash
+   pnpm infra:down
+   ```
+
+Por enquanto não há servidor para subir: `pnpm dev` não faz nada até a API chegar. Portas, usuários e como zerar o banco estão em `infra/README.md`.
+
 ## Licença
 
 Uso interno permitido para qualquer empresa ou pessoa: você pode rodar, modificar e usar o AssineAi para assinar **os próprios documentos da sua organização**, com os seus próprios certificados.
