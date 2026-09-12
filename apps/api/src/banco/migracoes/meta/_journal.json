@@ -50,6 +50,13 @@
       "when": 1788782200000,
       "tag": "0006_sistema_sd",
       "breakpoints": false
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789232518630,
+      "tag": "0007_empresa_tema",
+      "breakpoints": false
     }
   ]
 }
