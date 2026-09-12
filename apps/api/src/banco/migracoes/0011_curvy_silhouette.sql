@@ -1,0 +1,1 @@
+ALTER TABLE "usuario" ADD COLUMN "preferencias_notificacao" jsonb DEFAULT '{}';

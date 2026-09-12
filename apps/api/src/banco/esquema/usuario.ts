@@ -1,7 +1,7 @@
 // Quem entra no sistema em nome de uma empresa. Email unico por empresa; o
 // papel e texto com CHECK (sem enum do Postgres, que e chato de migrar).
 import { sql } from 'drizzle-orm'
-import { check, integer, pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core'
+import { check, integer, pgTable, text, timestamp, unique, uuid, jsonb } from 'drizzle-orm/pg-core'
 import { carimbos, id, politicaDaEmpresa } from './comum.js'
 import { empresa } from './empresa.js'
 
@@ -22,6 +22,7 @@ export const usuario = pgTable(
     emailConfirmadoEm: timestamp('email_confirmado_em', { withTimezone: true }),
     falhasLogin: integer('falhas_login').notNull().default(0),
     bloqueadoAte: timestamp('bloqueado_ate', { withTimezone: true }),
+    preferenciasNotificacao: jsonb('preferencias_notificacao').default('{}'),
     ...carimbos,
   },
   (t) => [

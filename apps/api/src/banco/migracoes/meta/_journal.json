@@ -78,6 +78,13 @@
       "when": 1789256307012,
       "tag": "0010_thankful_blur",
       "breakpoints": false
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1789257179068,
+      "tag": "0011_curvy_silhouette",
+      "breakpoints": false
     }
   ]
 }
