@@ -1,4 +1,4 @@
-import Redis from 'ioredis'
+import { Redis } from 'ioredis'
 import { carregarConfigOuSair } from '../config.js'
 
 let conexaoRedis: Redis | null = null
