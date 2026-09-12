@@ -10,6 +10,7 @@ import { criarWorkerSelagem } from './filas/trabalhadores/selagem.js'
 import { criarWorkerAncoragem } from './filas/trabalhadores/ancoragem.js'
 import { criarWorkerNotificacoes } from './filas/trabalhadores/notificacoes.js'
 import { criarWorkerManutencao } from './filas/trabalhadores/manutencao.js'
+import { criarWorkerLimpezaS3 } from './filas/trabalhadores/limpeza-s3.js'
 
 const config = carregarConfigOuSair()
 const log = criarLogger(config)
@@ -21,6 +22,7 @@ const workerSelagem = criarWorkerSelagem(banco.comoEmpresa)
 const workerAncoragem = criarWorkerAncoragem(banco.comoEmpresa)
 const workerNotificacoes = criarWorkerNotificacoes(banco.comoEmpresa)
 const workerManutencao = criarWorkerManutencao(banco.comoEmpresa)
+const workerLimpezaS3 = criarWorkerLimpezaS3(banco.comoEmpresa)
 
 const batimento = setInterval(() => log.debug('worker vivo'), 60_000)
 
@@ -34,6 +36,7 @@ for (const sinal of ['SIGTERM', 'SIGINT'] as const) {
     await workerAncoragem.close()
     await workerNotificacoes.close()
     await workerManutencao.close()
+    await workerLimpezaS3.close()
     await fecharConexaoRedis()
     await banco.fechar()
     log.info({ sinal }, 'worker encerrado')

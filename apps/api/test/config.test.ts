@@ -12,6 +12,7 @@ const completo: Record<string, string> = {
   ARMAZENAMENTO_BUCKET: 'assineai',
   ARMAZENAMENTO_CHAVE: 'assineai',
   ARMAZENAMENTO_SEGREDO: 'assineai-dev-segredo',
+  ARMAZENAMENTO_LIMITE_TAMANHO: '10485760',
   CHAVE_OTP: 'uma_chave_longa_suficiente_123',
   CORS_ORIGENS: 'http://localhost:5173',
 }
