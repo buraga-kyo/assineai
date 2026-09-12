@@ -13,9 +13,10 @@ declare module 'fastify' {
 }
 
 export function exigirAcesso(rota: RouteOptions): void {
+  const metodo = Array.isArray(rota.method) ? rota.method.join(',') : rota.method
+  if (metodo === 'OPTIONS') return
   const acesso: unknown = rota.config?.acesso
   if (typeof acesso === 'string' && (ACESSOS as readonly string[]).includes(acesso)) return
-  const metodo = Array.isArray(rota.method) ? rota.method.join(',') : rota.method
   throw new Error(
     `a rota ${metodo} ${rota.url} nao declara acesso; use config.acesso com sessao, publico ou webhook`,
   )
