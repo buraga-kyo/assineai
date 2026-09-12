@@ -13,6 +13,7 @@ const completo: Record<string, string> = {
   ARMAZENAMENTO_CHAVE: 'assineai',
   ARMAZENAMENTO_SEGREDO: 'assineai-dev-segredo',
   CHAVE_OTP: 'uma_chave_longa_suficiente_123',
+  CORS_ORIGENS: 'http://localhost:5173',
 }
 
 describe('carregarConfig', () => {
