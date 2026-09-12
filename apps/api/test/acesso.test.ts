@@ -35,7 +35,7 @@ describe('acesso por rota', () => {
 
   it('rota declarada sobe e responde', async () => {
     ;({ app } = criarAppDeTeste())
-    app.get('/ok', { config: { acesso: 'sessao' } }, async () => ({ ok: true }))
+    app.get('/ok', { config: { acesso: 'publico' } }, async () => ({ ok: true }))
     const resposta = await app.inject({ method: 'GET', url: '/ok' })
     expect(resposta.statusCode).toBe(200)
   })

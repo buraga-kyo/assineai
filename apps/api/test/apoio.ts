@@ -3,6 +3,8 @@ import type { DestinationStream } from 'pino'
 import { criarApp } from '../src/app.js'
 import { criarLogger } from '../src/logger.js'
 import type { Verificacoes } from '../src/saude/dependencias.js'
+import { BANCO_URL } from './config.js'
+import { criarBanco } from '../src/banco/conexao.js'
 
 export function capturarLog() {
   const linhas: string[] = []
@@ -22,9 +24,14 @@ export const falha = async () => {
 
 export function criarAppDeTeste(verificacoes: Partial<Verificacoes> = {}) {
   const log = capturarLog()
+  const banco = criarBanco(BANCO_URL ?? 'postgres://assineai_app:app_dev@localhost:5432/assineai')
   const app = criarApp({
     logger: log.logger,
     verificacoes: { banco: passa, redis: passa, storage: passa, ...verificacoes },
+    banco,
+  })
+  app.addHook('onClose', async () => {
+    await banco.fechar()
   })
   return { app, ...log }
 }

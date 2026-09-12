@@ -4,12 +4,19 @@ import { criarApp } from './app.js'
 import { carregarConfigOuSair } from './config.js'
 import { criarLogger } from './logger.js'
 import { criarVerificacoes } from './saude/dependencias.js'
+import { criarBanco } from './banco/conexao.js'
 
 const config = carregarConfigOuSair()
 const logger = criarLogger(config)
 const { verificacoes, fechar } = criarVerificacoes(config, logger)
-const app = criarApp({ logger, verificacoes })
-app.addHook('onClose', fechar)
+const banco = criarBanco(config.BANCO_URL)
+
+const app = criarApp({ logger, verificacoes, banco })
+
+app.addHook('onClose', async () => {
+  await fechar()
+  await banco.fechar()
+})
 
 for (const sinal of ['SIGTERM', 'SIGINT'] as const) {
   process.once(sinal, () => {
