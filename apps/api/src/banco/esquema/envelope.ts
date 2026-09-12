@@ -27,7 +27,9 @@ export const documentosEnvelope = pgTable(
       .references(() => envelopes.id, { onDelete: 'cascade' }),
     nome: text('nome').notNull(),
     caminhoStorage: text('caminho_storage').notNull(),
-    hash: text('hash'),
+    hashOriginal: text('hash_original'),
+    hashComposto: text('hash_composto'),
+    hashFinal: text('hash_final'),
     ...carimbos,
   }
   // Podemos não colocar RLS direto ou colocar usando um join, mas o comum é assumir que o tenant está no envelope e fazer query join ou confiar no envelope_id.
