@@ -67,6 +67,24 @@ Na raiz do repositório:
 
 Por enquanto não há servidor para subir: `pnpm dev` não faz nada até a API chegar. Portas, usuários e como zerar o banco estão em `infra/README.md`.
 
+## Certificados e Selagem Digital
+
+O pacote `@assineai/assinatura` utiliza o **JSignPdf 2.2.0** para selar digitalmente os PDFs de forma robusta e segura.
+
+### Instalação do JSignPdf.jar
+Por motivos de higiene de repositório, o binário do JSignPdf.jar de 19MB não é versionado. Após clonar ou atualizar o repositório, você deve baixar o binário de forma segura rodando o script:
+
+```bash
+bash infra/baixar-jsignpdf.sh
+```
+
+Este script baixa a versão estável, valida seu hash SHA-256 e instala o JAR em `Arquivos/Permanente/JSignPdf.jar`.
+
+### Certificados Digitais em Produção
+Em produção, os certificados A1 (`.pfx` ou `.p12`) nunca devem residir no repositório.
+- **Localização recomendada:** Devem ficar montados em um volume Docker somente leitura em `/cofre`.
+- **Configuração:** O caminho e a senha do certificado ativo de produção são configurados por meio de variáveis de ambiente seguras (por exemplo, `CERTIFICADO_ARQUIVO_CAMINHO` e `CERTIFICADO_SENHA`), que apontam para o arquivo montado no volume `/cofre`.
+
 ## Antes de abrir um PR
 
 Rode na raiz:
