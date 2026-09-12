@@ -23,6 +23,7 @@ const esquema = z.object({
   CHAVE_OTP: z.string().min(16),
   OTP_VALIDADE_MIN: z.coerce.number().int().positive().default(10),
   OTP_TENTATIVAS: z.coerce.number().int().positive().default(5),
+  CORS_ORIGENS: z.string().min(1),
 })
 
 export type Config = z.infer<typeof esquema>
