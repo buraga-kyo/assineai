@@ -24,6 +24,7 @@ import { rotasSessao } from './http/sessao.js'
 import { rotasTema } from './http/tema.js'
 import { rotasStorage } from './http/storage.js'
 import { rotasEnvelopes } from './http/envelopes.js'
+import { rotasVerificacao } from './http/verificacao.js'
 import type { BancoDaEmpresa, criarBanco } from './banco/conexao.js'
 import { criarClienteS3, type Armazenamento } from './storage/s3.js'
 
@@ -39,6 +40,9 @@ declare module 'fastify' {
     sessao?: { id: string; empresaId: string; usuarioId: string }
     banco: <T>(fn: (banco: BancoDaEmpresa) => Promise<T>) => Promise<T>
     armazenamento: Armazenamento
+  }
+  interface FastifyInstance {
+    banco: ReturnType<typeof criarBanco>
   }
 }
 
@@ -153,6 +157,9 @@ export function criarApp({ logger, verificacoes, banco, config }: OpcoesApp) {
     }
   })
 
+  // Decoradores globais da instancia
+  app.decorate('banco', banco)
+
   // Registro das rotas
   app.register(rotasSaude, { verificacoes })
   app.register(rotasUsuarios(banco))
@@ -160,6 +167,7 @@ export function criarApp({ logger, verificacoes, banco, config }: OpcoesApp) {
   app.register(rotasTema)
   app.register(rotasStorage)
   app.register(rotasEnvelopes)
+  app.register(rotasVerificacao)
 
   return app
 }
