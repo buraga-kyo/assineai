@@ -15,3 +15,24 @@ dist/
 *.tsbuildinfo
 coverage/
 .turbo/
+
+# Certificados, chaves e credenciais
+*.pfx
+*.p12
+*.pem
+*.key
+
+# Binários e empacotados
+*.jar
+
+# Temporários e editores
+*.swp
+*~
+.swp
+.swo
+
+# Arquivos locais de processamento / uploads / downloads
+/Arquivos/Permanente/JSignPdf.jar
+/Arquivos/Permanente/*.pfx
+/Arquivos/Permanente/*.pem
+
