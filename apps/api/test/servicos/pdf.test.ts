@@ -1,6 +1,19 @@
 import { test, expect } from 'vitest'
 import { PDFDocument, rgb } from 'pdf-lib'
-import { carimbarDocumento, DadosCarimbo } from '../../src/servicos/pdf.js'
+import { carimbarDocumento, DadosCarimbo, adicionarQrELinkDeVerificacao } from '../../src/servicos/pdf.js'
+import { gerarQrEmMemoria } from '../../src/servicos/qr.js'
+
+test('adiciona qr e anotação de link sem corromper o pdf', async () => {
+  const pdfMock = await PDFDocument.create()
+  pdfMock.addPage([595.28, 841.89])
+  const bytesIniciais = await pdfMock.save()
+
+  const qrBuffer = await gerarQrEmMemoria('TESTE-123')
+  const pdfFinal = await adicionarQrELinkDeVerificacao(bytesIniciais, 'TESTE-123', qrBuffer)
+  
+  const pdfCarregado = await PDFDocument.load(pdfFinal)
+  expect(pdfCarregado.getPageCount()).toBe(1)
+})
 
 test('carimba o documento na pagina e proporcoes certas', async () => {
   // Criar um PDF A4 retrato

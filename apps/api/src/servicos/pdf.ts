@@ -1,4 +1,4 @@
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
+import { PDFDocument, rgb, StandardFonts, PDFName, PDFDict, PDFArray, PDFNumber, PDFString } from 'pdf-lib'
 
 export interface DadosCarimbo {
   pagina: number // 1-based, como o usuário vê
@@ -12,6 +12,53 @@ export interface DadosCarimbo {
   codigo: string
   hashPedaço: string
   rabiscoBytes?: Uint8Array
+}
+
+export async function adicionarQrELinkDeVerificacao(pdfBytes: Uint8Array, codigo: string, qrBuffer: Buffer): Promise<Uint8Array> {
+  const pdfDoc = await PDFDocument.load(pdfBytes)
+  const paginas = pdfDoc.getPages()
+  if (paginas.length === 0) return await pdfDoc.save()
+  
+  // Desenha na ultima pagina pra simplificar o exemplo, mas a rigor poderia ser em todas
+  const pagina = paginas[paginas.length - 1]
+  const largura = pagina.getWidth()
+  const altura = pagina.getHeight()
+  
+  // Canto inferior direito pro QR
+  const tamanhoQr = 60
+  const padding = 20
+  const posX = largura - tamanhoQr - padding
+  const posY = padding
+  
+  const imagemQr = await pdfDoc.embedPng(qrBuffer)
+  
+  pagina.drawImage(imagemQr, {
+    x: posX,
+    y: posY,
+    width: tamanhoQr,
+    height: tamanhoQr
+  })
+
+  // Anotação do Link clicável em cima do QR
+  const appUrl = process.env.URL_APP || 'http://localhost:5173'
+  const url = `${appUrl}/v/${codigo}`
+
+  const linkAnotacao = pdfDoc.context.obj({
+    Type: 'Annot',
+    Subtype: 'Link',
+    Rect: [posX, posY, posX + tamanhoQr, posY + tamanhoQr],
+    Border: [0, 0, 0],
+    A: {
+      Type: 'Action',
+      S: 'URI',
+      URI: PDFString.of(url)
+    }
+  })
+
+  const linkReference = pdfDoc.context.register(linkAnotacao)
+  pagina.node.addAnnot(linkReference)
+
+  return await pdfDoc.save()
 }
 
 export async function carimbarDocumento(pdfBytes: Uint8Array, carimbos: DadosCarimbo[]): Promise<Uint8Array> {
