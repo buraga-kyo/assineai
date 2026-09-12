@@ -2,6 +2,11 @@
 // rota, erro padrao e a rota de saude. Quem chama (servidor.ts e os testes)
 // escolhe o logger e as verificacoes; por isso nada aqui toca rede sozinho.
 import Fastify from 'fastify'
+import helmet from '@fastify/helmet'
+import cors from '@fastify/cors'
+import rateLimit from '@fastify/rate-limit'
+import { Redis } from 'ioredis'
+import type { Config } from './config.js'
 import {
   serializerCompiler,
   validatorCompiler,
@@ -22,6 +27,7 @@ export type OpcoesApp = {
   logger: Logger
   verificacoes: Verificacoes
   banco: ReturnType<typeof criarBanco>
+  config: Config
 }
 
 declare module 'fastify' {
@@ -49,13 +55,45 @@ function obterCookie(cookieHeader: string | undefined, nome: string): string | u
   return undefined
 }
 
-export function criarApp({ logger, verificacoes, banco }: OpcoesApp) {
-  const app = Fastify({ loggerInstance: logger }).withTypeProvider<ZodTypeProvider>()
+export function criarApp({ logger, verificacoes, banco, config }: OpcoesApp) {
+  const app = Fastify({ loggerInstance: logger, trustProxy: true }).withTypeProvider<ZodTypeProvider>()
+  
+  app.register(helmet, {
+    hsts: { maxAge: 31536000, includeSubDomains: true },
+    noSniff: true,
+    frameguard: { action: 'deny' }
+  })
+
+  app.register(cors, {
+    origin: config.CORS_ORIGENS.split(',').map(s => s.trim()),
+    credentials: true,
+  })
+
+  // Para não vazar a conexão, conectamos o redis aqui e fechamos no onClose
+  const redisRateLimit = config.NODE_ENV === 'test' ? null : new Redis(config.REDIS_URL, { maxRetriesPerRequest: null })
+  app.register(rateLimit, {
+    ...(redisRateLimit ? { redis: redisRateLimit } : {}),
+    global: true,
+    max: 1000,
+    timeWindow: '1 minute'
+  })
+  app.addHook('onClose', async () => {
+    if (redisRateLimit) redisRateLimit.disconnect()
+  })
+
   app.setValidatorCompiler(validatorCompiler)
   app.setSerializerCompiler(serializerCompiler)
   app.addHook('onRoute', exigirAcesso)
   app.setNotFoundHandler(responderNaoEncontrado)
   app.setErrorHandler(tratarErro)
+
+  // Hook anti-CSRF
+  app.addHook('onRequest', async (request, reply) => {
+    const metodosMutaveis = ['POST', 'PUT', 'DELETE', 'PATCH']
+    if (metodosMutaveis.includes(request.method) && !request.headers['x-requisicao']) {
+      return reply.code(403).send({ erro: { codigo: 'CSRF_REJEITADO', mensagem: 'Cabeçalho X-Requisicao ausente' } })
+    }
+  })
 
   // Decoradores vazios para tipagem rápida e consistente (evitando explicit-any)
   app.decorateRequest('sessao', undefined as never)
