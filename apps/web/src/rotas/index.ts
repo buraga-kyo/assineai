@@ -14,6 +14,16 @@ export const roteador = createRouter({
       path: '/',
       name: 'painel',
       component: () => import('../paginas/Painel.vue')
+    },
+    {
+      path: '/envelopes',
+      name: 'envelopes',
+      component: () => import('../paginas/Envelopes.vue')
+    },
+    {
+      path: '/envelopes/:id',
+      name: 'envelope-detalhe',
+      component: () => import('../paginas/EnvelopeDetalhe.vue')
     }
   ]
 })
