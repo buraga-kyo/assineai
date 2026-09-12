@@ -21,6 +21,7 @@ import type { Verificacoes } from './saude/dependencias.js'
 import { rotasSaude } from './saude/rotas.js'
 import { rotasUsuarios } from './http/usuarios.js'
 import { rotasSessao } from './http/sessao.js'
+import { rotasTema } from './http/tema.js'
 import type { BancoDaEmpresa, criarBanco } from './banco/conexao.js'
 
 export type OpcoesApp = {
@@ -147,6 +148,7 @@ export function criarApp({ logger, verificacoes, banco, config }: OpcoesApp) {
   app.register(rotasSaude, { verificacoes })
   app.register(rotasUsuarios(banco))
   app.register(rotasSessao(banco))
+  app.register(rotasTema)
 
   return app
 }

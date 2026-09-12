@@ -11,7 +11,7 @@ const logger = criarLogger(config)
 const { verificacoes, fechar } = criarVerificacoes(config, logger)
 const banco = criarBanco(config.BANCO_URL)
 
-const app = criarApp({ logger, verificacoes, banco })
+const app = criarApp({ logger, verificacoes, banco, config })
 
 app.addHook('onClose', async () => {
   await fechar()
