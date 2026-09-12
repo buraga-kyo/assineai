@@ -30,6 +30,9 @@ const esquema = z.object({
   TSA_SENHA: z.string().optional(),
   CHAVE_MESTRA: z.string().min(1),
   CHAVE_ID: z.string().min(1).default('1'),
+  TELEGRAM_BOT_TOKEN_PLATAFORMA: z.string().optional(),
+  EVOLUTION_URL: z.string().url().optional(),
+  EVOLUTION_CHAVE_GLOBAL: z.string().optional(),
 })
 
 export type Config = z.infer<typeof esquema>
