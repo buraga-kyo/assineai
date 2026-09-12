@@ -2,6 +2,7 @@ import type { App } from '../app.js'
 import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
 import { envelopes, documentosEnvelope, signatariosEnvelope } from '../banco/esquema/envelope.js'
+import { evidencia } from '../banco/esquema/evidencia.js'
 import { ErroDaApi } from './erros.js'
 
 export async function rotasEnvelopes(app: App) {
@@ -190,6 +191,24 @@ export async function rotasEnvelopes(app: App) {
       })
 
       return reply.code(200).send({ mensagem: 'Cancelado com sucesso' })
+    }
+  )
+
+  app.get(
+    '/envelopes/:id/evidencias',
+    {
+      config: { acesso: 'sessao' },
+      schema: { params: z.object({ id: z.string().uuid() }) }
+    },
+    async (request, reply) => {
+      const sessao = request.sessao!
+      const envelopeId = request.params.id
+
+      const evs = await request.banco(async (tx) => {
+        return tx.select().from(evidencia).where(and(eq(evidencia.envelopeId, envelopeId), eq(evidencia.empresaId, sessao.empresaId)))
+      })
+
+      return reply.send(evs)
     }
   )
 }
