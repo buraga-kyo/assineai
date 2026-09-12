@@ -35,3 +35,19 @@ COPY --from=build /app/apps/api/node_modules apps/api/node_modules
 COPY --from=build /app/apps/api/dist apps/api/dist
 USER node
 CMD ["node", "apps/api/dist/banco/migrar.js"]
+
+# Alvo para rodar a API e Worker com Python para o OpenTimestamps
+FROM node:22-slim AS worker
+ENV NODE_ENV=production
+RUN apt-get update && apt-get install -y python3 python3-pip python3-venv && rm -rf /var/lib/apt/lists/*
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN pip install opentimestamps-client
+WORKDIR /app
+COPY --from=build /app/package.json ./
+COPY --from=build /app/node_modules node_modules
+COPY --from=build /app/apps/api/package.json apps/api/
+COPY --from=build /app/apps/api/node_modules apps/api/node_modules
+COPY --from=build /app/apps/api/dist apps/api/dist
+USER node
+CMD ["node", "apps/api/dist/worker.js"]
