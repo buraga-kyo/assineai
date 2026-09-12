@@ -28,6 +28,8 @@ const esquema = z.object({
   TSA_URL: z.string().url().optional(),
   TSA_USUARIO: z.string().optional(),
   TSA_SENHA: z.string().optional(),
+  CHAVE_MESTRA: z.string().min(1),
+  CHAVE_ID: z.string().min(1).default('1'),
 })
 
 export type Config = z.infer<typeof esquema>
