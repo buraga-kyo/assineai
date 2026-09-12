@@ -43,6 +43,13 @@
       "when": 1788782187319,
       "tag": "0005_sessao_fk_composta",
       "breakpoints": false
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788782200000,
+      "tag": "0006_sistema_sd",
+      "breakpoints": false
     }
   ]
 }
