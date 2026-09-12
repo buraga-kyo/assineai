@@ -25,6 +25,9 @@ const esquema = z.object({
   OTP_VALIDADE_MIN: z.coerce.number().int().positive().default(10),
   OTP_TENTATIVAS: z.coerce.number().int().positive().default(5),
   CORS_ORIGENS: z.string().min(1),
+  TSA_URL: z.string().url().optional(),
+  TSA_USUARIO: z.string().optional(),
+  TSA_SENHA: z.string().optional(),
 })
 
 export type Config = z.infer<typeof esquema>

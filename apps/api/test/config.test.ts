@@ -47,6 +47,17 @@ describe('carregarConfig', () => {
     expect(config.PORTA_API).toBe(4000)
     expect(config.ARMAZENAMENTO_CAMINHO_FORCADO).toBe(false)
   })
+
+  it('aceita configuracao opcional da TSA', () => {
+    const config = carregarConfig({
+      ...completo,
+      TSA_URL: 'http://tsa.icpbrasil.gov.br',
+      TSA_USUARIO: 'admin',
+    })
+    expect(config.TSA_URL).toBe('http://tsa.icpbrasil.gov.br')
+    expect(config.TSA_USUARIO).toBe('admin')
+    expect(config.TSA_SENHA).toBeUndefined()
+  })
 })
 
 describe('acharArquivoEnv', () => {
