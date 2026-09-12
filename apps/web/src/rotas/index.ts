@@ -41,6 +41,11 @@ export const roteador = createRouter({
       component: () => import('../paginas/Contatos.vue')
     },
     {
+      path: '/inbox',
+      name: 'inbox',
+      component: () => import('../paginas/Inbox.vue')
+    },
+    {
       path: '/galeria',
       name: 'galeria-temas',
       component: () => import('../paginas/GaleriaTemas.vue')
