@@ -21,6 +21,7 @@ coverage/
 *.p12
 *.pem
 *.key
+.env*
 
 # Binários e empacotados
 *.jar
@@ -35,4 +36,6 @@ coverage/
 /Arquivos/Permanente/JSignPdf.jar
 /Arquivos/Permanente/*.pfx
 /Arquivos/Permanente/*.pem
+/Arquivos/Temporario/
+uploads/
 
