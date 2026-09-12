@@ -10,6 +10,7 @@ export const envelopes = pgTable(
     empresaId: uuid('empresa_id')
       .notNull()
       .references(() => empresa.id, { onDelete: 'cascade' }),
+    codigoPublico: text('codigo_publico').unique(),
     titulo: text('titulo').notNull(),
     estado: text('estado').notNull().$type<'rascunho' | 'pendente' | 'assinado' | 'cancelado'>().default('rascunho'),
     ...carimbos,
