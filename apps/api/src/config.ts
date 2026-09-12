@@ -18,6 +18,8 @@ const esquema = z.object({
   ARMAZENAMENTO_CHAVE: z.string().min(1),
   ARMAZENAMENTO_SEGREDO: z.string().min(1),
   ARMAZENAMENTO_CAMINHO_FORCADO: z.stringbool().default(true),
+  SMTP_URL: z.string().url().optional(),
+  EMAIL_REMETENTE: z.string().optional(),
 })
 
 export type Config = z.infer<typeof esquema>
