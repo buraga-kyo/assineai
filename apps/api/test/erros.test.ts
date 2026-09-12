@@ -59,7 +59,7 @@ describe('erro padrao', () => {
 
   it('validacao do zod devolve 400 com o campo de cada falha', async () => {
     const { app } = appComRotasDeErro()
-    const resposta = await app.inject({ method: 'POST', url: '/eco', payload: { nome: '' } })
+    const resposta = await app.inject({ method: 'POST', url: '/eco', headers: { 'x-requisicao': '1' }, payload: { nome: '' } })
     expect(resposta.statusCode).toBe(400)
     const { erro } = resposta.json()
     expect(erro.codigo).toBe('dados_invalidos')
