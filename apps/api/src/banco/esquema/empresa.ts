@@ -15,6 +15,7 @@ export const empresa = pgTable(
     profissaoPrincipal: text('profissao_principal'),
     fusoHorario: text('fuso_horario').notNull().default('America/Sao_Paulo'),
     config: jsonb().notNull().default({}),
+    tema: jsonb().notNull().default({}),
     ...carimbos,
   },
   (t) => [
