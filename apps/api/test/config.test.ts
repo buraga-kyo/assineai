@@ -12,6 +12,7 @@ const completo: Record<string, string> = {
   ARMAZENAMENTO_BUCKET: 'assineai',
   ARMAZENAMENTO_CHAVE: 'assineai',
   ARMAZENAMENTO_SEGREDO: 'assineai-dev-segredo',
+  CHAVE_OTP: 'uma_chave_longa_suficiente_123',
 }
 
 describe('carregarConfig', () => {
