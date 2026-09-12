@@ -29,6 +29,12 @@ export const roteador = createRouter({
       path: '/envelopes/:id',
       name: 'envelope-detalhe',
       component: () => import('../paginas/EnvelopeDetalhe.vue')
+    },
+    {
+      path: '/assinar/:token',
+      name: 'assinar',
+      component: () => import('../paginas/Signatario.vue'),
+      meta: { publico: true } // Não precisa de login
     }
   ]
 })
