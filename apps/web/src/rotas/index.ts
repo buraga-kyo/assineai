@@ -35,6 +35,12 @@ export const roteador = createRouter({
       name: 'assinar',
       component: () => import('../paginas/Signatario.vue'),
       meta: { publico: true } // Não precisa de login
+    },
+    {
+      path: '/v/:codigo',
+      name: 'verificacao',
+      component: () => import('../paginas/Verificacao.vue'),
+      meta: { publico: true } // Não precisa de login
     }
   ]
 })
