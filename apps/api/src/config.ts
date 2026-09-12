@@ -17,7 +17,7 @@ const esquema = z.object({
   ARMAZENAMENTO_BUCKET: z.string().min(1),
   ARMAZENAMENTO_CHAVE: z.string().min(1),
   ARMAZENAMENTO_SEGREDO: z.string().min(1),
-  ARMAZENAMENTO_CAMINHO_FORCADO: z.coerce.boolean().default(true),
+  ARMAZENAMENTO_CAMINHO_FORCADO: z.enum(['true', 'false']).default('true').transform((v) => v === 'true'),
   ARMAZENAMENTO_LIMITE_TAMANHO: z.coerce.number().int().positive().default(10 * 1024 * 1024),
   SMTP_URL: z.string().url().optional(),
   EMAIL_REMETENTE: z.string().optional(),

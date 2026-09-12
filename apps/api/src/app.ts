@@ -22,7 +22,9 @@ import { rotasSaude } from './saude/rotas.js'
 import { rotasUsuarios } from './http/usuarios.js'
 import { rotasSessao } from './http/sessao.js'
 import { rotasTema } from './http/tema.js'
+import { rotasStorage } from './http/storage.js'
 import type { BancoDaEmpresa, criarBanco } from './banco/conexao.js'
+import { criarClienteS3, type Armazenamento } from './storage/s3.js'
 
 export type OpcoesApp = {
   logger: Logger
@@ -35,6 +37,7 @@ declare module 'fastify' {
   interface FastifyRequest {
     sessao?: { id: string; empresaId: string; usuarioId: string }
     banco: <T>(fn: (banco: BancoDaEmpresa) => Promise<T>) => Promise<T>
+    armazenamento: Armazenamento
   }
 }
 
@@ -99,6 +102,10 @@ export function criarApp({ logger, verificacoes, banco, config }: OpcoesApp) {
   // Decoradores vazios para tipagem rápida e consistente (evitando explicit-any)
   app.decorateRequest('sessao', undefined as never)
   app.decorateRequest('banco', undefined as never)
+  app.decorateRequest('armazenamento', undefined as never)
+
+  // O cliente S3 é injetado no request
+  const armazenamento = criarClienteS3(config)
 
   // Hook global de autenticação de sessão
   app.addHook('preHandler', async (request, reply) => {
@@ -141,6 +148,7 @@ export function criarApp({ logger, verificacoes, banco, config }: OpcoesApp) {
       request.banco = <T>(fn: (banco: BancoDaEmpresa) => Promise<T>) => {
         return banco.comoEmpresa(s.empresa_id, fn)
       }
+      request.armazenamento = armazenamento
     }
   })
 
@@ -149,6 +157,7 @@ export function criarApp({ logger, verificacoes, banco, config }: OpcoesApp) {
   app.register(rotasUsuarios(banco))
   app.register(rotasSessao(banco))
   app.register(rotasTema)
+  app.register(rotasStorage)
 
   return app
 }
