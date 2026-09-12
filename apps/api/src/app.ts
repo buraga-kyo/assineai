@@ -23,6 +23,7 @@ import { rotasUsuarios } from './http/usuarios.js'
 import { rotasSessao } from './http/sessao.js'
 import { rotasTema } from './http/tema.js'
 import { rotasStorage } from './http/storage.js'
+import { rotasEnvelopes } from './http/envelopes.js'
 import type { BancoDaEmpresa, criarBanco } from './banco/conexao.js'
 import { criarClienteS3, type Armazenamento } from './storage/s3.js'
 
@@ -158,6 +159,7 @@ export function criarApp({ logger, verificacoes, banco, config }: OpcoesApp) {
   app.register(rotasSessao(banco))
   app.register(rotasTema)
   app.register(rotasStorage)
+  app.register(rotasEnvelopes)
 
   return app
 }
