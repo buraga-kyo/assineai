@@ -1,1 +1,2 @@
-export const nome = 'ui'
+export * from './tokens/index.js'
+export * from './plugin.js'
