@@ -31,26 +31,30 @@ export const roteador = createRouter({
       component: () => import('../paginas/EnvelopeDetalhe.vue')
     },
     {
+      path: '/estudio',
+      name: 'estudio',
+      component: () => import('../paginas/EstudioMarca.vue')
+    },
+    {
       path: '/assinar/:token',
       name: 'assinar',
       component: () => import('../paginas/Signatario.vue'),
-      meta: { publico: true } // Não precisa de login
+      meta: { publico: true }
     },
     {
       path: '/v/:codigo',
       name: 'verificacao',
       component: () => import('../paginas/Verificacao.vue'),
-      meta: { publico: true } // Não precisa de login
+      meta: { publico: true }
     }
   ]
 })
 
-// Guarda global: se a rota não for pública e o cara não tiver sessão, manda pro login
+// Guarda global
 roteador.beforeEach(async (destino) => {
   const sessao = useStoreSessao()
   
   if (!destino.meta.publico && !sessao.autenticado) {
-    // Tenta bater na API pra ver se o cookie de sessão tá válido
     const aindaTemSessao = await sessao.verificarSessao()
     if (!aindaTemSessao) {
       return { name: 'entrar' }
