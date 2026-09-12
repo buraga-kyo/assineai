@@ -85,6 +85,13 @@
       "when": 1789257179068,
       "tag": "0011_curvy_silhouette",
       "breakpoints": false
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1789257419105,
+      "tag": "0012_sloppy_sharon_carter",
+      "breakpoints": false
     }
   ]
 }
