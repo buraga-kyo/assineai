@@ -38,6 +38,20 @@ module.exports = (InstanciaConfiguradaDoSequelize, Sequelize) => {
         SignatarioTokenLinkAssinatura: {
             type: Sequelize.TEXT
         },
+        SignatarioOtpHmac: {
+            type: Sequelize.STRING
+        },
+        SignatarioOtpValidade: {
+            type: Sequelize.DATE
+        },
+        SignatarioOtpTentativas: {
+            type: Sequelize.INTEGER,
+            defaultValue: 0
+        },
+        SignatarioBloqueado: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
+        },
         SignatarioLinkAssinatura: {
             type: Sequelize.TEXT
         },
