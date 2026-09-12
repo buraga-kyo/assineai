@@ -4,12 +4,13 @@
 import { HeadBucketCommand, S3Client } from '@aws-sdk/client-s3'
 import type { FastifyBaseLogger } from 'fastify'
 import { Redis } from 'ioredis'
+import { createTransport } from 'nodemailer'
 import { Pool } from 'pg'
 import type { Config } from '../config.js'
 
 export type Estado = { ok: boolean; ms: number }
 export type Verificacao = () => Promise<unknown>
-export type Verificacoes = { banco: Verificacao; redis: Verificacao; storage: Verificacao }
+export type Verificacoes = { banco: Verificacao; redis: Verificacao; storage: Verificacao; smtp: Verificacao }
 
 export const LIMITE_MS = 2000
 
@@ -71,12 +72,15 @@ export function criarVerificacoes(config: Config, log: FastifyBaseLogger) {
     maxAttempts: 1,
     requestHandler: { requestTimeout: LIMITE_MS, connectionTimeout: LIMITE_MS },
   })
+  const smtp = config.SMTP_URL ? createTransport({ url: config.SMTP_URL }) : undefined
   const verificacoes: Verificacoes = {
     banco: () => banco.query('select 1'),
     redis: () => redis.ping(),
     storage: () => storage.send(new HeadBucketCommand({ Bucket: config.ARMAZENAMENTO_BUCKET })),
+    smtp: () => (smtp ? smtp.verify() : Promise.reject(new Error('SMTP_URL nao configurado'))),
   }
   const fechar = async () => {
+    if (smtp) smtp.close()
     redis.disconnect()
     storage.destroy()
     await banco.end()
