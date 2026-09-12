@@ -18,6 +18,8 @@ const esquema = z.object({
   ARMAZENAMENTO_CHAVE: z.string().min(1),
   ARMAZENAMENTO_SEGREDO: z.string().min(1),
   ARMAZENAMENTO_CAMINHO_FORCADO: z.stringbool().default(true),
+  SMTP_URL: z.string().url().optional(),
+  EMAIL_REMETENTE: z.string().optional(),
   CHAVE_OTP: z.string().min(16),
   OTP_VALIDADE_MIN: z.coerce.number().int().positive().default(10),
   OTP_TENTATIVAS: z.coerce.number().int().positive().default(5),

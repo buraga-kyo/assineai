@@ -27,7 +27,7 @@ export function criarAppDeTeste(verificacoes: Partial<Verificacoes> = {}) {
   const banco = criarBanco(BANCO_URL ?? 'postgres://assineai_app:app_dev@localhost:5432/assineai')
   const app = criarApp({
     logger: log.logger,
-    verificacoes: { banco: passa, redis: passa, storage: passa, ...verificacoes },
+    verificacoes: { banco: passa, redis: passa, storage: passa, smtp: passa, ...verificacoes },
     banco,
   })
   app.addHook('onClose', async () => {
