@@ -1,6 +1,7 @@
 import type { ICanal } from './interface.js'
 import { cifrar, decifrar } from './criptografia.js'
 import { TipoCanal } from '../banco/esquema/canais.js'
+import { CanalTelegram } from './telegram.js'
 
 // Registro de drivers de canal disponíveis
 const registroCanais: Map<TipoCanal, ICanal> = new Map()
@@ -8,6 +9,8 @@ const registroCanais: Map<TipoCanal, ICanal> = new Map()
 export function registrarCanal(tipo: TipoCanal, implementacao: ICanal) {
   registroCanais.set(tipo, implementacao)
 }
+
+registrarCanal('telegram', new CanalTelegram())
 
 export class FabricaDeCanais {
   static obter(tipo: TipoCanal): ICanal {
