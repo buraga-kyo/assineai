@@ -1,0 +1,8 @@
+{$DOMAIN:assine.ai} {
+  # Frontend Vue/Nginx
+  handle_path /api/* {
+    reverse_proxy api:3000
+  }
+  
+  reverse_proxy web:80
+}
