@@ -5,6 +5,12 @@ export const roteador = createRouter({
   history: createWebHistory(),
   routes: [
     {
+      path: '/cadastro',
+      name: 'cadastro',
+      component: () => import('../paginas/Cadastro.vue'),
+      meta: { publico: true }
+    },
+    {
       path: '/entrar',
       name: 'entrar',
       component: () => import('../paginas/Entrar.vue'),
