@@ -30,16 +30,51 @@ export const useStoreTema = defineStore('tema', () => {
     }
   }
 
-  async function salvarTema() {
+  async function carregarTema() {
     carregando.value = true
     try {
-      // API call de mentira
-      await new Promise(resolve => setTimeout(resolve, 800))
-      console.log('Tema salvo:', tema.value)
+      const res = await fetch('/api/tema')
+      if (res.ok) {
+        const json = await res.json()
+        if (json.tema) {
+           // Merging mock structure vs api structure
+           const t = json.tema
+           tema.value.paleta.primaria = t.paleta?.primaria || '#0B5D3B'
+           tema.value.paleta.fundo = t.paleta?.fundo || '#FFFFFF'
+           tema.value.paleta.texto = t.paleta?.texto || '#1B1B1B'
+           tema.value.tipografia.familia = t.fonte || 'Inter'
+           tema.value.marca.logoUrl = t.logo || ''
+           if (t.textos) {
+             tema.value.textos.tituloRelatorio = t.textos.tituloRelatorio || 'Relatório de Assinaturas'
+             tema.value.textos.rodape = t.textos.rodape || 'Documento gerado por AssineAi'
+           }
+        }
+      }
+    } catch (e) {
+      console.error(e)
     } finally {
       carregando.value = false
     }
   }
 
-  return { tema, carregando, erroContraste, validarContraste, salvarTema }
+  async function salvarTema() {
+    carregando.value = true
+    try {
+      const payload = {
+        logo: tema.value.marca.logoUrl || undefined,
+        paleta: tema.value.paleta,
+        fonte: tema.value.tipografia.familia,
+        textos: tema.value.textos
+      }
+      await fetch('/api/tema', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+    } finally {
+      carregando.value = false
+    }
+  }
+
+  return { tema, carregando, erroContraste, validarContraste, carregarTema, salvarTema }
 })

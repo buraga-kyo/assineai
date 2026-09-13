@@ -1,33 +1,54 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { CampoTexto } from '@assineai/ui'
 
 const roteador = useRouter()
 
-const obras = ref([
-  { id: '1', titulo: 'Minha Música Nova', codigo: 'OBR-1234', data: '12/09/2026', ancorado: true },
-  { id: '2', titulo: 'Letra Original V2', codigo: 'OBR-9999', data: '10/09/2026', ancorado: false }
-])
+const obras = ref<any[]>([])
 
 const modalAberto = ref(false)
 const novaObra = ref({ titulo: '', arquivo: null as File | null })
 const salvando = ref(false)
+const carregando = ref(false)
+
+async function carregarObras() {
+  carregando.value = true
+  try {
+    const res = await fetch('/api/obras')
+    if (res.ok) {
+      obras.value = await res.json()
+    }
+  } finally {
+    carregando.value = false
+  }
+}
+
+onMounted(() => {
+  carregarObras()
+})
 
 async function salvarObra() {
+  if (!novaObra.value.titulo) return
   salvando.value = true
-  setTimeout(() => {
-    salvando.value = false
-    modalAberto.value = false
-    obras.value.unshift({
-      id: Date.now().toString(),
-      titulo: novaObra.value.titulo,
-      codigo: 'OBR-' + Math.floor(Math.random() * 10000),
-      data: 'Hoje',
-      ancorado: false
+  try {
+    const res = await fetch('/api/obras', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        titulo: novaObra.value.titulo,
+        hash: 'hash-fake-gerado-no-front-do-arquivo' // No mundo real usariamos Web Crypto API aqui no front
+      })
     })
-    novaObra.value = { titulo: '', arquivo: null }
-  }, 1000)
+    
+    if (res.ok) {
+      modalAberto.value = false
+      novaObra.value = { titulo: '', arquivo: null }
+      carregarObras()
+    }
+  } finally {
+    salvando.value = false
+  }
 }
 </script>
 
@@ -43,24 +64,29 @@ async function salvarObra() {
         Suba o áudio, a letra ou a partitura. Nós calculamos o hash e ancoramos na Blockchain do Bitcoin gratuitamente para gerar a Prova de Anterioridade.
       </p>
     </v-card>
+    
+    <div v-if="carregando" class="text-center pa-8">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    </div>
 
-    <div v-for="obra in obras" :key="obra.id" class="mb-4">
+    <div v-else v-for="obra in obras" :key="obra.id" class="mb-4">
       <v-card variant="outlined" class="pa-4">
         <div class="d-flex justify-space-between align-center">
           <div>
             <h3 class="text-h6 font-weight-bold d-flex align-center gap-2">
               {{ obra.titulo }}
-              <v-chip size="x-small" :color="obra.ancorado ? 'success' : 'warning'">
-                {{ obra.ancorado ? 'Ancorado' : 'Processando...' }}
+              <!-- Verifica se o primeiro arquivo esta ancorado -->
+              <v-chip size="x-small" :color="obra.arquivos?.[0]?.ancorado ? 'success' : 'warning'">
+                {{ obra.arquivos?.[0]?.ancorado ? 'Ancorado' : 'Processando...' }}
               </v-chip>
             </h3>
             <div class="text-caption text-medium-emphasis mt-1">
-              Código: {{ obra.codigo }} • Criado em: {{ obra.data }}
+              Código: {{ obra.codigoPublico }}
             </div>
           </div>
           <div>
             <v-btn variant="text" prepend-icon="mdi-download">Certificado PDF</v-btn>
-            <v-btn variant="text" color="primary" prepend-icon="mdi-link" :to="`/o/${obra.codigo}`">Ver Página</v-btn>
+            <v-btn variant="text" color="primary" prepend-icon="mdi-link" :to="`/o/${obra.codigoPublico}`">Ver Página</v-btn>
           </div>
         </div>
       </v-card>

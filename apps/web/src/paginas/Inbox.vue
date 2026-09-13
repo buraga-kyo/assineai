@@ -1,34 +1,65 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { CampoTexto, ChipCanal } from '@assineai/ui'
 
 const roteador = useRouter()
 const busca = ref('')
-const conversaAtiva = ref<string | null>(null)
+const conversaAtiva = ref<any>(null)
 
-// Mock
-const conversas = ref([
-  { id: '1', contato: 'João da Silva', canal: 'whatsapp', ultimaMensagem: 'ACEITO 123456', estado: 'pendente', data: '10:30' },
-  { id: '2', contato: 'Clínica Sol', canal: 'telegram', ultimaMensagem: 'Oi, tenho uma dúvida sobre o contrato', estado: 'aberta', data: 'Ontem' }
-])
-
-const mensagens = ref([
-  { id: '1', texto: 'Aqui está o seu documento para assinatura.', enviadaPorNos: true, hora: '10:00' },
-  { id: '2', texto: 'ACEITO 123456', enviadaPorNos: false, hora: '10:30' }
-])
-
+const conversas = ref<any[]>([])
+const mensagens = ref<any[]>([])
 const novaMensagem = ref('')
+const carregando = ref(false)
 
-function enviar() {
-  if (!novaMensagem.value) return
+async function carregarConversas() {
+  const res = await fetch('/api/inbox/conversas')
+  if (res.ok) {
+    conversas.value = await res.json()
+  }
+}
+
+onMounted(() => {
+  carregarConversas()
+})
+
+watch(conversaAtiva, async (novaConvId) => {
+  if (!novaConvId) {
+    mensagens.value = []
+    return
+  }
+  const res = await fetch(`/api/inbox/conversas/${novaConvId.id}/mensagens`)
+  if (res.ok) {
+    mensagens.value = await res.json()
+  }
+})
+
+async function enviar() {
+  if (!novaMensagem.value || !conversaAtiva.value) return
+  const texto = novaMensagem.value
+  novaMensagem.value = ''
+  
+  // Otimista
   mensagens.value.push({
     id: Date.now().toString(),
-    texto: novaMensagem.value,
+    texto,
     enviadaPorNos: true,
-    hora: 'Agora'
+    hora: 'Enviando...'
   })
-  novaMensagem.value = ''
+
+  carregando.value = true
+  try {
+    await fetch(`/api/inbox/conversas/${conversaAtiva.value.id}/mensagens`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texto })
+    })
+    // Atualiza
+    const res = await fetch(`/api/inbox/conversas/${conversaAtiva.value.id}/mensagens`)
+    if (res.ok) mensagens.value = await res.json()
+  } finally {
+    carregando.value = false
+  }
 }
 </script>
 
@@ -40,7 +71,6 @@ function enviar() {
       <v-col cols="12" md="4" class="h-100 border-e overflow-y-auto bg-surface">
         <div class="pa-4 border-b d-flex align-center justify-space-between">
           <h1 class="text-h5 font-weight-black">Inbox</h1>
-          <v-chip size="small" color="primary">2 não lidas</v-chip>
         </div>
         <div class="pa-4">
           <CampoTexto v-model="busca" rotulo="" placeholder="Buscar conversa..." hide-details prepend-inner-icon="mdi-magnify" />
@@ -50,19 +80,16 @@ function enviar() {
           <v-list-item
             v-for="conv in conversas"
             :key="conv.id"
-            :active="conversaAtiva === conv.id"
+            :active="conversaAtiva?.id === conv.id"
             color="primary"
             class="border-b py-3 cursor-pointer"
-            @click="conversaAtiva = conv.id"
+            @click="conversaAtiva = conv"
           >
             <v-list-item-title class="font-weight-bold d-flex justify-space-between mb-1">
-              {{ conv.contato }}
-              <span class="text-caption text-medium-emphasis">{{ conv.data }}</span>
+              Contato {{ conv.contatoId }}
             </v-list-item-title>
-            <v-list-item-subtitle class="text-body-2">{{ conv.ultimaMensagem }}</v-list-item-subtitle>
             
             <div class="mt-2 d-flex justify-space-between align-center">
-              <ChipCanal :canal="conv.canal as any" />
               <v-chip size="x-small" :color="conv.estado === 'aberta' ? 'error' : 'warning'">{{ conv.estado }}</v-chip>
             </div>
           </v-list-item>
@@ -75,8 +102,7 @@ function enviar() {
           <!-- Header -->
           <div class="pa-4 border-b bg-surface d-flex justify-space-between align-center">
             <div>
-              <h2 class="text-h6 font-weight-bold">João da Silva</h2>
-              <span class="text-caption text-medium-emphasis">via WhatsApp</span>
+              <h2 class="text-h6 font-weight-bold">Contato {{ conversaAtiva.contatoId }}</h2>
             </div>
             <v-btn variant="outlined" size="small">Resolver</v-btn>
           </div>
@@ -96,7 +122,6 @@ function enviar() {
               >
                 {{ msg.texto }}
               </div>
-              <div class="text-caption text-medium-emphasis mt-1">{{ msg.hora }}</div>
             </div>
           </div>
 
@@ -110,13 +135,11 @@ function enviar() {
                 hide-details
                 placeholder="Digite sua resposta..."
                 @keyup.enter="enviar"
+                :disabled="carregando"
               ></v-text-field>
-              <v-btn color="primary" height="48" @click="enviar">
+              <v-btn color="primary" height="48" @click="enviar" :loading="carregando">
                 <v-icon icon="mdi-send"></v-icon>
               </v-btn>
-            </div>
-            <div class="text-caption text-medium-emphasis mt-2 text-center">
-              A resposta será enviada direto para o WhatsApp do contato.
             </div>
           </div>
         </template>

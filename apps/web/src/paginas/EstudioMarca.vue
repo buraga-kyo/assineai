@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStoreTema } from '../store/tema'
 import { CampoTexto, CampoSelecao } from '@assineai/ui'
 
 const roteador = useRouter()
 const store = useStoreTema()
+
+onMounted(() => {
+  store.carregarTema()
+})
 
 // Observa mudanças na paleta pra checar o contraste
 watch(() => store.tema.paleta, () => {
