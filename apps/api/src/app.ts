@@ -28,6 +28,7 @@ import { rotasVerificacao } from './http/verificacao.js'
 import { rotasCanais } from './http/canais.js'
 import { rotasContatos } from './http/contatos.js'
 import { rotasInbox } from './http/inbox.js'
+import { rotasCopiloto } from './http/copiloto.js'
 import type { BancoDaEmpresa, criarBanco } from './banco/conexao.js'
 import { criarClienteS3, type Armazenamento } from './storage/s3.js'
 
@@ -174,6 +175,7 @@ export function criarApp({ logger, verificacoes, banco, config }: OpcoesApp) {
   app.register(rotasCanais(banco))
   app.register(rotasContatos(banco))
   app.register(rotasInbox(banco))
+  app.register(rotasCopiloto(banco))
 
   return app
 }
