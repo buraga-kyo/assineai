@@ -47,4 +47,4 @@ AssinarPDF.js, cópias "Backup", sobras de editor) foi apagado e só existe na t
 
 `node Iniciar.js` nesta pasta, com um `.env` aqui e uma cópia de `Arquivos/Permanente`
 ao lado (JSignPdf.jar e cert.pfx; hoje ela mora na raiz do repositório). Nunca use
-`ModuloDoServidor/Iniciar.js`: ele sobe com `sync({ force: true })` e apaga o banco a cada boot.
+`ModuloDoServidor/Iniciar.js`: ele sobe com `sync({ force: true })` e apaga o banco a cada boot. 
