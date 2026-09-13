@@ -7,7 +7,7 @@ defineProps<{
   codigo: string
   titulo: string
   estado: 'rascunho' | 'pendente' | 'concluido' | 'cancelado'
-  prazo?: string
+  prazo?: string | undefined
   signatarios: Array<{ nome: string, canal: 'email' | 'whatsapp' | 'slack' | 'telegram' }>
 }>()
 

@@ -1,8 +1,14 @@
 {
   "extends": "../../packages/config/tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "dist"
+    "rootDir": "../../",
+    "outDir": "dist",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "@assineai/ui": ["../../packages/ui/src/index.ts"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", "env.d.ts"]
 }
