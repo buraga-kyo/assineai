@@ -17,6 +17,7 @@ const temaRocaNeonClaro = {
     'primary-darken-1': coresRocaNeon.primariaEscura,
     secondary: coresRocaNeon.secundaria,
     'secondary-darken-1': coresRocaNeon.secundariaEscura,
+    accent: coresRocaNeon.acento,
     error: coresRocaNeon.erro,
     info: coresRocaNeon.info,
     success: coresRocaNeon.sucesso,
@@ -37,6 +38,22 @@ export const pluginAssineAi = createVuetify({
     defaultTheme: 'temaRocaNeonClaro',
     themes: {
       temaRocaNeonClaro,
+    },
+  },
+  defaults: {
+    global: {
+      rounded: 0, // cantos retos para todos os componentes
+    },
+    VBtn: {
+      variant: 'flat', // botões sólidos e sem sombra por padrão
+      rounded: 0,
+    },
+    VCard: {
+      rounded: 0,
+    },
+    VTextField: {
+      variant: 'outlined', // cantos retos e com borda
+      rounded: 0,
     },
   },
 })
