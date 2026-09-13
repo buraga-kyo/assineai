@@ -5,6 +5,7 @@ import { canal, contatoCanal, eventoWebhook, TipoCanal, CANAIS } from '../banco/
 import { FabricaDeCanais } from '../canais/fabrica.js'
 import type { BancoDaEmpresa, criarBanco } from '../banco/conexao.js'
 import { randomBytes } from 'node:crypto'
+import { filaEntrada } from '../filas/trabalhadores/entrada.js'
 
 // Rota para gerenciar canais e receber webhooks
 export const rotasCanais = (banco: ReturnType<typeof criarBanco>): FastifyPluginAsyncZod => async (app) => {
@@ -60,14 +61,18 @@ export const rotasCanais = (banco: ReturnType<typeof criarBanco>): FastifyPlugin
       }
 
       // Grava o evento para processamento async antes de responder
-      await banco.bancoSistema.insert(eventoWebhook).values({
+      const [eventoDb] = await banco.bancoSistema.insert(eventoWebhook).values({
         empresaId: canalDb.empresaId,
         canalId: canalDb.id,
         payload: payload as any
-      })
+      }).returning({ id: eventoWebhook.id })
 
-      // Na vida real a gente colocaria um job na fila pra processar (ex: entrada:processar_mensagem)
-      // filaEntrada.add('processar_mensagem', { canalId: canalDb.id, ... })
+      // Despacha para a fila de entrada real
+      await filaEntrada.add('processar_mensagem', { 
+        empresaId: canalDb.empresaId,
+        canalId: canalDb.id, 
+        eventoId: eventoDb!.id 
+      })
 
       return reply.code(200).send({ ok: true })
     }
