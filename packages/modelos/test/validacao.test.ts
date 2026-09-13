@@ -9,7 +9,13 @@ test('todas as chaves do modelo.md estao no esquema zod', () => {
     const tags = Mustache.parse(md)
     const chavesNoMarkdown = tags.filter(t => t[0] === 'name').map(t => t[1])
     
-    const chavesNoEsquema = Object.keys(minuta.esquema.shape)
+    // Extrai o objeto base se for um ZodEffects (superRefine)
+    let schemaBase = minuta.esquema
+    if (schemaBase._def.typeName === 'ZodEffects') {
+      schemaBase = schemaBase._def.schema
+    }
+    
+    const chavesNoEsquema = Object.keys(schemaBase.shape || {})
 
     for (const chave of chavesNoMarkdown) {
       if (!chavesNoEsquema.includes(chave)) {
