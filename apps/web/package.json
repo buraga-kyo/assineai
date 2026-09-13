@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run --passWithNoTests"
   },
