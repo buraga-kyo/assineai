@@ -36,7 +36,7 @@ const roteador = useRouter()
               </p>
               
               <div class="d-flex flex-column flex-sm-row justify-center gap-4 mb-12">
-                <v-btn color="primary" size="x-large" @click="roteador.push({ name: 'entrar' })" elevation="2">
+                <v-btn color="primary" size="x-large" @click="roteador.push({ name: 'cadastro' })" elevation="2">
                   Começar Agora
                 </v-btn>
                 <v-btn variant="outlined" size="x-large" href="#funcionalidades">
@@ -86,7 +86,7 @@ const roteador = useRouter()
       <section class="py-16 bg-surface-variant text-center">
         <v-container>
           <h2 class="text-h4 font-weight-black mb-6">Pronto para fechar contratos mais rápido?</h2>
-          <v-btn color="primary" size="x-large" @click="roteador.push({ name: 'entrar' })">
+          <v-btn color="primary" size="x-large" @click="roteador.push({ name: 'cadastro' })">
             Testar a Plataforma
           </v-btn>
         </v-container>

@@ -86,6 +86,13 @@ async function conferirCodigo(codigoOtp: string) {
         >
           Mandar Código
         </v-btn>
+
+        <div class="text-center mt-6">
+          <span class="text-medium-emphasis">Ainda não tem conta? </span>
+          <router-link :to="{ name: 'cadastro' }" class="text-primary font-weight-bold text-decoration-none">
+            Criar conta
+          </router-link>
+        </div>
       </form>
 
       <!-- Passo 2: Digitar o código OTP que chegou no e-mail -->
