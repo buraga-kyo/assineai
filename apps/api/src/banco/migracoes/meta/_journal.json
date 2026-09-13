@@ -106,6 +106,13 @@
       "when": 1789258007725,
       "tag": "0014_serious_bishop",
       "breakpoints": false
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1789258300459,
+      "tag": "0015_tired_whizzer",
+      "breakpoints": false
     }
   ]
 }

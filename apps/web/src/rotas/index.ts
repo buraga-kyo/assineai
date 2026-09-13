@@ -71,6 +71,17 @@ export const roteador = createRouter({
       name: 'verificacao',
       component: () => import('../paginas/Verificacao.vue'),
       meta: { publico: true }
+    },
+    {
+      path: '/obras',
+      name: 'obras',
+      component: () => import('../paginas/Obras.vue')
+    },
+    {
+      path: '/o/:codigo',
+      name: 'obra-publica',
+      component: () => import('../paginas/ObraPublica.vue'),
+      meta: { publico: true }
     }
   ]
 })
