@@ -12,6 +12,12 @@ export const roteador = createRouter({
     },
     {
       path: '/',
+      name: 'landing',
+      component: () => import('../paginas/Landing.vue'),
+      meta: { publico: true }
+    },
+    {
+      path: '/painel',
       name: 'painel',
       component: () => import('../paginas/Painel.vue')
     },
