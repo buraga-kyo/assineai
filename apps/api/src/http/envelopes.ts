@@ -4,6 +4,7 @@ import { eq, and } from 'drizzle-orm'
 import { envelopes, documentosEnvelope, signatariosEnvelope } from '../banco/esquema/envelope.js'
 import { evidencia } from '../banco/esquema/evidencia.js'
 import { ErroDaApi } from './erros.js'
+import { filaConvites } from '../filas/trabalhadores/convites.js'
 
 export async function rotasEnvelopes(app: App) {
   app.post(
@@ -204,7 +205,14 @@ export async function rotasEnvelopes(app: App) {
         // Atualiza estado
         await tx.update(envelopes).set({ estado: 'pendente' }).where(eq(envelopes.id, envelopeId))
         
-        // No mundo real aqui postaria na fila de convites
+        // Dispara para a fila de convites
+        for (const sig of sigs) {
+          await filaConvites.add('enviar_convite', {
+            empresaId: sessao.empresaId,
+            envelopeId,
+            signatarioId: sig.id
+          })
+        }
       })
 
       return reply.code(200).send({ mensagem: 'Enviado com sucesso' })
