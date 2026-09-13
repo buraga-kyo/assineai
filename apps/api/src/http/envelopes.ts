@@ -142,6 +142,44 @@ export async function rotasEnvelopes(app: App) {
   )
 
   app.post(
+    '/envelopes/:id/documentos',
+    {
+      config: { acesso: 'sessao' },
+      schema: { params: z.object({ id: z.string().uuid() }) }
+    },
+    async (request, reply) => {
+      const sessao = request.sessao!
+      const envelopeId = request.params.id
+      const arquivo = await request.file()
+
+      if (!arquivo) throw new ErroDaApi(400, 'dados_invalidos', 'Arquivo não enviado')
+      if (arquivo.mimetype !== 'application/pdf') throw new ErroDaApi(415, 'dados_invalidos', 'Só aceitamos PDF')
+
+      await request.banco(async (tx) => {
+        const env = await tx.select().from(envelopes).where(and(eq(envelopes.id, envelopeId), eq(envelopes.empresaId, sessao.empresaId)))
+        if (!env.length) throw new ErroDaApi(404, 'nao_encontrado', 'Envelope não encontrado')
+
+        const [docDb] = await tx.insert(documentosEnvelope).values({
+          empresaId: sessao.empresaId,
+          envelopeId,
+          nomeOriginal: arquivo.filename,
+          tamanhoBytes: 0, // Será atualizado se o S3 retornar ou depois
+          caminhoStorage: `pendente`
+        }).returning({ id: documentosEnvelope.id })
+
+        const docId = docDb!.id
+        const caminhoS3 = `empresa/${sessao.empresaId}/envelope/${envelopeId}/documento/${docId}/original.pdf`
+        
+        await request.armazenamento.enviarArquivo(caminhoS3, arquivo.file, 'application/pdf')
+        
+        await tx.update(documentosEnvelope).set({ caminhoStorage: caminhoS3 }).where(eq(documentosEnvelope.id, docId))
+      })
+
+      return reply.code(201).send({ ok: true })
+    }
+  )
+
+  app.post(
     '/envelopes/:id/enviar',
     {
       config: { acesso: 'sessao' },
