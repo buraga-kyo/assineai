@@ -30,8 +30,8 @@ function removerBloco(indice: number) {
 
 function moverBloco(indice: number, direcao: -1 | 1) {
   if (indice + direcao < 0 || indice + direcao >= blocos.value.length) return
-  const temp = blocos.value[indice]
-  blocos.value[indice] = blocos.value[indice + direcao]
+  const temp = blocos.value[indice]!
+  blocos.value[indice] = blocos.value[indice + direcao]!
   blocos.value[indice + direcao] = temp
 }
 

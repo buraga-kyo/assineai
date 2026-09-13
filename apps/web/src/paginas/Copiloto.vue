@@ -75,7 +75,7 @@ function gerar() {
             {{ msg.texto }}
           </div>
         </div>
-        <div v-if="carregando && mensagens[mensagens.length-1].autor === 'user'" class="text-caption text-medium-emphasis">Copiloto digitando...</div>
+        <div v-if="carregando && mensagens[mensagens.length-1]?.autor === 'user'" class="text-caption text-medium-emphasis">Copiloto digitando...</div>
       </div>
 
       <!-- Input -->
