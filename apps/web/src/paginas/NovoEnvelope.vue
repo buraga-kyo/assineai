@@ -38,16 +38,12 @@ function subiuArquivo(evento: Event) {
 }
 
 async function enviar() {
-  // Bateria na API aqui de verdade
-  console.log('Enviando envelope:', {
-    documento: store.documento?.name,
-    signatarios: store.signatarios,
-    carimbo: store.configCarimbo,
-    envio: store.configEnvio
-  })
-  
-  store.limpar()
-  roteador.push({ name: 'envelopes' })
+  try {
+    await store.dispararEnvelope(store.documento?.name || 'Novo Contrato')
+    roteador.push({ name: 'envelopes' })
+  } catch (e) {
+    alert('Erro ao criar envelope: ' + e)
+  }
 }
 </script>
 

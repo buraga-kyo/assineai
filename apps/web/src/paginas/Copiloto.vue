@@ -5,15 +5,16 @@ import { useRouter } from 'vue-router'
 const roteador = useRouter()
 
 const mensagens = ref([
-  { id: 1, autor: 'bot', texto: 'Olá! Sou o seu Copiloto Jurídico. Qual documento você quer criar hoje?' },
-  { id: 2, autor: 'user', texto: 'Quero um contrato de honorários.' },
-  { id: 3, autor: 'bot', texto: 'Perfeito. Para começarmos, qual o nome do seu cliente?' }
+  { id: 1, autor: 'bot', texto: 'Olá! Sou o seu Copiloto Jurídico. Para iniciar, me fale o modelo que você quer preencher. Exemplo: advocacia-honorarios, musica-split-sheet.' },
 ])
 
 const input = ref('')
 const carregando = ref(false)
+const slugAtual = ref('advocacia-honorarios')
+const variaveisPreenchidas = ref<Record<string, string>>({})
+const prontoParaGerar = ref(false)
 
-function enviar() {
+async function enviar() {
   if (!input.value) return
   
   mensagens.value.push({
@@ -26,23 +27,53 @@ function enviar() {
   const textoEnviado = input.value
   input.value = ''
   
-  // Mock da resposta
-  setTimeout(() => {
-    carregando.value = false
-    if (textoEnviado.includes('João')) {
-      mensagens.value.push({ id: Date.now(), autor: 'bot', texto: 'Entendi, João. E qual o valor total dos honorários?' })
+  try {
+    const res = await fetch('/api/copiloto/entrevista', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        slugMinuta: slugAtual.value,
+        mensagem: textoEnviado,
+        variaveisJaPreenchidas: variaveisPreenchidas.value
+      })
+    })
+
+    if (res.ok) {
+      const data = await res.json()
+      variaveisPreenchidas.value = data.variaveis
+      prontoParaGerar.value = data.pronto
+      mensagens.value.push({ id: Date.now(), autor: 'bot', texto: data.resposta })
     } else {
-      mensagens.value.push({ id: Date.now(), autor: 'bot', texto: 'Anotado. Clica ali embaixo para gerar o PDF e irmos para a tela de envio!' })
+      mensagens.value.push({ id: Date.now(), autor: 'bot', texto: 'Desculpe, ocorreu um erro na comunicação.' })
     }
-  }, 1000)
+  } catch (e) {
+    mensagens.value.push({ id: Date.now(), autor: 'bot', texto: 'Desculpe, a conexão falhou.' })
+  } finally {
+    carregando.value = false
+  }
 }
 
-function gerar() {
+async function gerar() {
   carregando.value = true
-  // Mock de redirecionar pro envelope
-  setTimeout(() => {
-    roteador.push({ name: 'novo-envelope' })
-  }, 1500)
+  try {
+    const res = await fetch('/api/copiloto/gerar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        slugMinuta: slugAtual.value,
+        variaveis: variaveisPreenchidas.value
+      })
+    })
+
+    if (res.ok) {
+      const data = await res.json()
+      roteador.push({ name: 'novo-envelope' }) // Na vida real redirecionaria pro /envelopes/:id
+    }
+  } catch (e) {
+    alert('Falha ao gerar o documento')
+  } finally {
+    carregando.value = false
+  }
 }
 </script>
 

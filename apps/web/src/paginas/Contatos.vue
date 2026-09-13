@@ -1,14 +1,38 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { CampoTexto, BotaoFechar } from '@assineai/ui'
 
 const roteador = useRouter()
 const busca = ref('')
+const carregando = ref(false)
 
-const contatos = ref([
-  { id: '1', nome: 'João da Silva', email: 'joao@fazenda.com', telefone: '5511999999999', etiquetas: [{ nome: 'Produtor', cor: '#0B5D3B' }] }
-])
+const contatos = ref<any[]>([])
+
+async function carregarContatos() {
+  carregando.value = true
+  try {
+    const url = busca.value ? `/api/contatos/buscar?q=${encodeURIComponent(busca.value)}` : '/api/contatos'
+    const res = await fetch(url)
+    if (res.ok) {
+      contatos.value = await res.json()
+    }
+  } finally {
+    carregando.value = false
+  }
+}
+
+onMounted(() => {
+  carregarContatos()
+})
+
+let timeoutBusca: ReturnType<typeof setTimeout>
+watch(busca, () => {
+  clearTimeout(timeoutBusca)
+  timeoutBusca = setTimeout(() => {
+    carregarContatos()
+  }, 500)
+})
 </script>
 
 <template>
@@ -26,17 +50,25 @@ const contatos = ref([
       </v-row>
     </v-card>
 
-    <div v-for="contato in contatos" :key="contato.id" class="mb-4">
+    <div v-if="carregando" class="text-center pa-8">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    </div>
+
+    <div v-else-if="contatos.length === 0" class="text-center pa-8 text-medium-emphasis">
+      Nenhum contato encontrado.
+    </div>
+
+    <div v-else v-for="contato in contatos" :key="contato.id" class="mb-4">
       <v-card variant="outlined" class="pa-4 cursor-pointer" @click="() => {}">
         <div class="d-flex justify-space-between align-center">
           <div>
-            <h3 class="text-h6 font-weight-bold">{{ contato.nome }}</h3>
+            <h3 class="text-h6 font-weight-bold" :class="{'text-medium-emphasis text-decoration-line-through': contato.lgpdApagado}">{{ contato.nome }}</h3>
             <div class="text-caption text-medium-emphasis">
               <span v-if="contato.email"><v-icon size="small" class="mr-1">mdi-email</v-icon>{{ contato.email }}</span>
               <span v-if="contato.telefone" class="ml-4"><v-icon size="small" class="mr-1">mdi-phone</v-icon>{{ contato.telefone }}</span>
             </div>
           </div>
-          <div>
+          <div v-if="contato.etiquetas">
             <v-chip v-for="(eti, i) in contato.etiquetas" :key="i" :color="eti.cor" size="small" variant="flat" class="text-white">{{ eti.nome }}</v-chip>
           </div>
         </div>
