@@ -33,6 +33,8 @@ const esquema = z.object({
   TELEGRAM_BOT_TOKEN_PLATAFORMA: z.string().optional(),
   EVOLUTION_URL: z.string().url().optional(),
   EVOLUTION_CHAVE_GLOBAL: z.string().optional(),
+  REDATOR_DRIVER: z.string().optional(),
+  REDATOR_MODELO: z.string().optional(),
 })
 
 export type Config = z.infer<typeof esquema>
