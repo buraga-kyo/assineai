@@ -57,7 +57,13 @@ export const useStoreCriacaoEnvelope = defineStore('criacaoEnvelope', () => {
     }
 
     // Na vida real a gente chamaria a rota pra dar o upload do documento (multipart)
-    // await uploadDocumento(envelopeId, documento.value)
+    const formData = new FormData()
+    formData.append('arquivo', documento.value)
+    const resUpload = await fetch(`/api/envelopes/${envelopeId}/documentos`, {
+      method: 'POST',
+      body: formData
+    })
+    if (!resUpload.ok) throw new Error('Erro no upload do documento')
 
     // 3. Envia o envelope
     await fetch(`/api/envelopes/${envelopeId}/enviar`, {
