@@ -1,33 +1,17 @@
-# Compose de producao do AssineAi, so o pedaco desta issue: o Postgres e o
-# servico `migracao`, que aplica as migrations e sai. A api, o worker e o
-# caddy entram na issue de deploy; api e worker vao depender de
-# `migracao: condition: service_completed_successfully`, para nunca subirem
-# com esquema atrasado.
-#
-# Sobe com um .env de producao NAO versionado (docker compose --env-file;
-# os nomes estao em infra/.env.prod.example). As senhas das roles vem desse
-# .env: infra/postgres-init-prod/01-roles.sh cria assineai_migracao e
-# assineai_app com elas no primeiro boot do volume (e so nele: o init do
-# Postgres nao roda de novo com o volume ja criado). A URL da migracao e
-# montada aqui com a mesma senha, para nao existir segundo lugar para errar.
 name: assineai-prod
 
 services:
   postgres:
     image: postgis/postgis:18-3.6
     restart: unless-stopped
-    # sem porta publicada: so os servicos desta rede falam com o banco
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-assineai}
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_SENHA:?defina POSTGRES_SENHA no .env de producao}
-      # lidas pelo 01-roles.sh no primeiro boot do volume
       ASSINEAI_MIGRACAO_SENHA: ${ASSINEAI_MIGRACAO_SENHA:?defina ASSINEAI_MIGRACAO_SENHA no .env de producao}
       ASSINEAI_APP_SENHA: ${ASSINEAI_APP_SENHA:?defina ASSINEAI_APP_SENHA no .env de producao}
     volumes:
-      # a imagem do Postgres 18 guarda os dados em /var/lib/postgresql/18/docker
       - postgres-dados:/var/lib/postgresql
-      # roles de producao com as senhas do ambiente (nao o postgres-init de dev)
       - ./postgres-init-prod:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d ${POSTGRES_DB:-assineai}"]
@@ -36,7 +20,30 @@ services:
       retries: 12
       start_period: 10s
 
-  # Roda `node apps/api/dist/banco/migrar.js` e sai com 0 (Exited 0 e o normal).
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?defina MINIO_ROOT_USER no .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?defina MINIO_ROOT_PASSWORD no .env}
+    volumes:
+      - minio-dados:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
   migracao:
     build:
       context: ..
@@ -52,5 +59,78 @@ services:
       BANCO_URL_MIGRACAO: postgres://assineai_migracao:${ASSINEAI_MIGRACAO_SENHA}@postgres:5432/${POSTGRES_DB:-assineai}
     command: ["node", "apps/api/dist/banco/migrar.js"]
 
+  api:
+    build:
+      context: ..
+      dockerfile: infra/docker/api.Dockerfile
+      target: migracao
+    restart: unless-stopped
+    depends_on:
+      migracao:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORTA_API: 3000
+      BANCO_URL: postgres://assineai_app:${ASSINEAI_APP_SENHA}@postgres:5432/${POSTGRES_DB:-assineai}
+      REDIS_URL: redis://redis:6379
+      ARMAZENAMENTO_ENDPOINT: http://minio:9000
+      ARMAZENAMENTO_REGIAO: sa-east-1
+      ARMAZENAMENTO_BUCKET: assineai
+      ARMAZENAMENTO_CHAVE: ${MINIO_ROOT_USER}
+      ARMAZENAMENTO_SEGREDO: ${MINIO_ROOT_PASSWORD}
+      CHAVE_OTP: ${CHAVE_OTP}
+      CORS_ORIGENS: ${CORS_ORIGENS}
+      CHAVE_MESTRA: ${CHAVE_MESTRA}
+    command: ["node", "apps/api/dist/servidor.js"]
+
+  worker:
+    build:
+      context: ..
+      dockerfile: infra/docker/api.Dockerfile
+      target: worker
+    restart: unless-stopped
+    depends_on:
+      migracao:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      BANCO_URL: postgres://assineai_app:${ASSINEAI_APP_SENHA}@postgres:5432/${POSTGRES_DB:-assineai}
+      REDIS_URL: redis://redis:6379
+      CHAVE_MESTRA: ${CHAVE_MESTRA}
+    # Command ja esta no dockerfile (worker.js)
+
+  web:
+    build:
+      context: ..
+      dockerfile: infra/docker/web.Dockerfile
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+      - web
+
 volumes:
   postgres-dados:
+  minio-dados:
+  caddy_data:
+  caddy_config:
