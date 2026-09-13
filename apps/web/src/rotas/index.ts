@@ -36,6 +36,11 @@ export const roteador = createRouter({
       component: () => import('../paginas/EstudioMarca.vue')
     },
     {
+      path: '/editor',
+      name: 'editor',
+      component: () => import('../paginas/EditorDocumento.vue')
+    },
+    {
       path: '/contatos',
       name: 'contatos',
       component: () => import('../paginas/Contatos.vue')
