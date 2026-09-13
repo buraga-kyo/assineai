@@ -78,6 +78,11 @@ export const roteador = createRouter({
       component: () => import('../paginas/Obras.vue')
     },
     {
+      path: '/guia',
+      name: 'guia-artista',
+      component: () => import('../paginas/GuiaArtista.vue')
+    },
+    {
       path: '/o/:codigo',
       name: 'obra-publica',
       component: () => import('../paginas/ObraPublica.vue'),
