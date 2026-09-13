@@ -36,6 +36,21 @@ COPY --from=build /app/apps/api/dist apps/api/dist
 USER node
 CMD ["node", "apps/api/dist/banco/migrar.js"]
 
+# Alvo da API com Typst instalado
+FROM node:22-slim AS api
+ENV NODE_ENV=production
+# Instalar dependências para o wget e typst
+RUN apt-get update && apt-get install -y wget xz-utils && rm -rf /var/lib/apt/lists/*
+RUN wget -qO- https://github.com/typst/typst/releases/latest/download/typst-x86_64-unknown-linux-musl.tar.xz | tar -xJ -C /usr/local/bin --strip-components=1 typst-x86_64-unknown-linux-musl/typst
+WORKDIR /app
+COPY --from=build /app/package.json ./
+COPY --from=build /app/node_modules node_modules
+COPY --from=build /app/apps/api/package.json apps/api/
+COPY --from=build /app/apps/api/node_modules apps/api/node_modules
+COPY --from=build /app/apps/api/dist apps/api/dist
+USER node
+CMD ["node", "apps/api/dist/servidor.js"]
+
 # Alvo para rodar a API e Worker com Python para o OpenTimestamps
 FROM node:22-slim AS worker
 ENV NODE_ENV=production

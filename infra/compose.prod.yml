@@ -63,7 +63,7 @@ services:
     build:
       context: ..
       dockerfile: infra/docker/api.Dockerfile
-      target: migracao
+      target: api
     restart: unless-stopped
     depends_on:
       migracao:
