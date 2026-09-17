@@ -14,6 +14,7 @@ const completo: Record<string, string> = {
   ARMAZENAMENTO_SEGREDO: 'assineai-dev-segredo',
   ARMAZENAMENTO_LIMITE_TAMANHO: '10485760',
   CHAVE_OTP: 'uma_chave_longa_suficiente_123',
+  CHAVE_MESTRA: 'uma_chave_mestra_secreta_longa_o_suficiente',
   CORS_ORIGENS: 'http://localhost:5173',
 }
 

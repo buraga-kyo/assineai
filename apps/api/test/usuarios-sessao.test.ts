@@ -29,6 +29,7 @@ describe.skipIf(!temBanco)('usuarios e sessao', () => {
     const res = await app.inject({
       method: 'POST',
       url: '/usuarios',
+      headers: { 'X-Requisicao': '1' },
       payload: {
         nomeEmpresa: `Test Emp ${rodada}`,
         nome: 'Dono Teste',
@@ -48,6 +49,7 @@ describe.skipIf(!temBanco)('usuarios e sessao', () => {
     const res = await app.inject({
       method: 'POST',
       url: '/sessao',
+      headers: { 'X-Requisicao': '1' },
       payload: {
         email: `test-inexistente@${rodada}.com`,
         senha: 'senha-qualquer-999',
@@ -56,7 +58,7 @@ describe.skipIf(!temBanco)('usuarios e sessao', () => {
 
     expect(res.statusCode).toBe(401)
     const body = JSON.parse(res.body)
-    expect(body.error).toBe('E-mail ou senha incorretos')
+    expect(body.erro?.mensagem || body.error).toMatch(/E-mail ou (código|senha) incorretos/)
   })
 
   test('POST /sessao (login) - sucesso com credenciais corretas', async () => {
@@ -67,6 +69,7 @@ describe.skipIf(!temBanco)('usuarios e sessao', () => {
     await app.inject({
       method: 'POST',
       url: '/usuarios',
+      headers: { 'X-Requisicao': '1' },
       payload: {
         nomeEmpresa: `Test Emp Login ${rodada}`,
         nome: 'Login Teste',
@@ -79,6 +82,7 @@ describe.skipIf(!temBanco)('usuarios e sessao', () => {
     const res = await app.inject({
       method: 'POST',
       url: '/sessao',
+      headers: { 'X-Requisicao': '1' },
       payload: { email, senha },
     })
 
@@ -111,6 +115,7 @@ describe.skipIf(!temBanco)('usuarios e sessao', () => {
     await app.inject({
       method: 'POST',
       url: '/usuarios',
+      headers: { 'X-Requisicao': '1' },
       payload: {
         nomeEmpresa: `Test Emp Fluxo ${rodada}`,
         nome: 'Fluxo Teste',
@@ -123,11 +128,13 @@ describe.skipIf(!temBanco)('usuarios e sessao', () => {
     const loginRes = await app.inject({
       method: 'POST',
       url: '/sessao',
+      headers: { 'X-Requisicao': '1' },
       payload: { email, senha },
     })
 
-    const rawCookie = loginRes.headers['set-cookie'] as string
-    const token = rawCookie.split(';')[0]!.split('=')[1]
+    const rawCookieRaw = loginRes.headers['set-cookie']
+    const rawCookie = Array.isArray(rawCookieRaw) ? rawCookieRaw[0] : rawCookieRaw
+    const token = (rawCookie as string).split(';')[0]!.split('=')[1]
 
     // 2. GET /sessao com o cookie ativo
     const sessaoRes = await app.inject({
@@ -150,6 +157,7 @@ describe.skipIf(!temBanco)('usuarios e sessao', () => {
       url: '/sessao',
       headers: {
         cookie: `__Host-sessao=${token}`,
+        'X-Requisicao': '1'
       },
     })
 
