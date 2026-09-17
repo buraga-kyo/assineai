@@ -13,6 +13,7 @@ test.describe('Fluxo Completo - Roça Neon', () => {
 
     // 1. Cadastro
     await page.goto('/cadastro');
+    await page.waitForTimeout(3000); // Aguarda o backend subir no CI
     await expect(page).toHaveTitle(/AssineAi/);
     
     // Preencher o formulário
