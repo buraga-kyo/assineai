@@ -2,44 +2,37 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStoreSessao } from '../store/sessao'
-import { CampoTexto, TecladoCodigo } from '@assineai/ui'
+import { TecladoCodigo } from '@assineai/ui'
 
 const roteador = useRouter()
 const sessao = useStoreSessao()
 
 const email = ref('')
-const passoAtual = ref<'PEDIR_EMAIL' | 'DIGITAR_CODIGO'>('PEDIR_EMAIL')
+const senha = ref('')
 const carregando = ref(false)
 const mensagemErro = ref('')
 
-// Na vida real a gente chamaria o Cloudflare Turnstile aqui e pegava o token
-const tokenRoboMentira = 'sou-humano-sim' 
-
-async function enviarEmail() {
-  if (!email.value) return
+async function logarComSenha() {
+  if (!email.value || !senha.value) return
   
   carregando.value = true
   mensagemErro.value = ''
   
   try {
-    await sessao.pedirCodigo(email.value, tokenRoboMentira)
-    passoAtual.value = 'DIGITAR_CODIGO'
-  } catch (erro) {
-    mensagemErro.value = 'E-mail inválido ou rolou um erro de conexão.'
-  } finally {
-    carregando.value = false
-  }
-}
+    const resposta = await fetch('/api/sessao', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Requisicao': '1' },
+      body: JSON.stringify({ email: email.value, senha: senha.value })
+    })
 
-async function conferirCodigo(codigoOtp: string) {
-  carregando.value = true
-  mensagemErro.value = ''
-  
-  try {
-    await sessao.entrarComCodigo(email.value, codigoOtp)
-    roteador.push({ name: 'painel' })
+    if (resposta.ok) {
+      roteador.push({ name: 'envelopes' })
+    } else {
+      const erroJson = await resposta.json()
+      mensagemErro.value = erroJson.erro?.mensagem || 'Senha ou e-mail inválidos.'
+    }
   } catch (erro: any) {
-    mensagemErro.value = erro.message || 'O código tá errado. Tenta de novo.'
+    mensagemErro.value = 'E-mail inválido ou rolou um erro de conexão.'
   } finally {
     carregando.value = false
   }
@@ -47,77 +40,74 @@ async function conferirCodigo(codigoOtp: string) {
 </script>
 
 <template>
-  <v-container class="h-100 d-flex align-center justify-center">
-    <v-card class="pa-8 w-100" max-width="450" variant="outlined">
-      <div class="text-center mb-6">
-        <h1 class="text-h4 font-weight-black text-primary mb-2">AssineAi</h1>
-        <p class="text-body-2 text-medium-emphasis">
-          Sem senha pra esquecer. A gente te manda o código pro e-mail e fechou.
+  <div class="signatario" style="min-height: 100vh; display: grid; place-items: center;">
+    <main class="cartao-assinar" style="width: 100%; max-width: 450px;">
+      
+      <div class="text-center mb-6" style="margin-bottom: 24px;">
+        <h1 style="font-family: var(--fonte-titulo); color: var(--primaria); text-transform: uppercase; font-size: 32px; letter-spacing: var(--espaco-titulo); margin-bottom: 8px;">AssineAi</h1>
+        <p class="suave">
+          Faça login para gerenciar seus documentos e assinaturas.
         </p>
       </div>
 
-      <div v-if="mensagemErro" class="bg-error text-on-error pa-3 rounded mb-4 text-center text-body-2">
+      <div v-if="mensagemErro" style="background-color: var(--erro); color: var(--sobre-erro); padding: 12px; border-radius: var(--raio); margin-bottom: 16px; text-align: center; font-weight: bold;">
         {{ mensagemErro }}
       </div>
 
-      <!-- Passo 1: Informar o e-mail -->
-      <form v-if="passoAtual === 'PEDIR_EMAIL'" @submit.prevent="enviarEmail">
-        <CampoTexto 
-          v-model="email" 
-          rotulo="Seu e-mail de trabalho" 
-          type="email" 
-          placeholder="voce@fazenda.com"
-          :disabled="carregando"
-          required
-        />
-        
-        <!-- O widget do Turnstile ficaria aqui visualmente -->
-        <div class="protecao-robo d-flex align-center justify-center pa-4 mb-4 mt-2 bg-surface-variant rounded">
-          <v-icon icon="mdi-shield-check" color="success" class="mr-2"></v-icon>
-          <span class="text-caption">Protegido contra robôs e DDoS</span>
+      <form @submit.prevent="logarComSenha" style="display: flex; flex-direction: column; gap: 16px;">
+        <div>
+          <label class="suave" style="display: block; margin-bottom: 4px; font-size: 14px;">E-mail de Trabalho</label>
+          <input 
+            type="email" 
+            v-model="email" 
+            placeholder="bragaus@outlook.com"
+            :disabled="carregando"
+            required
+            style="width: 100%; padding: 12px; background: var(--fundo); border: 2px solid var(--linha); border-radius: var(--raio); color: var(--texto); outline: none;"
+          />
         </div>
 
-        <v-btn 
-          type="submit" 
-          color="primary" 
-          block 
-          size="large" 
-          :loading="carregando"
-        >
-          Mandar Código
-        </v-btn>
+        <div>
+          <label class="suave" style="display: block; margin-bottom: 4px; font-size: 14px;">Senha Segura</label>
+          <input 
+            type="password" 
+            v-model="senha" 
+            placeholder="••••••••"
+            :disabled="carregando"
+            required
+            minlength="8"
+            style="width: 100%; padding: 12px; background: var(--fundo); border: 2px solid var(--linha); border-radius: var(--raio); color: var(--texto); outline: none;"
+          />
+        </div>
+        
+        <div style="display: flex; align-items: center; justify-content: center; padding: 16px; background: var(--superficie-2); border: 1px dashed var(--linha); border-radius: var(--raio); margin-top: 8px;">
+          <svg style="width: 16px; height: 16px; color: var(--selado); margin-right: 8px;" viewBox="0 0 24 24"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+          <span style="font-size: 14px;">Protegido contra robôs e DDoS</span>
+        </div>
 
-        <div class="text-center mt-6">
-          <span class="text-medium-emphasis">Ainda não tem conta? </span>
-          <router-link :to="{ name: 'cadastro' }" class="text-primary font-weight-bold text-decoration-none">
+        <button 
+          type="submit" 
+          class="botao primario"
+          :disabled="carregando"
+          style="width: 100%; margin-top: 8px;"
+        >
+          {{ carregando ? 'Entrando...' : 'Entrar' }}
+        </button>
+
+        <div style="text-align: center; margin-top: 24px; font-size: 14px;">
+          <span class="suave">Ainda não tem conta? </span>
+          <router-link :to="{ name: 'cadastro' }" style="color: var(--primaria); font-weight: bold; text-decoration: none;">
             Criar conta
           </router-link>
         </div>
       </form>
 
-      <!-- Passo 2: Digitar o código OTP que chegou no e-mail -->
-      <div v-else class="text-center">
-        <p class="mb-4">Mandamos 6 números pro e-mail <strong>{{ email }}</strong></p>
-        
-        <TecladoCodigo 
-          model-value=""
-          @completou="conferirCodigo" 
-        />
-        
-        <v-progress-circular v-if="carregando" indeterminate color="primary" class="mt-4"></v-progress-circular>
-        
-        <div class="mt-6">
-          <v-btn variant="text" size="small" @click="passoAtual = 'PEDIR_EMAIL'">
-            Voltar e corrigir e-mail
-          </v-btn>
-        </div>
-      </div>
-    </v-card>
-  </v-container>
+    </main>
+  </div>
 </template>
 
 <style scoped>
-.protecao-robo {
-  border: 1px dashed var(--v-theme-outline);
+input:focus {
+  border-color: var(--primaria) !important;
 }
 </style>

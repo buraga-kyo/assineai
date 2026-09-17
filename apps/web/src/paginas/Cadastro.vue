@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { CampoTexto } from '@assineai/ui'
 
 const roteador = useRouter()
 
@@ -24,7 +23,7 @@ async function cadastrarUsuario() {
   try {
     const resposta = await fetch('/api/usuarios', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Requisicao': '1' },
       body: JSON.stringify({
         nomeEmpresa: nomeDaEmpresaDigitado.value,
         nome: nomeDoUsuarioDigitado.value,
@@ -37,7 +36,7 @@ async function cadastrarUsuario() {
       roteador.push({ name: 'entrar', query: { cadastroSucesso: 'true' } })
     } else {
       const erroJson = await resposta.json()
-      mensagemDeErro.value = erroJson.error || erroJson.mensagem || 'Ocorreu um erro ao criar a conta.'
+      mensagemDeErro.value = erroJson.erro?.mensagem || 'Ocorreu um erro ao criar a conta.'
     }
   } catch (erro) {
     mensagemDeErro.value = 'Falha na conexão. Tente novamente mais tarde.'
@@ -48,87 +47,98 @@ async function cadastrarUsuario() {
 </script>
 
 <template>
-  <v-container class="h-100 d-flex align-center justify-center">
-    <v-card class="pa-8 w-100" max-width="500" variant="outlined">
-      <div class="text-center mb-6">
-        <h1 class="text-h4 font-weight-black text-primary mb-2">AssineAi</h1>
-        <p class="text-body-1 text-medium-emphasis">
+  <div class="signatario" style="min-height: 100vh; display: grid; place-items: center;">
+    <main class="cartao-assinar" style="width: 100%; max-width: 450px;">
+      
+      <div class="text-center mb-6" style="margin-bottom: 24px;">
+        <h1 style="font-family: var(--fonte-titulo); color: var(--primaria); text-transform: uppercase; font-size: 32px; letter-spacing: var(--espaco-titulo); margin-bottom: 8px;">AssineAi</h1>
+        <p class="suave">
           Crie a conta da sua empresa. Rápido, seguro e sem complicações.
         </p>
       </div>
 
-      <div v-if="mensagemDeErro" class="bg-error text-on-error pa-3 rounded mb-4 text-center text-body-2">
+      <div v-if="mensagemDeErro" style="background-color: var(--erro); color: var(--sobre-erro); padding: 12px; border-radius: var(--raio); margin-bottom: 16px; text-align: center; font-weight: bold;">
         {{ mensagemDeErro }}
       </div>
 
-      <form @submit.prevent="cadastrarUsuario">
-        <CampoTexto 
-          v-model="nomeDaEmpresaDigitado" 
-          rotulo="Nome da Empresa" 
-          placeholder="Ex: Minha Empresa Ltda."
-          :disabled="carregando"
-          required
-        />
-
-        <CampoTexto 
-          v-model="nomeDoUsuarioDigitado" 
-          rotulo="Seu Nome Completo" 
-          placeholder="Ex: João da Silva"
-          :disabled="carregando"
-          class="mt-4"
-          required
-        />
-
-        <CampoTexto 
-          v-model="emailDigitado" 
-          rotulo="E-mail de Trabalho" 
-          type="email" 
-          placeholder="voce@empresa.com"
-          :disabled="carregando"
-          class="mt-4"
-          required
-        />
-
-        <CampoTexto 
-          v-model="senhaDigitada" 
-          rotulo="Senha Segura" 
-          type="password" 
-          placeholder="No mínimo 8 caracteres"
-          :disabled="carregando"
-          class="mt-4 mb-6"
-          required
-          minlength="8"
-        />
-
-        <!-- Proteção simulada do Turnstile visualmente -->
-        <div class="protecao-robo d-flex align-center justify-center pa-4 mb-6 bg-surface-variant rounded">
-          <v-icon icon="mdi-shield-check" color="success" class="mr-2"></v-icon>
-          <span class="text-caption">Conexão segura e verificada</span>
+      <form @submit.prevent="cadastrarUsuario" style="display: flex; flex-direction: column; gap: 16px;">
+        
+        <div>
+          <label class="suave" style="display: block; margin-bottom: 4px; font-size: 14px;">Nome da Empresa</label>
+          <input 
+            type="text" 
+            v-model="nomeDaEmpresaDigitado" 
+            placeholder="Ex: Minha Empresa Ltda."
+            :disabled="carregando"
+            required
+            style="width: 100%; padding: 12px; background: var(--fundo); border: 2px solid var(--linha); border-radius: var(--raio); color: var(--texto); outline: none;"
+          />
         </div>
 
-        <v-btn 
+        <div>
+          <label class="suave" style="display: block; margin-bottom: 4px; font-size: 14px;">Seu Nome Completo</label>
+          <input 
+            type="text" 
+            v-model="nomeDoUsuarioDigitado" 
+            placeholder="Ex: Matheus Braga"
+            :disabled="carregando"
+            required
+            style="width: 100%; padding: 12px; background: var(--fundo); border: 2px solid var(--linha); border-radius: var(--raio); color: var(--texto); outline: none;"
+          />
+        </div>
+
+        <div>
+          <label class="suave" style="display: block; margin-bottom: 4px; font-size: 14px;">E-mail de Trabalho</label>
+          <input 
+            type="email" 
+            v-model="emailDigitado" 
+            placeholder="bragaus@outlook.com"
+            :disabled="carregando"
+            required
+            style="width: 100%; padding: 12px; background: var(--fundo); border: 2px solid var(--linha); border-radius: var(--raio); color: var(--texto); outline: none;"
+          />
+        </div>
+
+        <div>
+          <label class="suave" style="display: block; margin-bottom: 4px; font-size: 14px;">Senha Segura</label>
+          <input 
+            type="password" 
+            v-model="senhaDigitada" 
+            placeholder="••••••••"
+            :disabled="carregando"
+            required
+            minlength="8"
+            style="width: 100%; padding: 12px; background: var(--fundo); border: 2px solid var(--linha); border-radius: var(--raio); color: var(--texto); outline: none;"
+          />
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: center; padding: 16px; background: var(--superficie-2); border: 1px dashed var(--linha); border-radius: var(--raio); margin-top: 8px;">
+          <svg style="width: 16px; height: 16px; color: var(--selado); margin-right: 8px;" viewBox="0 0 24 24"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+          <span style="font-size: 14px;">Conexão segura e verificada</span>
+        </div>
+
+        <button 
           type="submit" 
-          color="primary" 
-          block 
-          size="large" 
-          :loading="carregando"
+          class="botao primario"
+          :disabled="carregando"
+          style="width: 100%; margin-top: 8px;"
         >
-          Criar Minha Conta
-        </v-btn>
+          {{ carregando ? 'Criando...' : 'Criar Minha Conta' }}
+        </button>
         
-        <div class="text-center mt-6">
-          <span class="text-medium-emphasis">Já tem uma conta? </span>
-          <router-link :to="{ name: 'entrar' }" class="text-primary font-weight-bold text-decoration-none">
+        <div style="text-align: center; margin-top: 24px; font-size: 14px;">
+          <span class="suave">Já tem uma conta? </span>
+          <router-link :to="{ name: 'entrar' }" style="color: var(--primaria); font-weight: bold; text-decoration: none;">
             Entrar
           </router-link>
         </div>
       </form>
-    </v-card>
-  </v-container>
+    </main>
+  </div>
 </template>
 
 <style scoped>
-.protecao-robo {
-  border: 1px dashed var(--v-theme-outline);
+input:focus {
+  border-color: var(--primaria) !important;
 }
 </style>
