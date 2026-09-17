@@ -63,9 +63,9 @@ export const roteador = createRouter({
       component: () => import('../paginas/Inbox.vue')
     },
     {
-      path: '/copiloto',
-      name: 'copiloto',
-      component: () => import('../paginas/Copiloto.vue')
+      path: '/assistente',
+      name: 'assistente',
+      component: () => import('../paginas/AssistenteCriacao.vue')
     },
     {
       path: '/galeria',
