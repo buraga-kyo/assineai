@@ -43,6 +43,7 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: cp .env.example .env
       - run: bash infra/dev.sh up
       - run: pnpm db:migrar
         env:

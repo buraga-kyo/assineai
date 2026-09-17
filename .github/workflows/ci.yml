@@ -33,6 +33,9 @@ jobs:
       - name: Instalar navegadores do Playwright
         run: pnpm --filter @assineai/web exec playwright install --with-deps
 
+      - name: Criar arquivo de ambiente
+        run: cp .env.example .env
+
       - name: Subir Infraestrutura Local
         run: bash infra/dev.sh up
 
