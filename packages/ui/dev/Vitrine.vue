@@ -78,7 +78,7 @@ const otp = ref('123')
             <v-card class="pa-4 mb-4" variant="outlined">
               <PassoAPasso
                 :passos="['Documento', 'Assinantes', 'Campos', 'Pronto']"
-                :passoAtual="2"
+                :passo-atual="2"
               />
             </v-card>
 

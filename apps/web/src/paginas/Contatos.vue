@@ -58,7 +58,7 @@ watch(busca, () => {
       Nenhum contato encontrado.
     </div>
 
-    <div v-else v-for="contato in contatos" :key="contato.id" class="mb-4">
+    <div v-for="contato in contatos" v-else :key="contato.id" class="mb-4">
       <v-card variant="outlined" class="pa-4 cursor-pointer" @click="() => {}">
         <div class="d-flex justify-space-between align-center">
           <div>

@@ -26,7 +26,7 @@ async function cancelar() {
 
 <template>
   <v-container>
-    <v-btn variant="text" prepend-icon="mdi-arrow-left" @click="roteador.back()" class="mb-4">Voltar</v-btn>
+    <v-btn variant="text" prepend-icon="mdi-arrow-left" class="mb-4" @click="roteador.back()">Voltar</v-btn>
     
     <div class="d-flex justify-space-between align-start mb-6">
       <div>

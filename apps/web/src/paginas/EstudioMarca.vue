@@ -31,7 +31,7 @@ async function salvar() {
       <!-- PAINEL ESQUERDO: CONFIGURAÇÕES -->
       <v-col cols="12" md="4" class="h-100 border-e overflow-y-auto bg-surface">
         <div class="pa-6">
-          <v-btn variant="text" prepend-icon="mdi-arrow-left" @click="roteador.back()" class="mb-4">Voltar</v-btn>
+          <v-btn variant="text" prepend-icon="mdi-arrow-left" class="mb-4" @click="roteador.back()">Voltar</v-btn>
           
           <h1 class="text-h4 font-weight-black mb-6">Estúdio de Marca</h1>
           

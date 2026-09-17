@@ -49,12 +49,12 @@ async function enviar() {
 
 <template>
   <v-container>
-    <v-btn variant="text" prepend-icon="mdi-arrow-left" @click="roteador.back()" class="mb-4">Cancelar Criação</v-btn>
+    <v-btn variant="text" prepend-icon="mdi-arrow-left" class="mb-4" @click="roteador.back()">Cancelar Criação</v-btn>
     
     <h1 class="text-h4 font-weight-black mb-6">Criar Envelope</h1>
 
     <v-card class="pa-4 mb-6" variant="outlined">
-      <PassoAPasso :passos="passos" :passoAtual="store.passoAtual" />
+      <PassoAPasso :passos="passos" :passo-atual="store.passoAtual" />
     </v-card>
 
     <v-card class="pa-6" variant="outlined">
@@ -95,7 +95,7 @@ async function enviar() {
           <v-list-item v-for="(sig, i) in store.signatarios" :key="i" class="border-b">
             <v-list-item-title class="font-weight-bold">{{ sig.nome }}</v-list-item-title>
             <v-list-item-subtitle>{{ sig.canal }} - {{ sig.email }}</v-list-item-subtitle>
-            <template v-slot:append>
+            <template #append>
               <v-btn icon="mdi-delete" color="error" variant="text" size="small" @click="removerSignatario(i)"></v-btn>
             </template>
           </v-list-item>

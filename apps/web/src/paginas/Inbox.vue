@@ -134,10 +134,10 @@ async function enviar() {
                 density="comfortable"
                 hide-details
                 placeholder="Digite sua resposta..."
-                @keyup.enter="enviar"
                 :disabled="carregando"
+                @keyup.enter="enviar"
               ></v-text-field>
-              <v-btn color="primary" height="48" @click="enviar" :loading="carregando">
+              <v-btn color="primary" height="48" :loading="carregando" @click="enviar">
                 <v-icon icon="mdi-send"></v-icon>
               </v-btn>
             </div>

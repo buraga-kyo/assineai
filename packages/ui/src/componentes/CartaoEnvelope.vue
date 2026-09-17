@@ -43,12 +43,12 @@ function rotuloEstado(estadoEnvelope: string) {
     <h2>{{ titulo }}</h2>
     <span class="chip estado">{{ rotuloEstado(estado) }}</span>
     <div class="assinantes">
-      <span class="pessoa" v-for="(sig, indice) in signatarios" :key="indice">
+      <span v-for="(sig, indice) in signatarios" :key="indice" class="pessoa">
         <b class="avatar">{{ iniciais(sig.nome) }}</b>
         {{ sig.nome }} 
         <span :class="['canal', sig.canal]">{{ sig.canal }}</span>
       </span>
     </div>
-    <span class="prazo" v-if="prazo">{{ prazo }}</span>
+    <span v-if="prazo" class="prazo">{{ prazo }}</span>
   </article>
 </template>

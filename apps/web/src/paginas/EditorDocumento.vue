@@ -79,8 +79,8 @@ const markdownPreview = computed(() => {
               <div class="d-flex justify-space-between align-start mb-2">
                 <v-chip size="small" class="text-uppercase">{{ bloco.tipo }}</v-chip>
                 <div>
-                  <v-btn icon="mdi-arrow-up" size="x-small" variant="text" @click="moverBloco(i, -1)" :disabled="i === 0"></v-btn>
-                  <v-btn icon="mdi-arrow-down" size="x-small" variant="text" @click="moverBloco(i, 1)" :disabled="i === blocos.length - 1"></v-btn>
+                  <v-btn icon="mdi-arrow-up" size="x-small" variant="text" :disabled="i === 0" @click="moverBloco(i, -1)"></v-btn>
+                  <v-btn icon="mdi-arrow-down" size="x-small" variant="text" :disabled="i === blocos.length - 1" @click="moverBloco(i, 1)"></v-btn>
                   <v-btn icon="mdi-delete" size="x-small" color="error" variant="text" @click="removerBloco(i)"></v-btn>
                 </div>
               </div>

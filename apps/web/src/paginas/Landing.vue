@@ -36,7 +36,7 @@ const roteador = useRouter()
               </p>
               
               <div class="d-flex flex-column flex-sm-row justify-center gap-4 mb-12">
-                <v-btn color="primary" size="x-large" @click="roteador.push({ name: 'cadastro' })" elevation="2">
+                <v-btn color="primary" size="x-large" elevation="2" @click="roteador.push({ name: 'cadastro' })">
                   Começar Agora
                 </v-btn>
                 <v-btn variant="outlined" size="x-large" href="#funcionalidades">
