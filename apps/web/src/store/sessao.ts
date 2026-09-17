@@ -28,7 +28,7 @@ export const useStoreSessao = defineStore('sessao', () => {
   async function pedirCodigo(email: string, tokenAntiRobo: string) {
     const resposta = await fetch('/api/sessao/otp', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Requisicao': '1' },
       body: JSON.stringify({ email, tokenAntiRobo })
     })
     
@@ -40,7 +40,7 @@ export const useStoreSessao = defineStore('sessao', () => {
   async function entrarComCodigo(email: string, codigo: string) {
     const resposta = await fetch('/api/sessao', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Requisicao': '1' },
       body: JSON.stringify({ email, codigo })
     })
     
@@ -57,7 +57,7 @@ export const useStoreSessao = defineStore('sessao', () => {
 
   // Mata a sessão
   async function sair() {
-    await fetch('/api/sessao', { method: 'DELETE' })
+    await fetch('/api/sessao', { method: 'DELETE', headers: { 'X-Requisicao': '1' } })
     autenticado.value = false
     usuario.value = null
   }
