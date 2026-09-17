@@ -46,7 +46,7 @@ jobs:
       - run: bash infra/dev.sh up
       - run: pnpm db:migrar
         env:
-          BANCO_URL: postgres://assineai_migracao:migracao_dev@localhost:5432/assineai
+          BANCO_URL_MIGRACAO: postgres://assineai_migracao:migracao_dev@localhost:5432/assineai
       - run: pnpm verificar
         env:
           BANCO_URL: postgres://assineai_app:app_dev@localhost:5432/assineai

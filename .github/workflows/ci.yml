@@ -39,7 +39,7 @@ jobs:
       - name: Rodar Migrações do Banco
         run: pnpm db:migrar
         env:
-          BANCO_URL: postgres://assineai_migracao:migracao_dev@localhost:5432/assineai
+          BANCO_URL_MIGRACAO: postgres://assineai_migracao:migracao_dev@localhost:5432/assineai
 
       - name: Testes Nativos (Vitest)
         run: pnpm test
