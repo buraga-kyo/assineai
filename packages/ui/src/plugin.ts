@@ -6,10 +6,11 @@ import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
 
 import { coresRocaNeon } from './tokens/index.js'
+import './roca-neon.css' // Importa o CSS base do Roça Neon
 
-// Tema claro do Roça Neon mapeado pros nomes que o Vuetify entende
-const temaRocaNeonClaro = {
-  dark: false,
+// Tema escuro do Roça Neon mapeado pros nomes que o Vuetify entende
+const temaRocaNeonEscuro = {
+  dark: true,
   colors: {
     background: coresRocaNeon.fundo,
     surface: coresRocaNeon.superficie,
@@ -35,24 +36,24 @@ export const pluginAssineAi = createVuetify({
     sets: { mdi },
   },
   theme: {
-    defaultTheme: 'temaRocaNeonClaro',
+    defaultTheme: 'temaRocaNeonEscuro',
     themes: {
-      temaRocaNeonClaro,
+      temaRocaNeonEscuro,
     },
   },
   defaults: {
     global: {
-      rounded: 0, // cantos retos para todos os componentes
+      rounded: 0, // cantos retos (sobrescritos pelo CSS)
     },
     VBtn: {
-      variant: 'flat', // botões sólidos e sem sombra por padrão
+      variant: 'flat', // botões sólidos
       rounded: 0,
     },
     VCard: {
       rounded: 0,
     },
     VTextField: {
-      variant: 'outlined', // cantos retos e com borda
+      variant: 'outlined',
       rounded: 0,
     },
   },

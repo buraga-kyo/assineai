@@ -1,49 +1,43 @@
-// Aqui a gente define a paleta de cores do "Roça Neon"
-// É a vibe AgroTech: terra, verde escuro e aquele neon pra dar o choque.
-// Como não temos um designer refinando os hexcodes ainda, esses são os chutes iniciais
-// que garantem contraste AA e legibilidade.
+// Paleta de cores do "Roça Neon" (Dark mode AgroTech)
+// Retirado da direção de arte em design/direcoes/roca-neon.css
 
 export const coresRocaNeon = {
   // Cores de Função
-  primaria: '#0B5D3B', // Verde bem escuro e fechado (floresta)
-  sobrePrimaria: '#FFFFFF', // Texto em cima da primária
-  primariaEscura: '#074229', 
+  primaria: '#C9FF3D', // Verde limão elétrico
+  sobrePrimaria: '#0E2117', 
   
-  secundaria: '#D95C14', // Um laranja terra queimado
-  sobreSecundaria: '#FFFFFF',
-  secundariaEscura: '#A6450E',
+  secundaria: '#3B2A1A', // superficie-2 no css
+  sobreSecundaria: '#E4CDB4', // cor dos links na lateral
+  
+  acento: '#E8792B',
+  sobreAcento: '#1A0F06', 
+  
+  aguardando: '#FFB236',
+  parcial: '#7CC9FF',
+  selado: '#7BE495',
+  recusado: '#FF8A7A',
+  expirado: '#A3B7A8',
 
-  acento: '#B4ED38', // O verde limão choque (Neon)
-  sobreAcento: '#1B1B1B', // Como o neon é claro, texto escuro em cima
+  sucesso: '#7BE495',
+  sobreSucesso: '#0E2117',
   
-  sucesso: '#16A34A',
-  sobreSucesso: '#FFFFFF',
+  aviso: '#FFB236',
+  sobreAviso: '#1A0F06',
   
-  aviso: '#EAB308',
-  sobreAviso: '#1B1B1B',
+  erro: '#FF8A7A',
+  sobreErro: '#0E2117',
   
-  erro: '#DC2626',
-  sobreErro: '#FFFFFF',
-  
-  info: '#2563EB',
-  sobreInfo: '#FFFFFF',
+  info: '#7CC9FF',
+  sobreInfo: '#0E2117',
 
-  // Neutros (Escala de cinzas, mas puxando levemente pro marrom/terra)
-  neutro50: '#F9F8F6',
-  neutro100: '#F1EFEA',
-  neutro200: '#E2DFD6',
-  neutro300: '#CFCAC0',
-  neutro400: '#AFA99D',
-  neutro500: '#8C867B',
-  neutro600: '#69645A',
-  neutro700: '#524F46',
-  neutro800: '#3D3A34',
-  neutro900: '#262420',
-
-  // Superfícies (Tema Claro por padrão)
-  fundo: '#F9F8F6', // O neutro50
-  superficie: '#FFFFFF', // Cartões e modais brancos
-  linha: '#E2DFD6', // O neutro200 pra bordas
-  textoPadrao: '#262420', // O neutro900
-  textoSuave: '#69645A', // O neutro600
+  // Superfícies (Tema Escuro/Verde)
+  fundo: '#0E2117',
+  superficie: '#173225',
+  superficie2: '#3B2A1A',
+  linha: '#2E5A3F',
+  linha2: '#5A4028',
+  
+  // Textos
+  textoPadrao: '#F2F7EC',
+  textoSuave: '#A9C2AC',
 }
