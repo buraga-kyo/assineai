@@ -26,5 +26,8 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
+  },
+  test: {
+    exclude: ['node_modules', 'dist', 'tests/e2e/**']
   }
 })

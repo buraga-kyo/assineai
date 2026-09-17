@@ -69,7 +69,7 @@ async function salvarObra() {
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
 
-    <div v-else v-for="obra in obras" :key="obra.id" class="mb-4">
+    <div v-for="obra in obras" v-else :key="obra.id" class="mb-4">
       <v-card variant="outlined" class="pa-4">
         <div class="d-flex justify-space-between align-center">
           <div>
@@ -110,7 +110,7 @@ async function salvarObra() {
 
         <div class="d-flex justify-end gap-2">
           <v-btn variant="text" @click="modalAberto = false">Cancelar</v-btn>
-          <v-btn color="primary" :loading="salvando" @click="salvarObra" :disabled="!novaObra.titulo">Gerar Hash</v-btn>
+          <v-btn color="primary" :loading="salvando" :disabled="!novaObra.titulo" @click="salvarObra">Gerar Hash</v-btn>
         </div>
       </v-card>
     </v-dialog>

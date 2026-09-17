@@ -87,7 +87,7 @@ async function gerar() {
           <h1 class="text-h6 font-weight-black">Assistente de Documentos</h1>
           <span class="text-caption text-medium-emphasis">Assistente Jurídico com Assistente</span>
         </div>
-        <v-btn color="primary" @click="gerar" :loading="carregando">Gerar Envelope</v-btn>
+        <v-btn color="primary" :loading="carregando" @click="gerar">Gerar Envelope</v-btn>
       </div>
 
       <!-- Chat -->

@@ -57,9 +57,9 @@ function recusarAssinatura() {
         <h2 v-else-if="passoAtual === 2">Hora de assinar</h2>
         <h2 v-else-if="passoAtual === 3">Tudo pronto!</h2>
         
-        <p class="suave" v-if="passoAtual === 0">Contrato de prestação de serviços, 3 páginas. Confira o documento para prosseguir.</p>
-        <p class="suave" v-if="passoAtual === 1">Digite o código de 6 dígitos que chegou no seu WhatsApp/SMS.</p>
-        <p class="suave" v-if="passoAtual === 2">Desenhe sua assinatura ou clique em assinar para usar uma digital gerada automaticamente.</p>
+        <p v-if="passoAtual === 0" class="suave">Contrato de prestação de serviços, 3 páginas. Confira o documento para prosseguir.</p>
+        <p v-if="passoAtual === 1" class="suave">Digite o código de 6 dígitos que chegou no seu WhatsApp/SMS.</p>
+        <p v-if="passoAtual === 2" class="suave">Desenhe sua assinatura ou clique em assinar para usar uma digital gerada automaticamente.</p>
       </div>
 
       <!-- PASSO 0: LER PDF -->

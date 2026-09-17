@@ -61,13 +61,13 @@ async function cadastrarUsuario() {
         {{ mensagemDeErro }}
       </div>
 
-      <form @submit.prevent="cadastrarUsuario" style="display: flex; flex-direction: column; gap: 16px;">
+      <form style="display: flex; flex-direction: column; gap: 16px;" @submit.prevent="cadastrarUsuario">
         
         <div>
           <label class="suave" style="display: block; margin-bottom: 4px; font-size: 14px;">Nome da Empresa</label>
           <input 
-            type="text" 
             v-model="nomeDaEmpresaDigitado" 
+            type="text" 
             placeholder="Ex: Minha Empresa Ltda."
             :disabled="carregando"
             required
@@ -78,8 +78,8 @@ async function cadastrarUsuario() {
         <div>
           <label class="suave" style="display: block; margin-bottom: 4px; font-size: 14px;">Seu Nome Completo</label>
           <input 
-            type="text" 
             v-model="nomeDoUsuarioDigitado" 
+            type="text" 
             placeholder="Ex: Matheus Braga"
             :disabled="carregando"
             required
@@ -90,8 +90,8 @@ async function cadastrarUsuario() {
         <div>
           <label class="suave" style="display: block; margin-bottom: 4px; font-size: 14px;">E-mail de Trabalho</label>
           <input 
-            type="email" 
             v-model="emailDigitado" 
+            type="email" 
             placeholder="bragaus@outlook.com"
             :disabled="carregando"
             required
@@ -102,8 +102,8 @@ async function cadastrarUsuario() {
         <div>
           <label class="suave" style="display: block; margin-bottom: 4px; font-size: 14px;">Senha Segura</label>
           <input 
-            type="password" 
             v-model="senhaDigitada" 
+            type="password" 
             placeholder="••••••••"
             :disabled="carregando"
             required

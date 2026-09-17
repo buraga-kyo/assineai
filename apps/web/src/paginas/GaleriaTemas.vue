@@ -33,7 +33,7 @@ async function aplicarTema(temaId: string) {
 
 <template>
   <v-container>
-    <v-btn variant="text" prepend-icon="mdi-arrow-left" @click="roteador.back()" class="mb-4">Voltar</v-btn>
+    <v-btn variant="text" prepend-icon="mdi-arrow-left" class="mb-4" @click="roteador.back()">Voltar</v-btn>
     
     <div class="mb-8 text-center">
       <h1 class="text-h3 font-weight-black mb-4">Galeria de Temas</h1>

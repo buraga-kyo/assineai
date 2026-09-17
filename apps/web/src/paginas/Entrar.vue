@@ -54,12 +54,12 @@ async function logarComSenha() {
         {{ mensagemErro }}
       </div>
 
-      <form @submit.prevent="logarComSenha" style="display: flex; flex-direction: column; gap: 16px;">
+      <form style="display: flex; flex-direction: column; gap: 16px;" @submit.prevent="logarComSenha">
         <div>
           <label class="suave" style="display: block; margin-bottom: 4px; font-size: 14px;">E-mail de Trabalho</label>
           <input 
-            type="email" 
             v-model="email" 
+            type="email" 
             placeholder="bragaus@outlook.com"
             :disabled="carregando"
             required
@@ -70,8 +70,8 @@ async function logarComSenha() {
         <div>
           <label class="suave" style="display: block; margin-bottom: 4px; font-size: 14px;">Senha Segura</label>
           <input 
-            type="password" 
             v-model="senha" 
+            type="password" 
             placeholder="••••••••"
             :disabled="carregando"
             required
