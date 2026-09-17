@@ -1,0 +1,40 @@
+name: CI/CD AssineAi
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  auditoria-e-testes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar pnpm
+        run: npm install -g pnpm@9.15.0
+
+      - name: Instalar Dependências
+        run: pnpm install --frozen-lockfile
+
+      - name: Checagem de Vulnerabilidades
+        run: pnpm audit --prod
+
+      - name: Análise Estática (Typecheck)
+        run: pnpm typecheck
+
+      - name: Instalar navegadores do Playwright
+        run: pnpm exec playwright install --with-deps
+
+      - name: Testes Nativos (Vitest)
+        run: pnpm test
+
+      - name: Testes E2E (Playwright)
+        run: pnpm exec playwright test
