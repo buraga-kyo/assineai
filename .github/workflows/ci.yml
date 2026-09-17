@@ -49,3 +49,14 @@ jobs:
 
       - name: Testes E2E (Playwright)
         run: pnpm --filter @assineai/web exec playwright test
+        env:
+          BANCO_URL: postgres://test:test@localhost:5432/test
+          REDIS_URL: redis://localhost:6379
+          ARMAZENAMENTO_ENDPOINT: http://localhost:9000
+          ARMAZENAMENTO_REGIAO: us-east-1
+          ARMAZENAMENTO_BUCKET: assineai
+          ARMAZENAMENTO_CHAVE: test
+          ARMAZENAMENTO_SEGREDO: test
+          CHAVE_OTP: teste123teste123teste123teste123
+          CORS_ORIGENS: http://localhost:5173
+          CHAVE_MESTRA: teste123teste123teste123teste123
