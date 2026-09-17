@@ -33,16 +33,24 @@ jobs:
       - name: Instalar navegadores do Playwright
         run: pnpm --filter @assineai/web exec playwright install --with-deps
 
+      - name: Subir Infraestrutura Local
+        run: bash infra/dev.sh up
+
+      - name: Rodar Migrações do Banco
+        run: pnpm db:migrar
+        env:
+          BANCO_URL: postgres://assineai_migracao:migracao_dev@localhost:5432/assineai
+
       - name: Testes Nativos (Vitest)
         run: pnpm test
         env:
-          BANCO_URL: postgres://test:test@localhost:5432/test
+          BANCO_URL: postgres://assineai_app:app_dev@localhost:5432/assineai
           REDIS_URL: redis://localhost:6379
           ARMAZENAMENTO_ENDPOINT: http://localhost:9000
           ARMAZENAMENTO_REGIAO: us-east-1
           ARMAZENAMENTO_BUCKET: assineai
-          ARMAZENAMENTO_CHAVE: test
-          ARMAZENAMENTO_SEGREDO: test
+          ARMAZENAMENTO_CHAVE: minioadmin
+          ARMAZENAMENTO_SEGREDO: minioadmin
           CHAVE_OTP: teste123teste123teste123teste123
           CORS_ORIGENS: http://localhost:5173
           CHAVE_MESTRA: teste123teste123teste123teste123
@@ -50,13 +58,13 @@ jobs:
       - name: Testes E2E (Playwright)
         run: pnpm --filter @assineai/web exec playwright test
         env:
-          BANCO_URL: postgres://test:test@localhost:5432/test
+          BANCO_URL: postgres://assineai_app:app_dev@localhost:5432/assineai
           REDIS_URL: redis://localhost:6379
           ARMAZENAMENTO_ENDPOINT: http://localhost:9000
           ARMAZENAMENTO_REGIAO: us-east-1
           ARMAZENAMENTO_BUCKET: assineai
-          ARMAZENAMENTO_CHAVE: test
-          ARMAZENAMENTO_SEGREDO: test
+          ARMAZENAMENTO_CHAVE: minioadmin
+          ARMAZENAMENTO_SEGREDO: minioadmin
           CHAVE_OTP: teste123teste123teste123teste123
           CORS_ORIGENS: http://localhost:5173
           CHAVE_MESTRA: teste123teste123teste123teste123
