@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, sql } from 'drizzle-orm'
 import type { App } from '../app.js'
 import { ErroDaApi } from './erros.js'
 import { envelopes, signatariosEnvelope } from '../banco/esquema/envelope.js'
@@ -23,7 +23,7 @@ export async function rotasAssinatura(app: App) {
       const sigId = request.params.token
       
       const dados = await app.banco.bancoSistema.execute(
-        app.banco.bancoSistema.dialect.sql`select s.id, s.nome, s.email, s.estado, e.titulo from signatarios_envelope s join envelopes e on s.envelope_id = e.id where s.id = ${sigId}`
+        sql`select s.id, s.nome, s.email, s.estado, e.titulo from signatarios_envelope s join envelopes e on s.envelope_id = e.id where s.id = ${sigId}`
       )
       
       if (!dados.rows.length) {
@@ -79,7 +79,7 @@ export async function rotasAssinatura(app: App) {
       
       // Valida o link
       const dados = await app.banco.bancoSistema.execute(
-        app.banco.bancoSistema.dialect.sql`select s.id, s.estado, s.empresa_id as "empresaId", s.envelope_id as "envelopeId" from signatarios_envelope s join envelopes e on s.envelope_id = e.id where s.id = ${sigId}`
+        sql`select s.id, s.estado, s.empresa_id as "empresaId", s.envelope_id as "envelopeId" from signatarios_envelope s join envelopes e on s.envelope_id = e.id where s.id = ${sigId}`
       )
       
       if (!dados.rows.length) {
