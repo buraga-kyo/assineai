@@ -1,1 +1,0 @@
-const { Documento, Signatario, PDFBase64 } = require("../Conector").Tabelas;
