@@ -1,7 +1,7 @@
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
-import { canal, contatoCanal, eventoWebhook, TipoCanal, CANAIS } from '../banco/esquema/canais.js'
+import { canal, contatoCanal, eventoWebhook, type TipoCanal, CANAIS } from '../banco/esquema/canais.js'
 import { FabricaDeCanais } from '../canais/fabrica.js'
 import type { BancoDaEmpresa, criarBanco } from '../banco/conexao.js'
 import { randomBytes } from 'node:crypto'

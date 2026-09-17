@@ -68,7 +68,7 @@ export const useStoreTema = defineStore('tema', () => {
       }
       await fetch('/api/tema', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Requisicao': '1' },
         body: JSON.stringify(payload)
       })
     } finally {

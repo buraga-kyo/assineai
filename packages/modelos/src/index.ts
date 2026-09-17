@@ -1,11 +1,11 @@
 import { esquema as advocaciaHonorariosEsquema } from './minutas/advocacia-honorarios/esquema.js'
-import metaAdvocaciaHonorarios from './minutas/advocacia-honorarios/meta.json' assert { type: 'json' }
+import metaAdvocaciaHonorarios from './minutas/advocacia-honorarios/meta.json' with { type: 'json' }
 
 import { esquema as musicaSplitSheetEsquema } from './minutas/musica-split-sheet/esquema.js'
-import metaMusicaSplitSheet from './minutas/musica-split-sheet/meta.json' assert { type: 'json' }
+import metaMusicaSplitSheet from './minutas/musica-split-sheet/meta.json' with { type: 'json' }
 
 import { esquema as musicaContratoShowEsquema } from './minutas/musica-contrato-show/esquema.js'
-import metaMusicaContratoShow from './minutas/musica-contrato-show/meta.json' assert { type: 'json' }
+import metaMusicaContratoShow from './minutas/musica-contrato-show/meta.json' with { type: 'json' }
 
 import { readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'

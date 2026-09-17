@@ -20,7 +20,7 @@ test('interpretarWebhook converte o webhook da evolution no formato EventoRecebi
   const eventos = evolution.interpretarWebhook(payloadEvolution)
   
   expect(eventos).toHaveLength(1)
-  expect(eventos[0].canal).toBe('whatsapp_evolution')
-  expect(eventos[0].identidadeExterna).toBe('5511999999999')
-  expect(eventos[0].conteudoTexto).toBe('ACEITO 777888')
+  expect(eventos[0]!.canal).toBe('whatsapp_evolution')
+  expect(eventos[0]!.identidadeExterna).toBe('5511999999999')
+  expect(eventos[0]!.conteudoTexto).toBe('ACEITO 777888')
 })

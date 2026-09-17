@@ -11,9 +11,9 @@ export class CanalEvolution implements ICanal {
   }
 
   // Header padrão pra conversar com a Evolution API
-  private get headers() {
+  private get headers(): Record<string, string> {
     return {
-      'apikey': this.apiKey,
+      'apikey': this.apiKey || '',
       'Content-Type': 'application/json'
     }
   }

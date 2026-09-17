@@ -39,7 +39,7 @@ export const useStoreEnvelopes = defineStore('envelopes', () => {
   // Cancela o bicho
   async function cancelarEnvelope(id: string) {
     try {
-      const res = await fetch(`/api/envelopes/${id}/cancelar`, { method: 'POST' })
+      const res = await fetch(`/api/envelopes/${id}/cancelar`, { method: 'POST', headers: { 'X-Requisicao': '1' } })
       if (res.ok) {
         const envelope = lista.value.find(e => e.id === id)
         if (envelope) envelope.estado = 'cancelado'

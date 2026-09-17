@@ -37,6 +37,8 @@ export function criarAppDeTeste(verificacoes: Partial<Verificacoes> = {}) {
     ARMAZENAMENTO_BUCKET: 'teste',
     ARMAZENAMENTO_CHAVE: 'teste',
     ARMAZENAMENTO_SEGREDO: 'teste',
+    CHAVE_MESTRA: 'mock',
+    CHAVE_ID: 'mock',
     ARMAZENAMENTO_CAMINHO_FORCADO: true,
     ARMAZENAMENTO_LIMITE_TAMANHO: 10 * 1024 * 1024,
     CHAVE_OTP: '01234567890123456',

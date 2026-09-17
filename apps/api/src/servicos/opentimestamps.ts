@@ -9,8 +9,8 @@ const executar = promisify(execFile)
 
 export interface InfoAncoragem {
   ancorado: boolean
-  numeroBloco?: number
-  horaBloco?: Date
+  numeroBloco?: number | undefined
+  horaBloco?: Date | undefined
 }
 
 export interface AncoraDeTempo {
@@ -73,7 +73,7 @@ export const driverOts: AncoraDeTempo = {
       
       return {
         ancorado: !!blocoMatch,
-        numeroBloco: blocoMatch ? parseInt(blocoMatch[1], 10) : undefined
+        numeroBloco: blocoMatch ? parseInt(blocoMatch[1] as string, 10) : undefined
       }
     } catch (e: any) {
       await unlink(otsPath).catch(() => {})

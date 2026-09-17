@@ -51,7 +51,7 @@ async function enviar() {
   try {
     await fetch(`/api/inbox/conversas/${conversaAtiva.value.id}/mensagens`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Requisicao': '1' },
       body: JSON.stringify({ texto })
     })
     // Atualiza

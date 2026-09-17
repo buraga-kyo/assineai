@@ -40,7 +40,7 @@ export const useStoreCriacaoEnvelope = defineStore('criacaoEnvelope', () => {
     // 1. Cria o envelope
     const resEnv = await fetch('/api/envelopes', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Requisicao': '1' },
       body: JSON.stringify({ titulo })
     })
     const envData = await resEnv.json()
@@ -51,7 +51,7 @@ export const useStoreCriacaoEnvelope = defineStore('criacaoEnvelope', () => {
     for (const sig of signatarios.value) {
       await fetch(`/api/envelopes/${envelopeId}/signatarios`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Requisicao': '1' },
         body: JSON.stringify({ nome: sig.nome, email: sig.email })
       })
     }

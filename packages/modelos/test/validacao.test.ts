@@ -10,8 +10,8 @@ test('todas as chaves do modelo.md estao no esquema zod', () => {
     const chavesNoMarkdown = tags.filter(t => t[0] === 'name').map(t => t[1])
     
     // Extrai o objeto base se for um ZodEffects (superRefine)
-    let schemaBase = minuta.esquema
-    if (schemaBase._def.typeName === 'ZodEffects') {
+    let schemaBase: any = minuta.esquema
+    if (schemaBase._def?.typeName === 'ZodEffects') {
       schemaBase = schemaBase._def.schema
     }
     

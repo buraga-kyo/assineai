@@ -20,7 +20,7 @@ test('interpretarWebhook converte o formato do Telegram para nosso EventoRecebid
   const eventos = telegram.interpretarWebhook(payloadTelegram)
   
   expect(eventos).toHaveLength(1)
-  expect(eventos[0].canal).toBe('telegram')
-  expect(eventos[0].identidadeExterna).toBe('987654321')
-  expect(eventos[0].conteudoTexto).toBe('ACEITO 123456')
+  expect(eventos[0]!.canal).toBe('telegram')
+  expect(eventos[0]!.identidadeExterna).toBe('987654321')
+  expect(eventos[0]!.conteudoTexto).toBe('ACEITO 123456')
 })

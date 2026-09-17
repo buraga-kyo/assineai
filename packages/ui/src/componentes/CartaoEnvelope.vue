@@ -10,8 +10,10 @@ defineProps<{
 function iniciais(nome: string) {
   const pedacos = nome.split(' ').filter(Boolean)
   if (pedacos.length === 0) return '??'
-  if (pedacos.length === 1) return pedacos[0].substring(0, 2).toUpperCase()
-  return (pedacos[0][0] + pedacos[pedacos.length - 1][0]).toUpperCase()
+  if (pedacos.length === 1) return (pedacos[0] || '').substring(0, 2).toUpperCase()
+  const p1 = pedacos[0] || ''
+  const p2 = pedacos[pedacos.length - 1] || ''
+  return ((p1[0] || '') + (p2[0] || '')).toUpperCase()
 }
 
 function classeEstado(estadoEnvelope: string) {

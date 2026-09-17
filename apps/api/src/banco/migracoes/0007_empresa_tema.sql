@@ -1,1 +1,0 @@
-ALTER TABLE "empresa" ADD COLUMN "tema" jsonb DEFAULT '{}'::jsonb NOT NULL;

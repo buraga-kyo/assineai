@@ -34,7 +34,7 @@ async function salvarObra() {
   try {
     const res = await fetch('/api/obras', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Requisicao': '1' },
       body: JSON.stringify({ 
         titulo: novaObra.value.titulo,
         hash: 'hash-fake-gerado-no-front-do-arquivo' // No mundo real usariamos Web Crypto API aqui no front

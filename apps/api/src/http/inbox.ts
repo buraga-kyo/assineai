@@ -3,8 +3,7 @@ import { z } from 'zod'
 import { eq, and, desc } from 'drizzle-orm'
 import { conversa, mensagem } from '../banco/esquema/inbox.js'
 import { FabricaDeCanais } from '../canais/fabrica.js'
-import { canal } from '../banco/esquema/canais.js'
-import { contatoCanal } from '../banco/esquema/contato.js'
+import { canal, contatoCanal } from '../banco/esquema/canais.js'
 import type { BancoDaEmpresa, criarBanco } from '../banco/conexao.js'
 
 export const rotasInbox = (banco: ReturnType<typeof criarBanco>): FastifyPluginAsyncZod => async (app) => {

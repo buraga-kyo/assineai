@@ -1,6 +1,6 @@
 import type { ICanal } from './interface.js'
 import { cifrar, decifrar } from './criptografia.js'
-import { TipoCanal } from '../banco/esquema/canais.js'
+import type { TipoCanal } from '../banco/esquema/canais.js'
 import { CanalTelegram } from './telegram.js'
 import { CanalEvolution } from './evolution.js'
 import { CanalWhatsAppMeta } from './meta.js'

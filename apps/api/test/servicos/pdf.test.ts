@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
 import { PDFDocument, rgb } from 'pdf-lib'
-import { carimbarDocumento, DadosCarimbo, adicionarQrELinkDeVerificacao } from '../../src/servicos/pdf.js'
+import { carimbarDocumento, type DadosCarimbo, adicionarQrELinkDeVerificacao } from '../../src/servicos/pdf.js'
 import { gerarQrEmMemoria } from '../../src/servicos/qr.js'
 
 test('adiciona qr e anotação de link sem corromper o pdf', async () => {

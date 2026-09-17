@@ -21,6 +21,7 @@ export async function adicionarQrELinkDeVerificacao(pdfBytes: Uint8Array, codigo
   
   // Desenha na ultima pagina pra simplificar o exemplo, mas a rigor poderia ser em todas
   const pagina = paginas[paginas.length - 1]
+  if (!pagina) return await pdfDoc.save()
   const largura = pagina.getWidth()
   const altura = pagina.getHeight()
   
@@ -74,6 +75,7 @@ export async function carimbarDocumento(pdfBytes: Uint8Array, carimbos: DadosCar
     }
 
     const paginaPdf = paginas[indicePagina]
+    if (!paginaPdf) continue
     
     // O pdf-lib as vezes tem getWidth/getHeight diferente se a página tiver Rotation
     // Mas a lib expõe os métodos seguros: getSize() que já deveria considerar rotação ou não

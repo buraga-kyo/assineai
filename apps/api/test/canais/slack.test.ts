@@ -21,7 +21,7 @@ test('interpretarWebhook ignora url_verification e extrai mensagem do user no Sl
   const eventos = slack.interpretarWebhook(payloadSlack)
   
   expect(eventos).toHaveLength(1)
-  expect(eventos[0].canal).toBe('slack')
-  expect(eventos[0].identidadeExterna).toBe('U1234567')
-  expect(eventos[0].conteudoTexto).toBe('ACEITO 555666')
+  expect(eventos[0]!.canal).toBe('slack')
+  expect(eventos[0]!.identidadeExterna).toBe('U1234567')
+  expect(eventos[0]!.conteudoTexto).toBe('ACEITO 555666')
 })

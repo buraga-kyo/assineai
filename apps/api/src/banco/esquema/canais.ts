@@ -1,6 +1,7 @@
 import { pgTable, text, uuid, jsonb, boolean } from 'drizzle-orm/pg-core'
 import { id, carimbos, politicaDaEmpresa } from './comum.js'
 import { empresa } from './empresa.js'
+import { contato } from './contato.js'
 import { sql } from 'drizzle-orm'
 import { check, unique } from 'drizzle-orm/pg-core'
 
@@ -36,6 +37,7 @@ export const contatoCanal = pgTable(
   {
     id,
     empresaId: uuid('empresa_id').notNull().references(() => empresa.id, { onDelete: 'cascade' }),
+    contatoId: uuid('contato_id').notNull().references(() => contato.id, { onDelete: 'cascade' }),
     canalId: uuid('canal_id').notNull().references(() => canal.id, { onDelete: 'cascade' }),
     // Pode ser o ID do usuário no telegram, número do zap, ou ID do slack
     identidadeExterna: text('identidade_externa').notNull(),

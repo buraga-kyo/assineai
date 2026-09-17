@@ -161,10 +161,8 @@ export async function rotasEnvelopes(app: App) {
         if (!env.length) throw new ErroDaApi(404, 'nao_encontrado', 'Envelope não encontrado')
 
         const [docDb] = await tx.insert(documentosEnvelope).values({
-          empresaId: sessao.empresaId,
           envelopeId,
-          nomeOriginal: arquivo.filename,
-          tamanhoBytes: 0, // Será atualizado se o S3 retornar ou depois
+          nome: arquivo.filename,
           caminhoStorage: `pendente`
         }).returning({ id: documentosEnvelope.id })
 

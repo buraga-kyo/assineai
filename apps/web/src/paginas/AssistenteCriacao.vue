@@ -30,7 +30,7 @@ async function enviar() {
   try {
     const res = await fetch('/api/assistente/entrevista', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Requisicao': '1' },
       body: JSON.stringify({
         slugMinuta: slugAtual.value,
         mensagem: textoEnviado,
@@ -58,7 +58,7 @@ async function gerar() {
   try {
     const res = await fetch('/api/assistente/gerar', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Requisicao': '1' },
       body: JSON.stringify({
         slugMinuta: slugAtual.value,
         variaveis: variaveisPreenchidas.value

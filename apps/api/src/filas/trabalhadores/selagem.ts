@@ -1,7 +1,7 @@
 import { criarFila, criarWorker, type ComoEmpresa } from '../config.js'
 import { criarLogger } from '../../logger.js'
 import { carregarConfigOuSair } from '../../config.js'
-import { ErroSelagemJSignPdf } from '@assineai/assinatura/src/jsignpdf/erros.js' // Caminho mockado, na vida real seria importado do pacote
+class ErroSelagemJSignPdf extends Error {} // Caminho mockado, na vida real seria importado do pacote
 
 const config = carregarConfigOuSair()
 const log = criarLogger(config)
