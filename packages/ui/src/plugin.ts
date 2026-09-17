@@ -6,6 +6,7 @@ import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
 
 import { coresRocaNeon } from './tokens/index.js'
+import './base.css'
 import './roca-neon.css' // Importa o CSS base do Roça Neon
 
 // Tema escuro do Roça Neon mapeado pros nomes que o Vuetify entende

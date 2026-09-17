@@ -1,7 +1,5 @@
 <script setup lang="ts">
-// Teclado virtual/input pra código OTP (6 dígitos).
-// Usa a prop 'model-value' pra fazer o v-model funcionar direitinho.
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch } from 'vue'
 
 const propriedades = defineProps<{
   modelValue: string
@@ -10,105 +8,82 @@ const propriedades = defineProps<{
 const emite = defineEmits(['update:modelValue', 'completou'])
 
 const digitosOtp = ref(['', '', '', '', '', ''])
-const inputRefs = ref<HTMLInputElement[]>([])
 
-// Quando a propriedade modelValue muda por fora, a gente atualiza os quadradinhos
 watch(() => propriedades.modelValue, (valorNovo) => {
   if (!valorNovo) {
     digitosOtp.value = ['', '', '', '', '', '']
     return
   }
-  
   const caracteres = valorNovo.split('').slice(0, 6)
-  caracteres.forEach((char, i) => {
-    digitosOtp.value[i] = char
-  })
+  for (let indice = 0; indice < 6; indice++) {
+    digitosOtp.value[indice] = caracteres[indice] || ''
+  }
 }, { immediate: true })
 
-function aoDigitar(evento: Event, indice: number) {
-  const elemento = evento.target as HTMLInputElement
-  const valorDigitado = elemento.value
-  
-  // Pega só o último número se o cara digitar muito rápido
-  digitosOtp.value[indice] = valorDigitado.slice(-1)
-  
-  // Emite o valor atualizado inteiro
+function digitarNumero(numero: string) {
+  const indiceVazio = digitosOtp.value.findIndex(d => d === '')
+  if (indiceVazio !== -1) {
+    digitosOtp.value[indiceVazio] = numero
+    emitirAlteracao()
+  }
+}
+
+function apagarNumero() {
+  for (let indice = 5; indice >= 0; indice--) {
+    if (digitosOtp.value[indice] !== '') {
+      digitosOtp.value[indice] = ''
+      emitirAlteracao()
+      break
+    }
+  }
+}
+
+function emitirAlteracao() {
   const valorCompleto = digitosOtp.value.join('')
   emite('update:modelValue', valorCompleto)
-  
-  // Se preencheu e não for o último, pula pro próximo
-  if (valorDigitado && indice < 5) {
-    nextTick(() => {
-      inputRefs.value[indice + 1]?.focus()
-    })
-  }
-
-  // Se completou os 6, avisa o pai
   if (valorCompleto.length === 6) {
     emite('completou', valorCompleto)
-  }
-}
-
-function aoApertarBackspace(evento: KeyboardEvent, indice: number) {
-  if (evento.key === 'Backspace' && !digitosOtp.value[indice] && indice > 0) {
-    nextTick(() => {
-      inputRefs.value[indice - 1]?.focus()
-    })
-  }
-}
-
-function colarCodigo(evento: ClipboardEvent) {
-  evento.preventDefault()
-  const textoColado = evento.clipboardData?.getData('text')?.replace(/\D/g, '').slice(0, 6)
-  
-  if (textoColado) {
-    textoColado.split('').forEach((char, i) => {
-      digitosOtp.value[i] = char
-    })
-    const valorCompleto = digitosOtp.value.join('')
-    emite('update:modelValue', valorCompleto)
-    
-    if (valorCompleto.length === 6) {
-      emite('completou', valorCompleto)
-      inputRefs.value[5]?.focus()
-    } else {
-      inputRefs.value[valorCompleto.length]?.focus()
-    }
   }
 }
 </script>
 
 <template>
-  <div class="teclado-codigo d-flex justify-center gap-2 my-4">
-    <input
-      v-for="(_, indice) in digitosOtp"
-      :key="indice"
-      ref="inputRefs"
-      v-model="digitosOtp[indice]"
-      type="text"
-      inputmode="numeric"
-      maxlength="2"
-      class="caixa-digito text-center text-h5 font-weight-bold"
-      @input="aoDigitar($event, indice)"
-      @keydown="aoApertarBackspace($event, indice)"
-      @paste="colarCodigo"
-    />
+  <div class="modulo-codigo">
+    <div class="codigo mb-4">
+      <b 
+        v-for="(digito, indice) in digitosOtp" 
+        :key="indice" 
+        :class="{ 'cheio': digito !== '' }"
+      >{{ digito }}</b>
+    </div>
+    
+    <div class="teclado mt-2">
+      <b @click="digitarNumero('1')">1</b>
+      <b @click="digitarNumero('2')">2</b>
+      <b @click="digitarNumero('3')">3</b>
+      <b @click="digitarNumero('4')">4</b>
+      <b @click="digitarNumero('5')">5</b>
+      <b @click="digitarNumero('6')">6</b>
+      <b @click="digitarNumero('7')">7</b>
+      <b @click="digitarNumero('8')">8</b>
+      <b @click="digitarNumero('9')">9</b>
+      <b></b>
+      <b @click="digitarNumero('0')">0</b>
+      <b @click="apagarNumero">
+        <svg viewBox="0 0 24 24"><path d="M9 5h12v14H9l-6-7z"/><path d="m12 9 6 6M18 9l-6 6"/></svg>
+      </b>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.caixa-digito {
-  width: 48px;
-  height: 56px;
-  border: 2px solid var(--v-theme-surface-variant);
-  border-radius: 8px;
-  background-color: var(--v-theme-surface);
-  color: var(--v-theme-on-surface);
-  outline: none;
-  transition: border-color 0.2s;
-  box-shadow: none;
+/* O CSS já vem globalmente do base.css e roca-neon.css */
+.teclado b {
+  cursor: pointer;
+  user-select: none;
 }
-.caixa-digito:focus {
-  border-color: var(--v-theme-primary);
+.teclado b:active {
+  transform: translateY(2px);
+  box-shadow: 1px 1px 0 var(--cliente-linha);
 }
 </style>
