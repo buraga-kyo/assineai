@@ -11,7 +11,7 @@ services:
       ASSINEAI_MIGRACAO_SENHA: ${ASSINEAI_MIGRACAO_SENHA:?defina ASSINEAI_MIGRACAO_SENHA no .env de producao}
       ASSINEAI_APP_SENHA: ${ASSINEAI_APP_SENHA:?defina ASSINEAI_APP_SENHA no .env de producao}
     volumes:
-      - postgres-dados:/var/lib/postgresql
+      - postgres-dados:/var/lib/postgresql/data
       - ./postgres-init-prod:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d ${POSTGRES_DB:-assineai}"]

@@ -6,7 +6,12 @@ import fastifyMultipart from '@fastify/multipart'
 import { randomUUID } from 'node:crypto'
 
 export async function rotasStorage(app: App) {
-  app.register(fastifyMultipart)
+  app.register(fastifyMultipart, {
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10MB máximo real
+      files: 1
+    }
+  })
 
   app.post(
     '/envelope/:idEnvelope/documento',

@@ -64,7 +64,13 @@ export const rotasSessao = (banco: ReturnType<typeof criarBanco>): FastifyPlugin
   app.post(
     '/sessao',
     {
-      config: { acesso: 'publico' },
+      config: { 
+        acesso: 'publico',
+        rateLimit: {
+          max: 5,
+          timeWindow: '1 minute'
+        }
+      },
       schema: {
         body: loginSchema,
         response: {

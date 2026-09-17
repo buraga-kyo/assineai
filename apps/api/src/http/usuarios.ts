@@ -22,7 +22,13 @@ export const rotasUsuarios = (banco: ReturnType<typeof criarBanco>): FastifyPlug
   app.post(
     '/usuarios',
     {
-      config: { acesso: 'publico' },
+      config: { 
+        acesso: 'publico',
+        rateLimit: {
+          max: 3,
+          timeWindow: '1 hour'
+        }
+      },
       schema: {
         body: requestSchema,
         response: {
