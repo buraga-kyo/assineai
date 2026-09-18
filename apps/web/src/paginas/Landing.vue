@@ -5,104 +5,86 @@ const roteador = useRouter()
 </script>
 
 <template>
-  <v-app class="bg-surface">
-    <!-- Cabeçalho Limpo -->
-    <v-app-bar flat class="px-md-8 px-4 border-b bg-surface">
-      <div class="d-flex align-center">
-        <v-icon icon="mdi-pen" color="primary" size="32" class="mr-2"></v-icon>
-        <span class="text-h6 font-weight-black text-primary" style="letter-spacing: -1px;">AssineAi</span>
+  <div class="landing-page" style="min-height: 100vh; display: flex; flex-direction: column; background: var(--fundo);">
+    
+    <!-- Cabeçalho Roça Neon -->
+    <header class="topo" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; border-bottom: 2px solid var(--linha);">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span class="logo" style="font-family: var(--fonte-titulo); color: var(--primaria); font-size: 24px;">ASSINEAI</span>
       </div>
-      <v-spacer></v-spacer>
-      <v-btn variant="text" class="mr-2 d-none d-sm-inline-flex" href="#como-funciona">Como Funciona</v-btn>
-      <v-btn color="primary" variant="flat" @click="roteador.push({ name: 'entrar' })">Acessar Plataforma</v-btn>
-    </v-app-bar>
+      <div>
+        <a class="botao contorno" href="#" @click.prevent="roteador.push({ name: 'entrar' })" style="margin-right: 16px;">Entrar</a>
+        <a class="botao primario" href="#" @click.prevent="roteador.push({ name: 'cadastro' })">Criar Conta</a>
+      </div>
+    </header>
 
-    <v-main>
+    <main class="conteudo" style="flex: 1; display: flex; flex-direction: column; padding: 0;">
+      
       <!-- Hero Section -->
-      <section class="pa-4 pa-md-12 text-center" style="background-color: var(--v-theme-surface-variant)">
-        <v-container>
-          <v-row justify="center">
-            <v-col cols="12" md="8" lg="6">
-              <v-chip color="success" size="small" variant="flat" class="mb-6 font-weight-bold text-uppercase px-4">
-                Agora com prova de anterioridade
-              </v-chip>
-              
-              <h1 class="text-h3 text-md-h2 font-weight-black mb-6" style="line-height: 1.1;">
-                Assinatura digital com a <span class="text-primary">cara do seu negócio.</span>
-              </h1>
-              
-              <p class="text-body-1 text-md-h6 text-medium-emphasis mb-8 px-md-8">
-                Esqueça portais de assinatura confusos. Mande seus contratos direto pelo WhatsApp ou Telegram do cliente, com o tema da sua empresa e validade jurídica inquestionável.
-              </p>
-              
-              <div class="d-flex flex-column flex-sm-row justify-center gap-4 mb-12">
-                <v-btn color="primary" size="x-large" elevation="2" @click="roteador.push({ name: 'cadastro' })">
-                  Começar Agora
-                </v-btn>
-                <v-btn variant="outlined" size="x-large" href="#funcionalidades">
-                  Ver Recursos
-                </v-btn>
-              </div>
-            </v-col>
-          </v-row>
-        </v-container>
+      <section style="background-color: var(--superficie-2); padding: 80px 24px; text-align: center; border-bottom: 2px solid var(--linha);">
+        <div style="max-width: 800px; margin: 0 auto;">
+          <span class="chip selado mb-4" style="display: inline-block;">Agora com prova de anterioridade</span>
+          
+          <h1 style="font-family: var(--fonte-titulo); font-size: 48px; color: var(--texto); line-height: 1.1; margin-bottom: 24px; text-transform: uppercase;">
+            Assinatura digital com a <span style="color: var(--primaria);">cara do seu negócio.</span>
+          </h1>
+          
+          <p class="suave" style="font-size: 18px; margin-bottom: 40px;">
+            Esqueça portais de assinatura confusos. Mande seus contratos direto pelo WhatsApp ou Telegram do cliente, com o tema da sua empresa e validade jurídica inquestionável.
+          </p>
+          
+          <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+            <a class="botao primario" href="#" @click.prevent="roteador.push({ name: 'cadastro' })" style="font-size: 18px; padding: 16px 32px;">Começar Agora</a>
+            <a class="botao contorno" href="#funcionalidades" style="font-size: 18px; padding: 16px 32px;">Ver Recursos</a>
+          </div>
+        </div>
       </section>
 
       <!-- Diferenciais -->
-      <section id="funcionalidades" class="py-16">
-        <v-container>
-          <div class="text-center mb-12">
-            <h2 class="text-h4 font-weight-black mb-4">Feito para não travar o negócio</h2>
-            <p class="text-body-1 text-medium-emphasis">A burocracia não pode ser mais difícil que vender.</p>
-          </div>
+      <section id="funcionalidades" style="padding: 80px 24px; max-width: 1200px; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 64px;">
+          <h2 style="font-family: var(--fonte-titulo); font-size: 32px; color: var(--texto); margin-bottom: 16px; text-transform: uppercase;">Feito para não travar o negócio</h2>
+          <p class="suave" style="font-size: 18px;">A burocracia não pode ser mais difícil que vender.</p>
+        </div>
 
-          <v-row>
-            <v-col cols="12" md="4">
-              <v-card class="h-100 pa-6 text-center" variant="outlined">
-                <v-icon icon="mdi-whatsapp" color="success" size="64" class="mb-4"></v-icon>
-                <h3 class="text-h5 font-weight-bold mb-3">Pelo Zap ou Telegram</h3>
-                <p class="text-medium-emphasis">O cliente recebe o PDF e aceita ali mesmo no chat da sua empresa. Sem precisar baixar aplicativo ou criar senha.</p>
-              </v-card>
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-card class="h-100 pa-6 text-center" variant="outlined">
-                <v-icon icon="mdi-palette" color="primary" size="64" class="mb-4"></v-icon>
-                <h3 class="text-h5 font-weight-bold mb-3">Estúdio de Marca</h3>
-                <p class="text-medium-emphasis">Seu logo, sua cor, sua fonte. O relatório final sai parecendo um documento feito pela sua própria equipe.</p>
-              </v-card>
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-card class="h-100 pa-6 text-center" variant="outlined">
-                <v-icon icon="mdi-bitcoin" color="warning" size="64" class="mb-4"></v-icon>
-                <h3 class="text-h5 font-weight-bold mb-3">Rede Bitcoin</h3>
-                <p class="text-medium-emphasis">Cada assinatura e arquivo são ancorados na blockchain de forma definitiva. Inviolável e verificável para sempre.</p>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-container>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px;">
+          
+          <article class="cartao" style="--cor: var(--selado); padding: 32px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">💬</div>
+            <h3 style="font-size: 24px; margin-bottom: 16px;">Pelo Zap ou Telegram</h3>
+            <p class="suave">O cliente recebe o PDF e aceita ali mesmo no chat da sua empresa. Sem precisar baixar aplicativo ou criar senha.</p>
+          </article>
+
+          <article class="cartao" style="--cor: var(--primaria); padding: 32px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">🎨</div>
+            <h3 style="font-size: 24px; margin-bottom: 16px;">Estúdio de Marca</h3>
+            <p class="suave">Seu logo, sua cor, sua fonte. O relatório final sai parecendo um documento feito pela sua própria equipe.</p>
+          </article>
+
+          <article class="cartao" style="--cor: var(--aguardando); padding: 32px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">🔗</div>
+            <h3 style="font-size: 24px; margin-bottom: 16px;">Rede Blockchain</h3>
+            <p class="suave">Cada assinatura e arquivo são ancorados de forma definitiva no tempo usando OpenTimestamps. Inviolável e verificável para sempre.</p>
+          </article>
+
+        </div>
       </section>
-      
+
       <!-- CTA Final -->
-      <section class="py-16 bg-surface-variant text-center">
-        <v-container>
-          <h2 class="text-h4 font-weight-black mb-6">Pronto para fechar contratos mais rápido?</h2>
-          <v-btn color="primary" size="x-large" @click="roteador.push({ name: 'cadastro' })">
-            Testar a Plataforma
-          </v-btn>
-        </v-container>
+      <section style="background-color: var(--superficie-2); padding: 80px 24px; text-align: center; border-top: 2px solid var(--linha);">
+        <h2 style="font-family: var(--fonte-titulo); font-size: 32px; color: var(--texto); margin-bottom: 32px; text-transform: uppercase;">Pronto para fechar contratos mais rápido?</h2>
+        <a class="botao primario" href="#" @click.prevent="roteador.push({ name: 'cadastro' })" style="font-size: 18px; padding: 16px 32px;">Testar a Plataforma</a>
       </section>
 
-    </v-main>
-    
-    <v-footer class="bg-surface border-t py-6 text-center d-flex flex-column">
-      <div class="mb-2 font-weight-bold">AssineAi © 2026</div>
-      <div class="text-caption text-medium-emphasis">Infraestrutura assinada com a vibração Roça Neon.</div>
-    </v-footer>
-  </v-app>
+    </main>
+
+    <footer style="background-color: var(--superficie); padding: 32px; text-align: center; border-top: 2px solid var(--linha);">
+      <div style="font-family: var(--fonte-titulo); color: var(--texto); margin-bottom: 8px;">ASSINEAI © 2026</div>
+      <p class="suave" style="font-size: 14px;">Infraestrutura assinada com a vibração Roça Neon.</p>
+    </footer>
+
+  </div>
 </template>
 
 <style scoped>
-.gap-4 {
-  gap: 16px;
-}
 </style>
