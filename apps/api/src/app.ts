@@ -34,6 +34,7 @@ import type { BancoDaEmpresa, criarBanco } from './banco/conexao.js'
 import { criarClienteS3, type Armazenamento } from './storage/s3.js'
 
 import { rotasAssinatura } from './http/assinatura.js'
+import { rotasCertificados } from './http/certificados.js'
 
 export type OpcoesApp = {
   logger: Logger
@@ -181,6 +182,7 @@ export function criarApp({ logger, verificacoes, banco, config }: OpcoesApp) {
   app.register(rotasAssistente(banco))
   app.register(rotasAssinatura)
   app.register(rotasObras(banco))
+  app.register(rotasCertificados(banco))
 
   return app
 }
