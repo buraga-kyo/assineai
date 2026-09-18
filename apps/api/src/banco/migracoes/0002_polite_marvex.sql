@@ -1,0 +1,2 @@
+ALTER TABLE "envelopes" ADD COLUMN "certificado_id" uuid;
+ALTER TABLE "envelopes" ADD CONSTRAINT "envelopes_certificado_id_certificado_id_fk" FOREIGN KEY ("certificado_id") REFERENCES "public"."certificado"("id") ON DELETE set null ON UPDATE no action;

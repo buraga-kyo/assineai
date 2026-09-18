@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm'
 import { pgTable, text, uuid, integer } from 'drizzle-orm/pg-core'
 import { id, carimbos, politicaDaEmpresa } from './comum.js'
 import { empresa } from './empresa.js'
+import { certificado } from './certificado.js'
 
 export const envelopes = pgTable(
   'envelopes',
@@ -10,6 +11,7 @@ export const envelopes = pgTable(
     empresaId: uuid('empresa_id')
       .notNull()
       .references(() => empresa.id, { onDelete: 'cascade' }),
+    certificadoId: uuid('certificado_id').references(() => certificado.id, { onDelete: 'set null' }),
     codigoPublico: text('codigo_publico').unique(),
     titulo: text('titulo').notNull(),
     estado: text('estado').notNull().$type<'rascunho' | 'pendente' | 'assinado' | 'cancelado'>().default('rascunho'),
