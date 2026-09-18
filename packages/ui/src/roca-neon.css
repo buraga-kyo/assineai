@@ -14,14 +14,15 @@
 /* forma: cantos retos, bordas grossas, sombra dura deslocada */
 .botao.primario{box-shadow:4px 4px 0 var(--acento)}
 .lateral{background:var(--superficie-2);border-right-color:#5A4028}
-.lateral a.ativo{background:var(--fundo);box-shadow:inset 4px 0 0 var(--primaria),4px 4px 0 var(--acento)}
+.lateral a.ativo{background:var(--fundo)}
 .lateral a{color:#E4CDB4;box-shadow:4px 4px 0 var(--acento)}
 .logo{transform:rotate(-4deg)}
 .topo{background:var(--superficie)}
 .cartao{border-left:8px solid var(--cor,var(--linha))}
 .cartao h2{font-family:var(--fonte-corpo);font-weight:800;text-transform:none;letter-spacing:0}
 .filtros a{box-shadow:4px 4px 0 var(--acento)}
-.filtros a.ativo{box-shadow:inset 4px 0 0 var(--primaria),4px 4px 0 var(--acento)}
+.lateral a.ativo,.filtros a.ativo{position:relative}
+.lateral a.ativo::before,.filtros a.ativo::before{content:"";position:absolute;top:-2px;left:50%;width:32px;height:4px;translate:-50% 0;border-radius:var(--raio-pilula);background:var(--primaria)}
 .chip.estado{border-width:2px;text-transform:uppercase;letter-spacing:.04em}
 /* página do signatário: faixa grossa com a cor do cliente, teclas com sombra dura */
 .signatario .cabeca{background:var(--cliente);color:#fff;margin:-22px -22px 0;padding:18px 22px;border-radius:0}
