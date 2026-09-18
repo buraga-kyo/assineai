@@ -123,7 +123,12 @@ export function criarWorkerSelagem(comoEmpresa: ComoEmpresa) {
       await banco.update(envelopes).set({ estado: 'assinado' }).where(eq(envelopes.id, envelopeId))
       
       log.info({ envelopeId }, 'Envelope selado com sucesso')
-      // (Em um ambiente real, aqui invocaríamos a fila de notificações para avisar o autor)
+      const { filaNotificacoes } = await import('./notificacoes.js')
+      await filaNotificacoes.add('aviso_dono', {
+        empresaId,
+        envelopeId,
+        motivo: 'assinado'
+      })
     },
     { concurrency: 1 } // Garantir que selagem seja sequencial (um por vez por causa de CPU/memória)
   )

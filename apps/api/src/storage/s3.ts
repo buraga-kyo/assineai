@@ -14,7 +14,7 @@ export function criarClienteS3(config: Config) {
   })
 
   return {
-    async enviarArquivo(caminho: string, corpo: Buffer | Uint8Array | import('stream').Readable, contentType: string) {
+    async enviarArquivo(caminho: string, corpo: Buffer | Uint8Array | import('stream').Readable | string, contentType: string) {
       const comando = new PutObjectCommand({
         Bucket: config.ARMAZENAMENTO_BUCKET,
         Key: caminho,
@@ -22,6 +22,17 @@ export function criarClienteS3(config: Config) {
         ContentType: contentType,
       })
       await cliente.send(comando)
+    },
+
+    async baixarArquivo(caminho: string): Promise<Buffer> {
+      const comando = new GetObjectCommand({
+        Bucket: config.ARMAZENAMENTO_BUCKET,
+        Key: caminho,
+      })
+      const resp = await cliente.send(comando)
+      if (!resp.Body) throw new Error('Arquivo não encontrado no S3')
+      const arrayBuffer = await resp.Body.transformToByteArray()
+      return Buffer.from(arrayBuffer)
     },
 
     async gerarUrlDeDownload(caminho: string, expiracaoSegundos = 600) {
