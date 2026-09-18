@@ -1,7 +1,24 @@
 import { test, expect } from 'vitest'
 import { PDFDocument, rgb } from 'pdf-lib'
-import { carimbarDocumento, type DadosCarimbo, adicionarQrELinkDeVerificacao } from '../../src/servicos/pdf.js'
+import { carimbarDocumento, type DadosCarimbo, adicionarQrELinkDeVerificacao, adicionarRelatorioAoPdf } from '../../src/servicos/pdf.js'
 import { gerarQrEmMemoria } from '../../src/servicos/qr.js'
+
+test('adiciona relatorio de assinaturas ao pdf criando uma pagina extra', async () => {
+  const pdfMock = await PDFDocument.create()
+  pdfMock.addPage([595.28, 841.89])
+  const bytesIniciais = await pdfMock.save()
+
+  const qrBuffer = await gerarQrEmMemoria('TESTE-123')
+  const env = { titulo: 'Contrato Teste', codigoPublico: 'TESTE-123' }
+  const sigs = [{ id: '1', nome: 'João Testador', email: 'joao@teste.com' }]
+  const evs = [{ signatarioId: '1', tipo: 'assinatura_concluida', criadoEm: new Date() }]
+  
+  const pdfFinalBytes = await adicionarRelatorioAoPdf(bytesIniciais, env, sigs, evs, null, qrBuffer)
+  const pdfCarregado = await PDFDocument.load(pdfFinalBytes)
+  
+  // A página original + 1 página de relatório
+  expect(pdfCarregado.getPageCount()).toBe(2)
+})
 
 test('adiciona qr e anotação de link sem corromper o pdf', async () => {
   const pdfMock = await PDFDocument.create()
